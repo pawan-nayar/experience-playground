@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Geometry: Where Numbers Meet Pictures</title>
+
+    <meta name="description" content="Master coordinate geometry with interactive examples, clear explanations, and real-world applications. Learn plotting, slope, distance, and line equations step by step.">
+    <meta name="keywords" content="coordinate geometry, plotting points, slope, distance formula, midpoint, line equations, graphing, analytical geometry, math guide">
+    <meta name="author" content="Educational AI Assistant">
+    <meta name="robots" content="index, follow">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Reset & Global Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #212529; line-height: 1.7; scroll-behavior: smooth; }
+        .container { max-width: 800px; margin: auto; padding: 24px; background: #fff; }
+        h1, h2, h3, h4 { font-family: 'Inter', sans-serif; }
+
+        /* Header & Footer Styles */
+        .site-header, .site-footer { background-color: #212529; color: #f8f9fa; padding: 20px 40px; }
+        .site-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .site-header .logo { font-size: 1.5rem; font-weight: bold; color: #fff; text-decoration: none; }
+        .site-header nav { display: flex; gap: 20px; flex-wrap: wrap; }
+        .site-header nav a { color: #ced4da; text-decoration: none; }
+        .site-header nav a:hover { color: #fff; }
+        .site-footer { text-align: center; margin-top: 50px; padding: 40px; }
+        
+        /* Typography and Layout */
+        h1 { font-size: clamp(2rem, 5vw, 2.6rem); text-align: left; margin-bottom: 8px; color: #212529; line-height: 1.2; }
+        h2 { font-size: clamp(1.5rem, 4vw, 2rem); color: #212529; margin: 48px 0 16px; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
+        h3 { font-size: clamp(1.2rem, 3vw, 1.5rem); color: #212529; margin-top: 32px; margin-bottom: 12px; }
+        h4 { font-size: clamp(1rem, 2.5vw, 1.2rem); font-weight: bold; color: #fd7e14; margin-bottom: 10px; }
+        p, ul, ol { margin-bottom: 16px; }
+        ul, ol { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        section { margin-bottom: 48px; }
+
+        /* Custom Boxes */
+        .intro-box { font-size: 1.1rem; line-height: 1.8; background: #fef7f0; padding: 20px; border-radius: 12px; border-left: 4px solid #fd7e14; margin: 24px 0; }
+        .watch-out-box { background: #fff5f5; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .watch-out-box h4 { color: #dc3545; margin-bottom: 5px; }
+        .why-this-works-box { background: #f0f9ff; border-left: 4px solid #007bff; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .why-this-works-box h4 { color: #007bff; margin-bottom: 5px; }
+        
+        /* Concept Cards */
+        .concept-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0; }
+        .concept-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 1px solid #dee2e6; border-radius: 12px; padding: 20px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .concept-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(253,126,20,0.15); }
+        .concept-card h4 { color: #fd7e14; margin-bottom: 15px; font-size: 1.3rem; }
+        .concept-card p { color: #495057; line-height: 1.6; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #fd7e14, #e87312); }
+        
+        /* Language and Interactivity Styles */
+        .language-tabs { display: flex; justify-content: center; margin-bottom: 2rem; gap: 1rem; }
+        .lang-button { background-color: #f8f9fa; color: #212529; padding: 0.6rem 1.2rem; border-radius: 0.75rem; border: 1px solid #dee2e6; cursor: pointer; font-weight: 600; transition: all 0.2s ease-in-out; }
+        .lang-button.active { background-color: #fd7e14; color: white; border-color: #e87312; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .content-section { display: none; }
+        .content-section.active-lang { display: block; }
+
+        /* Accordion for FAQ/Confusions */
+        .accordion-item + .accordion-item { margin-top: 8px; }
+        .accordion-header { width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #e9ecef; padding: 16px 20px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; color: #212529; font-weight: bold; transition: background 0.3s ease; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-header::after { content: '+'; font-size: 1.5rem; transition: transform 0.3s ease; color: #6c757d; }
+        .accordion-header[aria-expanded="true"] { background: #e9ecef; color: #212529; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .accordion-header[aria-expanded="true"]::after { content: '−'; }
+        .accordion-content { padding: 20px; border-radius: 0 0 8px 8px; background: #fff; display: none; border: 1px solid #e9ecef; border-top: none; }
+        
+        /* Glossary / Memory Card Styles */
+        .memory-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .memory-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 3px solid #fd7e14;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(253,126,20,0.1);
+        }
+        .memory-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(253,126,20,0.2);
+            border-color: #e87312;
+        }
+        .memory-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #fd7e14, #e87312, #dc6108);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        .card-header h3 {
+            margin: 0;
+            color: #212529;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card-content p {
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #fd7e14;
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        /* Quiz Container */
+        .quiz-container { padding: 20px; border: 2px solid #e9ecef; border-radius: 12px; background: #fff; margin-top: 1.5rem; }
+        .quiz-option { display: block; width: 100%; text-align: left; background-color: #f8f9fa; border: 2px solid #e9ecef; border-radius: 0.75rem; padding: 0.85rem 1.25rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s ease-in-out; font-weight: 500; }
+        .quiz-option:hover:not(.answered):not(.selected) { background-color: #e9ecef; border-color: #fd7e14; }
+        .quiz-option.selected { border-color: #495057; }
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+        .incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24 !important; }
+        .quiz-feedback { margin-top: 1.5rem; padding: 1rem 1.5rem; border-radius: 0.75rem; font-weight: 600; display: none; text-align: center; font-size: 1.1rem; }
+        .quiz-feedback.visible { display: block; }
+        .ftb-input { border: 2px solid #e9ecef; border-radius: 0.5rem; padding: 0.4rem 0.75rem; text-align: center; margin: 0 0.3rem; width: 140px; transition: all 0.2s; background-color: #f8f9fa; font-size: 1rem; }
+        .ftb-input:focus { border-color: #fd7e14; outline: none; box-shadow: 0 0 0 3px rgba(253,126,20,0.2); }
+        .quiz-btn { background: #fd7e14; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background 0.3s ease; font-weight: bold; }
+        .quiz-btn:hover:not(:disabled) { background: #e87312; }
+        .quiz-btn:disabled { background: #ced4da; cursor: not-allowed; }
+
+        /* Interactive Canvas for coordinate plotting */
+        .interactive-canvas {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            display: block;
+            margin: 20px auto;
+            cursor: crosshair;
+            background: #fff;
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #fd7e14, #e87312);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Poll styles */
+        .poll-container {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .poll-option {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .poll-option input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .poll-results {
+            margin-top: 15px;
+            display: none;
+        }
+        .poll-bar {
+            background: #e9ecef;
+            height: 25px;
+            border-radius: 12px;
+            margin: 8px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .poll-bar-fill {
+            background: linear-gradient(90deg, #fd7e14, #e87312);
+            height: 100%;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { margin: 10px; padding: 15px; }
+            h1 { font-size: 2rem; }
+            .concept-cards { grid-template-columns: 1fr; }
+            .memory-cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="site-header">
+        <a href="#" class="logo">Beyond Dictionary</a>
+        <nav>
+            <a href="#">What's New</a>
+            <a href="#">Learning</a>
+            <a href="#">Games & Quizzes</a>
+            <a href="#">Blog</a>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <div class="language-tabs">
+            <button class="lang-button active" data-lang="en">English</button>
+            <button class="lang-button" data-lang="hi">Hindi/Hinglish</button>
+        </div>
+
+        <!-- English Content -->
+        <div class="content-section active-lang" data-lang="en">
+            
+            <section id="intro">
+                <h1>Coordinate Geometry: Where Numbers Meet Pictures 📊✨</h1>
+                <div class="intro-box">
+                    <p>Welcome to the bridge between algebra and geometry! Ever wondered how GPS knows exactly where you are, or how video games create smooth character movements? That's coordinate geometry at work—the magical system that turns numbers into pictures and pictures into numbers.</p>
+                    <p>Imagine having a universal language that can describe any location, any movement, any shape with just pairs of numbers. Whether you're plotting a treasure map, designing a building, or programming a robot, coordinate geometry gives you the tools to translate between the world of calculations and the world of visual space.</p>
+                    <p><strong>Ready to master the art of mathematical mapping? Let's turn coordinates into clarity!</strong></p>
+                </div>
+            </section>
+
+            <div class="progress-indicator">
+                <div class="progress-fill" id="readingProgress"></div>
+            </div>
+            
+            <section id="fundamentals">
+                <h2>The Coordinate Plane: Your Mathematical Universe 🌍</h2>
+                <p>The coordinate plane is like a city grid system—every location has a unique address made of two numbers.</p>
+                
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>Points & Coordinates 📍</h4>
+                        <p>Every point has an address (x, y). The x tells you how far left or right, the y tells you how far up or down from the origin (0,0).</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>The Four Quadrants 🧭</h4>
+                        <p>Quadrant I: (+,+) both positive<br>Quadrant II: (-,+) x negative, y positive<br>Quadrant III: (-,-) both negative<br>Quadrant IV: (+,-) x positive, y negative</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Plotting Points 🎯</h4>
+                        <p>Start at origin (0,0). Move x units horizontally (right if positive, left if negative), then y units vertically (up if positive, down if negative).</p>
+                    </div>
+                </div>
+
+                <h3>Interactive Plotting Practice</h3>
+                <p>Click on the grid to plot points and see their coordinates!</p>
+                <canvas id="coordinateCanvas" class="interactive-canvas" width="500" height="400"></canvas>
+                <div id="clickedPoint" style="text-align: center; margin: 10px 0; font-weight: bold; color: #fd7e14;"></div>
+
+                <div class="watch-out-box">
+                    <h4>Watch Out! Order Matters</h4>
+                    <p>Always remember: (x, y) means "x first, then y." It's like reading an address—you need the street number before the street name. Mix these up and you'll end up in the wrong place!</p>
+                </div>
+            </section>
+
+            <section id="slope-distance">
+                <h2>Slope: The Language of Steepness ⛰️</h2>
+                <p>Slope tells us how steep a line is and which direction it's going. It's the ratio of "rise over run."</p>
+
+                <div class="why-this-works-box">
+                    <h4>Why This Works: The Rise Over Run Rule</h4>
+                    <p>Slope = (change in y) ÷ (change in x) = (y₂ - y₁) ÷ (x₂ - x₁). Think of climbing stairs—the slope tells you how much you go up (or down) for every step you take forward.</p>
+                </div>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>Positive Slope ↗️</h4>
+                        <p>Line goes up from left to right. Like climbing a hill—as x increases, y increases too.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Negative Slope ↘️</h4>
+                        <p>Line goes down from left to right. Like going downhill—as x increases, y decreases.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Zero Slope ➡️</h4>
+                        <p>Horizontal line. No matter how far you walk horizontally, your height stays the same.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Undefined Slope ⬆️</h4>
+                        <p>Vertical line. You can't walk forward at all—you can only go straight up or down.</p>
+                    </div>
+                </div>
+
+                <h3>Distance and Midpoint: Measuring Space</h3>
+                <ul>
+                    <li><strong>Distance Formula:</strong> d = √[(x₂-x₁)² + (y₂-y₁)²] — It's just the Pythagorean theorem!</li>
+                    <li><strong>Midpoint Formula:</strong> ((x₁+x₂)/2, (y₁+y₂)/2) — Average the coordinates to find the exact middle.</li>
+                </ul>
+            </section>
+
+            <section id="line-equations">
+                <h2>Line Equations: Different Flavors, Same Line 📐</h2>
+                <p>There are several ways to write the equation of a line. Each form is useful in different situations.</p>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>Slope-Intercept Form</h4>
+                        <p><strong>y = mx + b</strong><br>m = slope, b = y-intercept<br>Perfect when you know the slope and where the line crosses the y-axis.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Point-Slope Form</h4>
+                        <p><strong>y - y₁ = m(x - x₁)</strong><br>Great when you know one point and the slope. Most direct for writing equations quickly.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Standard Form</h4>
+                        <p><strong>Ax + By = C</strong><br>Useful for finding intercepts quickly and handling vertical lines (where B = 0).</p>
+                    </div>
+                </div>
+
+                <h3>Parallel and Perpendicular Lines</h3>
+                <ul>
+                    <li><strong>Parallel lines:</strong> Same slope, different y-intercepts. They never meet, like railroad tracks.</li>
+                    <li><strong>Perpendicular lines:</strong> Their slopes multiply to equal -1. One slope is the negative reciprocal of the other.</li>
+                </ul>
+
+                <div class="watch-out-box">
+                    <h4>Watch Out! Perpendicular Slope Trick</h4>
+                    <p>If one line has slope 2/3, a perpendicular line has slope -3/2. Flip the fraction and change the sign! Special case: horizontal and vertical lines are always perpendicular.</p>
+                </div>
+            </section>
+
+            <section id="applications">
+                <h2>Real-World Applications: Math in Action 🌟</h2>
+                <p>Coordinate geometry isn't just classroom math—it powers the technology and systems we use every day.</p>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>Navigation & GPS 🛰️</h4>
+                        <p>Every location on Earth has coordinates (latitude, longitude). GPS calculates your position using distance measurements from satellites.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Computer Graphics 🎮</h4>
+                        <p>Video games use coordinates to track character positions and calculate movements, collisions, and animations in real-time.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Architecture & Design 🏗️</h4>
+                        <p>Architects use coordinate systems to create precise building plans and ensure structures are properly aligned and proportioned.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>Sports Analytics 📊</h4>
+                        <p>Player positions, ball trajectories, and optimal strategies are all analyzed using coordinate geometry principles.</p>
+                    </div>
+                </div>
+
+                <h3>Motion and Physics Applications</h3>
+                <ul>
+                    <li><strong>Position-Time Graphs:</strong> Slope represents velocity (speed and direction)</li>
+                    <li><strong>Collision Detection:</strong> Calculate when two moving objects will meet</li>
+                    <li><strong>Optimization:</strong> Find shortest paths and most efficient routes</li>
+                </ul>
+            </section>
+
+            <section id="common-confusions">
+                <h2>Turning Confusion into Clarity 💡</h2>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Confusion: Why do we plot x first, then y?</button>
+                        <div class="accordion-content">
+                            <p><b>Learning Win:</b> Think of it like reading! In English, we read left to right (x-direction) before we read up and down (y-direction). The coordinate (3, 2) means "go 3 steps right, then 2 steps up" — just like reading a map where you find the column first, then the row.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Confusion: Negative slopes are confusing — why does the line go down?</button>
+                        <div class="accordion-content">
+                            <p><b>Learning Win:</b> Imagine walking from left to right along the line. With a positive slope, you're walking uphill. With a negative slope, you're walking downhill. The steeper the slope (bigger absolute value), the steeper your climb or descent!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Confusion: Which line equation form should I use?</button>
+                        <div class="accordion-content">
+                            <p><b>Learning Win:</b> Use the form that matches your given information! Know a point and slope? Use point-slope. Know the y-intercept and slope? Use slope-intercept. Need to find intercepts quickly? Use standard form. Don't overthink it — pick the one that makes your work easier!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Confusion: Distance can't be negative, right?</button>
+                        <div class="accordion-content">
+                            <p><b>Learning Win:</b> Exactly right! Distance is always positive (or zero). That's why we use the square root in the distance formula — it ensures we get a positive result. Think of distance as "how far apart" two points are, which is always a positive measurement.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interactive-zone">
+                <h2>Interactive Learning Zone 🎯</h2>
+
+                <!-- Poll 1 -->
+                <div class="poll-container">
+                    <h3>📊 Quick Poll: What's the trickiest part of coordinate geometry for you?</h3>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1" value="plotting"> Plotting points correctly
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1" value="slope"> Understanding slope
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1" value="equations"> Writing line equations
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1" value="applications"> Seeing real-world applications
+                    </div>
+                    <button class="quiz-btn" onclick="showPollResults('poll1', ['plotting', 'slope', 'equations', 'applications'], ['Plotting points correctly', 'Understanding slope', 'Writing line equations', 'Seeing real-world applications'])">Show Results</button>
+                    <div class="poll-results" id="poll1-results"></div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="quiz-container">
+                    <h3>Quiz 1: Coordinate Basics</h3>
+                    <div id="quiz-mcq1" class="quiz-section" data-type="mcq">
+                        <p>1. What are the coordinates of a point that is 3 units right and 2 units down from the origin?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="Remember: right is positive x, down is negative y.">(-3, -2)</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Perfect! ✅ Right 3 units = +3 in x-direction, down 2 units = -2 in y-direction.">(3, -2)</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="This would be 3 units right and 2 units up.">(3, 2)</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 2: Slope Understanding</h3>
+                    <div id="quiz-mcq2" class="quiz-section" data-type="mcq">
+                        <p>2. A line passes through points (1, 2) and (3, 8). What is its slope?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="Check your calculation: (8-2)/(3-1) = 6/2 = 3">2</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Correct! ✅ Slope = (8-2)/(3-1) = 6/2 = 3">3</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="This would be if you calculated (3-1)/(8-2) instead.">1/3</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 3: Line Equations</h3>
+                    <div id="quiz-mcq3" class="quiz-section" data-type="mcq">
+                        <p>3. What is the equation of a line with slope 2 that passes through point (1, 3)?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="This line would pass through (0, 3), not (1, 3).">y = 2x + 3</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Perfect! ✅ Using point-slope form: y - 3 = 2(x - 1) → y = 2x + 1">y = 2x + 1</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="Check your algebra when converting from point-slope form.">y = 2x - 1</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 4: Fill in the Blanks</h3>
+                    <div id="quiz-ftb1" class="quiz-section" data-type="ftb">
+                        <p>4. The distance between points (0, 0) and (3, 4) is <input type="text" data-answer="5" class="ftb-input"> units.</p>
+                        <p>5. The midpoint between (2, 6) and (8, 2) is (<input type="text" data-answer="5" class="ftb-input">, <input type="text" data-answer="4" class="ftb-input">).</p>
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <button class="quiz-btn">Check Answers</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 5: Parallel and Perpendicular</h3>
+                    <div id="quiz-tf1" class="quiz-section" data-type="tf">
+                        <p>6. If one line has slope 1/2, a perpendicular line has slope -2.</p>
+                        <div>
+                            <button class="quiz-option" data-correct="true" data-feedback="Correct! ✅ Perpendicular slopes multiply to -1: (1/2) × (-2) = -1">True</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="The perpendicular slope is the negative reciprocal: -(2/1) = -2">False</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 6: Quadrants</h3>
+                    <div id="quiz-mcq4" class="quiz-section" data-type="mcq">
+                        <p>7. In which quadrant is the point (-5, 3) located?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="Quadrant I has both coordinates positive (+,+)">Quadrant I</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Correct! ✅ Quadrant II has negative x and positive y (-,+)">Quadrant II</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="Quadrant III has both coordinates negative (-,-)">Quadrant III</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 7: Real-World Application</h3>
+                    <div id="quiz-mcq5" class="quiz-section" data-type="mcq">
+                        <p>8. A car's position is tracked on a coordinate plane. At time t=0, it's at (2, 1). At t=3 seconds, it's at (8, 7). What's the car's average speed?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="This is just the horizontal distance. You need total distance.">2 units/second</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Perfect! ✅ Distance = √[(8-2)² + (7-1)²] = √[36 + 36] = √72 ≈ 8.49 units in 3 seconds = 2.83 units/second">2.83 units/second</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="This would be if you calculated 6/3 = 2, but you need the total distance.">3 units/second</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 8: Slope Interpretation</h3>
+                    <div id="quiz-tf2" class="quiz-section" data-type="tf">
+                        <p>9. A line with slope -1/3 is steeper than a line with slope 1/4.</p>
+                        <div>
+                            <button class="quiz-option" data-correct="true" data-feedback="Correct! ✅ Steepness is measured by absolute value: |-1/3| = 1/3 > 1/4">True</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="Remember: steepness is about absolute value, not the sign of the slope">False</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>Quiz 9: Challenge Problem</h3>
+                    <div id="quiz-mcq6" class="quiz-section" data-type="mcq">
+                        <p>10. Two lines intersect at point (2, 5). One line has equation y = 3x - 1. What is the slope of a line perpendicular to this line?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="This is the same slope, not perpendicular.">3</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="Perfect! ✅ Perpendicular slope is negative reciprocal: -1/3">-1/3</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="This is the negative of the original slope, not the negative reciprocal.">-3</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faq">
+                <h2>Frequently Asked Questions 🤔</h2>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q1: Why do we need so many different forms of line equations?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Different forms are tools for different jobs! Slope-intercept (y = mx + b) is great for graphing quickly. Point-slope form is perfect when you know a point and slope. Standard form (Ax + By = C) makes finding x and y intercepts easy. It's like having different types of screwdrivers — each one works best in specific situations.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q2: How does GPS actually use coordinate geometry?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> GPS satellites broadcast their precise locations and the current time. Your GPS receiver measures how long signals take to arrive from multiple satellites. Using the distance formula and some advanced coordinate geometry, it calculates where you must be located for those distances to work out. It's like being at the intersection of multiple circles!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q3: What's the difference between slope and steepness?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Slope includes direction (positive or negative), while steepness is just about how much the line climbs or falls. A slope of -3 and +3 have the same steepness (both very steep) but different directions. Steepness is measured by the absolute value of the slope.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q4: Can two different points have the same coordinates?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> No! That's the beauty of the coordinate system. Each pair of coordinates (x, y) corresponds to exactly one point on the plane. It's like having a unique address for every location. If two "points" had the same coordinates, they would actually be the same point.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q5: Why is the slope of a vertical line undefined?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Slope is rise over run (change in y over change in x). For a vertical line, the change in x is zero because you don't move horizontally at all. Since we can't divide by zero in mathematics, the slope is undefined. Think of it as "infinitely steep."</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q6: How do video games use coordinate geometry?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Video games constantly track character positions using coordinates. When you move your character, the game updates their (x, y) or (x, y, z) coordinates. It calculates distances for collision detection, uses slopes for projectile paths, and applies transformations for rotations and scaling. Every movement you see is coordinate geometry in action!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q7: What's the relationship between coordinate geometry and algebra?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Coordinate geometry is where algebra becomes visual! Algebraic equations become graphs, and geometric shapes become equations. When you graph y = 2x + 3, you're translating an algebraic expression into a visual line. This connection helps us solve problems both algebraically and geometrically.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q8: Why do perpendicular slopes multiply to -1?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> This comes from the geometric relationship between perpendicular lines. When you rotate a line 90°, its slope becomes the negative reciprocal of the original slope. This mathematical relationship ensures that the lines meet at exactly 90°, which is what "perpendicular" means.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q9: Can coordinate geometry work in 3D?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Absolutely! In 3D coordinate geometry, we add a z-axis for depth, so points become (x, y, z). This is used in 3D modeling, computer graphics, architecture, and engineering. The same principles apply — distance formulas, midpoints, and equations — but now we're working in three-dimensional space.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q10: What careers use coordinate geometry heavily?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> Many! Engineers use it for design and analysis, architects for building plans, game developers for graphics programming, data scientists for visualizations, pilots and ship captains for navigation, urban planners for city layouts, and animators for creating smooth movements. Almost any field involving spatial relationships uses coordinate geometry.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="glossary">
+                <h2>Complete Coordinate Geometry Glossary 📚</h2>
+                <div class="memory-cards-grid">
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📍</span><h3>Coordinates</h3></div>
+                        <div class="card-content">
+                            <p>A pair of numbers (x, y) that specify the exact location of a point on the coordinate plane.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎯</span><h3>Origin</h3></div>
+                        <div class="card-content">
+                            <p>The point (0, 0) where the x-axis and y-axis intersect; the starting point of the coordinate system.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🧭</span><h3>Quadrant</h3></div>
+                        <div class="card-content">
+                            <p>One of the four regions created by the x and y axes. Each quadrant has unique sign patterns for coordinates.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">⛰️</span><h3>Slope</h3></div>
+                        <div class="card-content">
+                            <p>The steepness and direction of a line, calculated as rise over run or (y₂ - y₁)/(x₂ - x₁).</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📏</span><h3>Distance Formula</h3></div>
+                        <div class="card-content">
+                            <p>d = √[(x₂-x₁)² + (y₂-y₁)²] — calculates the straight-line distance between two points.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎯</span><h3>Midpoint</h3></div>
+                        <div class="card-content">
+                            <p>The point exactly halfway between two given points: ((x₁+x₂)/2, (y₁+y₂)/2).</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📊</span><h3>Y-intercept</h3></div>
+                        <div class="card-content">
+                            <p>The point where a line crosses the y-axis; the y-coordinate when x = 0.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📈</span><h3>X-intercept</h3></div>
+                        <div class="card-content">
+                            <p>The point where a line crosses the x-axis; the x-coordinate when y = 0.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">↗️</span><h3>Positive Slope</h3></div>
+                        <div class="card-content">
+                            <p>A line that rises from left to right; as x increases, y increases.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">↘️</span><h3>Negative Slope</h3></div>
+                        <div class="card-content">
+                            <p>A line that falls from left to right; as x increases, y decreases.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">⬆️</span><h3>Undefined Slope</h3></div>
+                        <div class="card-content">
+                            <p>The slope of a vertical line; cannot be calculated because division by zero is undefined.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">➡️</span><h3>Zero Slope</h3></div>
+                        <div class="card-content">
+                            <p>The slope of a horizontal line; the line has no rise, only run.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🚂</span><h3>Parallel Lines</h3></div>
+                        <div class="card-content">
+                            <p>Lines with the same slope that never intersect; they maintain constant distance apart.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">➕</span><h3>Perpendicular Lines</h3></div>
+                        <div class="card-content">
+                            <p>Lines that intersect at 90°; their slopes multiply to equal -1 (negative reciprocals).</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📐</span><h3>Slope-Intercept Form</h3></div>
+                        <div class="card-content">
+                            <p>y = mx + b, where m is the slope and b is the y-intercept.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📌</span><h3>Point-Slope Form</h3></div>
+                        <div class="card-content">
+                            <p>y - y₁ = m(x - x₁), used when you know a point (x₁, y₁) and the slope m.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📋</span><h3>Standard Form</h3></div>
+                        <div class="card-content">
+                            <p>Ax + By = C, where A, B, and C are integers and A and B are not both zero.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🔄</span><h3>Linear Equation</h3></div>
+                        <div class="card-content">
+                            <p>An equation whose graph is a straight line; variables have maximum power of 1.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎲</span><h3>Ordered Pair</h3></div>
+                        <div class="card-content">
+                            <p>A pair of numbers (x, y) where order matters; represents coordinates of a point.</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🌐</span><h3>Coordinate Plane</h3></div>
+                        <div class="card-content">
+                            <p>A two-dimensional plane formed by the intersection of perpendicular x and y axes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Hindi/Hinglish Content -->
+        <div class="content-section" data-lang="hi">
+            <section id="intro-hi">
+                <h1>निर्देशांक ज्यामिति: जहाँ संख्याएँ चित्र बन जाती हैं 📊✨</h1>
+                <div class="intro-box">
+                    <p>बीजगणित और ज्यामिति के बीच का पुल! GPS किसी स्थान का पता कैसे लगाता है या गेम में पात्र इतनी सहजता से कैसे चलते हैं — यह सब निर्देशांक ज्यामिति का कमाल है, जो संख्याओं को स्थान और चित्रों में बदल देती है।</p>
+                    <p>हर स्थान का एक सार्वभौमिक पता होता है — संख्याओं की जोड़ी (x, y)। चाहे खज़ाने का नक्शा बनाना हो, इमारत डिज़ाइन करनी हो या रोबोट प्रोग्राम करना हो, निर्देशांक ज्यामिति गणना की दुनिया और दृश्य स्थान की दुनिया को जोड़ने के उपकरण देती है।</p>
+                    <p><strong>आइए सीखें कि निर्देशांक कैसे स्पष्टता में बदलते हैं!</strong></p>
+                </div>
+            </section>
+
+            <div class="progress-indicator">
+                <div class="progress-fill" id="readingProgress"></div>
+            </div>
+
+            <section id="fundamentals-hi">
+                <h2>निर्देशांक तल: आपका गणितीय ब्रह्माण्ड 🌍</h2>
+                <p>निर्देशांक तल शहर की ग्रिड की तरह है — हर स्थान का एक अनोखा पता (x, y) होता है।</p>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>बिन्दु और निर्देशांक 📍</h4>
+                        <p>हर बिन्दु का पता (x, y) होता है। x बताता है मूलबिन्दु (0,0) से क्षैतिज दिशा में दाएँ/बाएँ कितनी दूर, और y बताता है ऊर्ध्व दिशा में ऊपर/नीचे कितनी दूर।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>चार चतुर्थांश 🧭</h4>
+                        <p>चतुर्थांश I: (+,+) दोनों धनात्मक<br>चतुर्थांश II: (-,+) x ऋणात्मक, y धनात्मक<br>चतुर्थांश III: (-,-) दोनों ऋणात्मक<br>चतुर्थांश IV: (+,-) x धनात्मक, y ऋणात्मक</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>बिन्दु चिन्हित करना 🎯</h4>
+                        <p>पहले x के अनुसार क्षैतिज चलें (धनात्मक तो दाएँ, ऋणात्मक तो बाएँ), फिर y के अनुसार ऊर्ध्व दिशा में चलें (धनात्मक तो ऊपर, ऋणात्मक तो नीचे)।</p>
+                    </div>
+                </div>
+
+                <div class="watch-out-box">
+                    <h4>ध्यान दें! क्रम बहुत जरूरी है</h4>
+                    <p>हमेशा (x, y) का अर्थ है — पहले x, फिर y। जैसे पते में पहले घर‑संख्या और फिर गली का नाम। क्रम बदलने पर बिन्दु बदल जाएगा।</p>
+                </div>
+            </section>
+
+            <section id="slope-distance-hi">
+                <h2>ढाल (Slope): चढ़ाई‑उतराई की भाषा ⛰️</h2>
+                <p>ढाल बताती है कि रेखा कितनी तीव्र है और किस दिशा में जा रही है — यह <em>rise/run</em> यानी Δy/Δx है।</p>
+
+                <div class="why-this-works-box">
+                    <h4>क्यों सही है: Rise over Run नियम</h4>
+                    <p>m = (y₂ − y₁) ÷ (x₂ − x₁)। सीढ़ियाँ चढ़ने जितना सोचिए — हर क्षैतिज कदम (run) पर आप कितना ऊपर/नीचे (rise) जाते हैं, वही ढाल है।</p>
+                </div>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>धनात्मक ढाल ↗️</h4>
+                        <p>रेखा बाएँ से दाएँ जाते हुए ऊपर चढ़ती है — x बढ़ने पर y भी बढ़ता है।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>ऋणात्मक ढाल ↘️</h4>
+                        <p>रेखा बाएँ से दाएँ जाते हुए नीचे उतरती है — x बढ़ने पर y घटता है।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>शून्य ढाल ➡️</h4>
+                        <p>क्षैतिज रेखा — कितनी भी दूर चलें, ऊँचाई नहीं बदलती।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>अनिर्धारित ढाल ⬆️</h4>
+                        <p>ऊर्ध्व रेखा — क्षैतिज चाल 0 होने से ढाल परिभाषित नहीं होती (शून्य से भाग नहीं कर सकते)।</p>
+                    </div>
+                </div>
+
+                <h3>दूरी और मध्यबिन्दु: मापना सीखें</h3>
+                <ul>
+                    <li><strong>दूरी सूत्र:</strong> d = √[(x₂−x₁)² + (y₂−y₁)²] — यही पाइथागोरस प्रमेय है।</li>
+                    <li><strong>मध्यबिन्दु सूत्र:</strong> ((x₁+x₂)/2, (y₁+y₂)/2) — दोनों निर्देशांकों का औसत।</li>
+                </ul>
+            </section>
+
+            <section id="line-equations-hi">
+                <h2>रेखा के समीकरण: कई रूप, वही रेखा 📐</h2>
+                <p>रेखा के समीकरण लिखने के अलग‑अलग तरीके हैं; अलग परिस्थितियों में अलग रूप उपयोगी होता है।</p>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>ढाल–अव intercept रूप</h4>
+                        <p><strong>y = mx + b</strong><br>m = ढाल, b = y‑अव intercept। जब ढाल और y‑अव intercept ज्ञात हो।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>बिन्दु–ढाल रूप</h4>
+                        <p><strong>y − y₁ = m(x − x₁)</strong><br>जब एक बिन्दु और ढाल ज्ञात हो — सबसे सीधा तरीका।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>मानक रूप</h4>
+                        <p><strong>Ax + By = C</strong><br>इंटरसेप्ट जल्दी पाने तथा ऊर्ध्व रेखाओं के लिए उपयोगी।</p>
+                    </div>
+                </div>
+
+                <h3>समांतर और लम्बवत रेखाएँ</h3>
+                <ul>
+                    <li><strong>समांतर:</strong> एक‑सी ढाल, y‑अव intercept अलग — कभी नहीं मिलतीं।</li>
+                    <li><strong>लम्बवत:</strong> ढालों का गुणनफल −1; एक ढाल दूसरी का ऋणात्मक व्युत्क्रम (negative reciprocal) होती है।</li>
+                </ul>
+
+                <div class="watch-out-box">
+                    <h4>टिप: लम्बवत ढाल तरकीब</h4>
+                    <p>यदि किसी रेखा की ढाल 2/3 है तो लम्बवत रेखा की ढाल −3/2 होगी — भिन्न उलटें और चिन्ह बदल दें। विशेष मामला: क्षैतिज और ऊर्ध्व रेखाएँ हमेशा लम्बवत होती हैं।</p>
+                </div>
+
+                <h3>इंटरैक्टिव बिन्दु चिन्हित करने का अभ्यास</h3>
+                <p>ग्रिड पर क्लिक करके बिन्दु चिन्हित करें और उनके निर्देशांक देखें!</p>
+                <canvas id="coordinateCanvas" class="interactive-canvas" width="500" height="400"></canvas>
+                <div id="clickedPoint" style="text-align: center; margin: 10px 0; font-weight: bold; color: #fd7e14;"></div>
+            </section>
+
+            <section id="applications-hi">
+                <h2>वास्तविक जीवन में प्रयोग 🌟</h2>
+                <p>निर्देशांक ज्यामिति केवल कक्षा का विषय नहीं — यह रोज़मर्रा की तकनीक को शक्ति देती है।</p>
+
+                <div class="concept-cards">
+                    <div class="concept-card">
+                        <h4>नेविगेशन एवं GPS 🛰️</h4>
+                        <p>धरती पर हर स्थान के निर्देशांक होते हैं (अक्षांश, देशांतर)। उपग्रहों से दूरी के आधार पर आपका स्थान निकाला जाता है।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>कम्प्यूटर ग्राफ़िक्स 🎮</h4>
+                        <p>गेम में पात्रों की स्थिति, गति, टकराव और ऐनिमेशन — सब निर्देशांकों से नियंत्रित होते हैं।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>आर्किटेक्चर एवं डिज़ाइन 🏗️</h4>
+                        <p>सटीक नक्शे और आयाम बनाए जाते हैं ताकि स्ट्रक्चर सही अनुपात और रेखांकन में हों।</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4>खेल विश्लेषण 📊</h4>
+                        <p>खिलाड़ियों की स्थिति, गेंद की ट्रैजेक्टरी और रणनीति का विश्लेषण निर्देशांक सिद्धान्तों से होता है।</p>
+                    </div>
+                </div>
+
+                <h3>गति और भौतिकी में प्रयोग</h3>
+                <ul>
+                    <li><strong>स्थिति-समय ग्राफ:</strong> ढाल वेग (गति और दिशा) दर्शाती है</li>
+                    <li><strong>टकराव जाँच:</strong> दो गतिमान वस्तुओं के मिलने का समय निकालें</li>
+                    <li><strong>अनुकूलन:</strong> सबसे छोटा रास्ता और कार्यक्षम मार्ग खोजें</li>
+                </ul>
+            </section>
+
+            <section id="common-confusions-hi">
+                <h2>भ्रम को स्पष्टता में बदलें 💡</h2>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">भ्रम: क्यों पहले x, फिर y चिन्हित करते हैं?</button>
+                        <div class="accordion-content">
+                            <p><b>सीखने की जीत:</b> पढ़ने की तरह सोचिए! हिंदी में हम बाएँ से दाएँ (x-दिशा) पढ़ते हैं, फिर ऊपर-नीचे (y-दिशा)। निर्देशांक (3, 2) का अर्थ है "3 कदम दाएँ, फिर 2 कदम ऊपर" — जैसे नक्शे में पहले कॉलम, फिर पंक्ति ढूँढ़ते हैं।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">भ्रम: ऋणात्मक ढाल भ्रमित करती है — रेखा नीचे क्यों जाती है?</button>
+                        <div class="accordion-content">
+                            <p><b>सीखने की जीत:</b> कल्पना कीजिए कि आप रेखा के साथ बाएँ से दाएँ चल रहे हैं। धनात्मक ढाल के साथ आप पहाड़ी चढ़ रहे हैं। ऋणात्मक ढाल के साथ आप पहाड़ी से उतर रहे हैं। जितनी तीव्र ढाल (बड़ा निरपेक्ष मान), उतनी तीव्र चढ़ाई या उतराई!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">भ्रम: कौन-सा रेखा समीकरण रूप उपयोग करूँ?</button>
+                        <div class="accordion-content">
+                            <p><b>सीखने की जीत:</b> वह रूप उपयोग करें जो आपकी दी गई जानकारी से मेल खाता हो! बिन्दु और ढाल जानते हैं? बिन्दु-ढाल रूप उपयोग करें। y-अव intercept और ढाल जानते हैं? ढाल-अव रूप। इंटरसेप्ट जल्दी चाहिए? मानक रूप। इसे ज्यादा न सोचें — वह चुनें जो आपका काम आसान बनाए!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">भ्रम: दूरी ऋणात्मक नहीं हो सकती, है ना?</button>
+                        <div class="accordion-content">
+                            <p><b>सीखने की जीत:</b> बिल्कुल सही! दूरी हमेशा धनात्मक (या शून्य) होती है। इसलिए दूरी सूत्र में वर्गमूल का उपयोग करते हैं — यह सुनिश्चित करता है कि हमें धनात्मक परिणाम मिले। दूरी को "दो बिन्दुओं के बीच कितनी दूर" के रूप में सोचें, जो हमेशा एक धनात्मक माप होता है।</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faq-hi">
+                <h2>प्रायः पूछे जाने वाले प्रश्न 🤔</h2>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">क्यों (x, y) में पहले x और फिर y लिखते हैं?</button>
+                        <div class="accordion-content"><p><b>समझ:</b> जैसे तालिका पढ़ते समय पहले कॉलम और फिर पंक्ति देखते हैं, वैसे ही पहले क्षैतिज स्थिति (x) और फिर ऊर्ध्व स्थिति (y)।</p></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">ऊर्ध्व रेखा की ढाल अनिर्धारित क्यों?</button>
+                        <div class="accordion-content"><p><b>समझ:</b> ढाल = Δy/Δx, पर ऊर्ध्व रेखा में Δx = 0 होता है — शून्य से भाग असम्भव है, इसलिए ढाल अनिर्धारित।</p></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">कौन‑सा समीकरण रूप कब उपयोग करें?</button>
+                        <div class="accordion-content"><p><b>समझ:</b> बिन्दु व ढाल हों तो बिन्दु–ढाल रूप, ढाल व y‑अव intercept हों तो ढाल–अव रूप, इंटरसेप्ट चाहिए तो मानक रूप।</p></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q4: क्या दो अलग बिन्दुओं के समान निर्देशांक हो सकते हैं?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> नहीं! यही निर्देशांक तंत्र की सुंदरता है। प्रत्येक निर्देशांक जोड़ी (x, y) तल पर ठीक एक बिन्दु से संबंधित होती है। यह हर स्थान के लिए एक अनोखा पता होने जैसा है। यदि दो "बिन्दुओं" के समान निर्देशांक होते, तो वे वास्तव में एक ही बिन्दु होते।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q5: ऊर्ध्व रेखा की ढाल अनिर्धारित क्यों होती है?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> ढाल rise over run (y में परिवर्तन/x में परिवर्तन) है। ऊर्ध्व रेखा के लिए, x में परिवर्तन शून्य होता है क्योंकि आप क्षैतिज रूप से बिल्कुल नहीं चलते। चूंकि हम गणित में शून्य से भाग नहीं कर सकते, ढाल अनिर्धारित होती है। इसे "अनंत रूप से तीव्र" के रूप में सोचें।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q6: वीडियो गेम निर्देशांक ज्यामिति का उपयोग कैसे करते हैं?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> वीडियो गेम लगातार निर्देशांकों का उपयोग करके पात्रों की स्थिति ट्रैक करते हैं। जब आप अपने पात्र को चलाते हैं, तो गेम उनके (x, y) या (x, y, z) निर्देशांक अपडेट करता है। यह टकराव जाँच के लिए दूरियों की गणना करता है, प्रक्षेप्य पथ के लिए ढाल का उपयोग करता है, और घूर्णन और स्केलिंग के लिए परिवर्तन लागू करता है। आप जो हर गति देखते हैं, वह निर्देशांक ज्यामिति का कार्य है!</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q7: निर्देशांक ज्यामिति और बीजगणित का क्या संबंध है?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> निर्देशांक ज्यामिति वह जगह है जहाँ बीजगणित दृश्य बन जाता है! बीजगणितीय समीकरण ग्राफ बन जाते हैं, और ज्यामितीय आकार समीकरण बन जाते हैं। जब आप y = 2x + 3 का ग्राफ बनाते हैं, तो आप एक बीजगणितीय व्यंजक को दृश्य रेखा में अनुवाद कर रहे होते हैं। यह संबंध हमें समस्याओं को बीजगणितीय और ज्यामितीय दोनों तरीकों से हल करने में मदद करता है।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q8: लम्बवत ढालें -1 से गुणा क्यों होती हैं?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> यह लम्बवत रेखाओं के बीच ज्यामितीय संबंध से आता है। जब आप किसी रेखा को 90° घुमाते हैं, तो उसकी ढाल मूल ढाल का ऋणात्मक व्युत्क्रम बन जाती है। यह गणितीय संबंध सुनिश्चित करता है कि रेखाएँ ठीक 90° पर मिलें, जो "लम्बवत" का अर्थ है।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q9: क्या निर्देशांक ज्यामिति 3D में काम करती है?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> बिल्कुल! 3D निर्देशांक ज्यामिति में, हम गहराई के लिए z-अक्ष जोड़ते हैं, इसलिए बिन्दु (x, y, z) बन जाते हैं। यह 3D मॉडलिंग, कम्प्यूटर ग्राफ़िक्स, आर्किटेक्चर और इंजीनियरिंग में उपयोग किया जाता है। वही सिद्धान्त लागू होते हैं — दूरी सूत्र, मध्यबिन्दु, और समीकरण — लेकिन अब हम त्रि-आयामी स्थान में काम कर रहे हैं।</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">Q10: कौन-से करियर निर्देशांक ज्यामिति का भारी उपयोग करते हैं?</button>
+                        <div class="accordion-content">
+                            <p><b>A:</b> बहुत से! इंजीनियर डिज़ाइन और विश्लेषण के लिए, आर्किटेक्ट भवन योजनाओं के लिए, गेम डेवलपर्स ग्राफ़िक्स प्रोग्रामिंग के लिए, डेटा वैज्ञानिक विज़ुअलाइज़ेशन के लिए, पायलट और जहाज़ के कप्तान नेविगेशन के लिए, शहरी योजनाकार शहर के लेआउट के लिए, और एनिमेटर सहज गतियों बनाने के लिए। लगभग कोई भी क्षेत्र जो स्थानिक संबंधों से संबंधित है, निर्देशांक ज्यामिति का उपयोग करता है।</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interactive-zone-hi">
+                <h2>इंटरैक्टिव सीखने का क्षेत्र 🎯</h2>
+
+                <!-- Poll 1 -->
+                <div class="poll-container">
+                    <h3>📊 त्वरित सर्वेक्षण: निर्देशांक ज्यामिति का कौन-सा भाग आपको सबसे कठिन लगता है?</h3>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1-hi" value="plotting"> बिन्दु सही तरीके से चिन्हित करना
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1-hi" value="slope"> ढाल समझना
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1-hi" value="equations"> रेखा के समीकरण लिखना
+                    </div>
+                    <div class="poll-option">
+                        <input type="radio" name="poll1-hi" value="applications"> वास्तविक जीवन में प्रयोग देखना
+                    </div>
+                    <button class="quiz-btn" onclick="showPollResults('poll1-hi', ['plotting', 'slope', 'equations', 'applications'], ['बिन्दु सही तरीके से चिन्हित करना', 'ढाल समझना', 'रेखा के समीकरण लिखना', 'वास्तविक जीवन में प्रयोग देखना'])">परिणाम दिखाएँ</button>
+                    <div class="poll-results" id="poll1-hi-results"></div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 1: निर्देशांक मूल बातें</h3>
+                    <div id="quiz-mcq1-hi" class="quiz-section" data-type="mcq">
+                        <p>1. मूलबिन्दु से 3 इकाई दाएँ और 2 इकाई नीचे स्थित बिन्दु के निर्देशांक क्या हैं?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="याद रखें: दाएँ = धनात्मक x, नीचे = ऋणात्मक y।">(-3, -2)</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="बिल्कुल सही! ✅ दाएँ 3 इकाई = x-दिशा में +3, नीचे 2 इकाई = y-दिशा में -2।">(3, -2)</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह 3 इकाई दाएँ और 2 इकाई ऊपर होगा।">(3, 2)</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 2: ढाल समझना</h3>
+                    <div id="quiz-mcq2-hi" class="quiz-section" data-type="mcq">
+                        <p>2. एक रेखा बिन्दुओं (1, 2) और (3, 8) से होकर जाती है। उसकी ढाल क्या है?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="अपनी गणना जाँचें: (8-2)/(3-1) = 6/2 = 3">2</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="सही! ✅ ढाल = (8-2)/(3-1) = 6/2 = 3">3</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह तब होगा यदि आप (3-1)/(8-2) की गणना करते।">1/3</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 3: रेखा के समीकरण</h3>
+                    <div id="quiz-mcq3-hi" class="quiz-section" data-type="mcq">
+                        <p>3. ढाल 2 वाली रेखा जो बिन्दु (1, 3) से होकर जाती है, उसका समीकरण क्या है?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह रेखा (0, 3) से होकर जाएगी, (1, 3) से नहीं।">y = 2x + 3</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="बिल्कुल सही! ✅ बिन्दु-ढाल रूप: y - 3 = 2(x - 1) → y = 2x + 1">y = 2x + 1</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="बिन्दु-ढाल रूप से बीजगणित में गलती की है।">y = 2x - 1</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 4: रिक्त स्थान भरें</h3>
+                    <div id="quiz-ftb1-hi" class="quiz-section" data-type="ftb">
+                        <p>4. बिन्दुओं (0, 0) और (3, 4) के बीच की दूरी <input type="text" data-answer="5" class="ftb-input"> इकाई है।</p>
+                        <p>5. बिन्दुओं (2, 6) और (8, 2) के बीच का मध्यबिन्दु (<input type="text" data-answer="5" class="ftb-input">, <input type="text" data-answer="4" class="ftb-input">) है।</p>
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <button class="quiz-btn">उत्तर जाँचें</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 5: समांतर और लम्बवत</h3>
+                    <div id="quiz-tf1-hi" class="quiz-section" data-type="tf">
+                        <p>6. यदि किसी रेखा की ढाल 1/2 है, तो लम्बवत रेखा की ढाल -2 है।</p>
+                        <div>
+                            <button class="quiz-option" data-correct="true" data-feedback="सही! ✅ लम्बवत ढालें -1 के बराबर होती हैं: (1/2) × (-2) = -1">सत्य</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="लम्बवत ढाल ऋणात्मक व्युत्क्रम होती है: -(2/1) = -2">असत्य</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 6: चतुर्थांश</h3>
+                    <div id="quiz-mcq4-hi" class="quiz-section" data-type="mcq">
+                        <p>7. बिन्दु (-5, 3) किस चतुर्थांश में स्थित है?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="चतुर्थांश I में दोनों निर्देशांक धनात्मक (+,+) होते हैं">चतुर्थांश I</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="सही! ✅ चतुर्थांश II में x ऋणात्मक और y धनात्मक (-,+) होता है">चतुर्थांश II</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="चतुर्थांश III में दोनों निर्देशांक ऋणात्मक (-,-) होते हैं">चतुर्थांश III</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 7: वास्तविक जीवन में प्रयोग</h3>
+                    <div id="quiz-mcq5-hi" class="quiz-section" data-type="mcq">
+                        <p>8. एक कार की स्थिति निर्देशांक तल पर ट्रैक की जाती है। समय t=0 पर वह (2, 1) पर है। t=3 सेकंड पर वह (8, 7) पर है। कार की औसत गति क्या है?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह केवल क्षैतिज दूरी है। आपको कुल दूरी चाहिए।">2 इकाई/सेकंड</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="बिल्कुल सही! ✅ दूरी = √[(8-2)² + (7-1)²] = √[36 + 36] = √72 ≈ 8.49 इकाई 3 सेकंड में = 2.83 इकाई/सेकंड">2.83 इकाई/सेकंड</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह तब होगा यदि आप 6/3 = 2 की गणना करते, पर आपको कुल दूरी चाहिए।">3 इकाई/सेकंड</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 8: ढाल की व्याख्या</h3>
+                    <div id="quiz-tf2-hi" class="quiz-section" data-type="tf">
+                        <p>9. ढाल -1/3 वाली रेखा, ढाल 1/4 वाली रेखा से अधिक तीव्र है।</p>
+                        <div>
+                            <button class="quiz-option" data-correct="true" data-feedback="सही! ✅ तीव्रता निरपेक्ष मान से मापी जाती है: |-1/3| = 1/3 > 1/4">सत्य</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="याद रखें: तीव्रता ढाल के निरपेक्ष मान से होती है, चिन्ह से नहीं">असत्य</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <h3>प्रश्नोत्तरी 9: चुनौती प्रश्न</h3>
+                    <div id="quiz-mcq6-hi" class="quiz-section" data-type="mcq">
+                        <p>10. दो रेखाएँ बिन्दु (2, 5) पर मिलती हैं। एक रेखा का समीकरण y = 3x - 1 है। इस रेखा के लम्बवत रेखा की ढाल क्या है?</p>
+                        <div>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह वही ढाल है, लम्बवत नहीं।">3</button>
+                            <button class="quiz-option" data-correct="true" data-feedback="बिल्कुल सही! ✅ लम्बवत ढाल ऋणात्मक व्युत्क्रम होती है: -1/3">-1/3</button>
+                            <button class="quiz-option" data-correct="false" data-feedback="यह मूल ढाल का ऋणात्मक है, ऋणात्मक व्युत्क्रम नहीं।">-3</button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="glossary-hi">
+                <h2>पूर्ण निर्देशांक ज्यामिति शब्दकोश 📚</h2>
+                <div class="memory-cards-grid">
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📍</span><h3>निर्देशांक</h3></div>
+                        <div class="card-content">
+                            <p>संख्याओं की जोड़ी (x, y) जो निर्देशांक तल पर किसी बिन्दु की सटीक स्थिति बताती है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎯</span><h3>मूलबिन्दु</h3></div>
+                        <div class="card-content">
+                            <p>बिन्दु (0, 0) जहाँ x-अक्ष और y-अक्ष मिलते हैं; निर्देशांक तंत्र का प्रारंभिक बिन्दु।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🧭</span><h3>चतुर्थांश</h3></div>
+                        <div class="card-content">
+                            <p>x और y अक्षों द्वारा बनाए गए चार क्षेत्रों में से एक। प्रत्येक चतुर्थांश में निर्देशांकों के अलग चिन्ह होते हैं।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">⛰️</span><h3>ढाल</h3></div>
+                        <div class="card-content">
+                            <p>रेखा की तीव्रता और दिशा, जो rise over run या (y₂ - y₁)/(x₂ - x₁) के रूप में गणना की जाती है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📏</span><h3>दूरी सूत्र</h3></div>
+                        <div class="card-content">
+                            <p>d = √[(x₂-x₁)² + (y₂-y₁)²] — दो बिन्दुओं के बीच सीधी रेखा की दूरी की गणना करता है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎯</span><h3>मध्यबिन्दु</h3></div>
+                        <div class="card-content">
+                            <p>दो दिए गए बिन्दुओं के बीच का बिन्दु: ((x₁+x₂)/2, (y₁+y₂)/2)।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📊</span><h3>Y-अव intercept</h3></div>
+                        <div class="card-content">
+                            <p>वह बिन्दु जहाँ रेखा y-अक्ष को काटती है; x = 0 होने पर y-निर्देशांक।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📈</span><h3>X-अव intercept</h3></div>
+                        <div class="card-content">
+                            <p>वह बिन्दु जहाँ रेखा x-अक्ष को काटती है; y = 0 होने पर x-निर्देशांक।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">↗️</span><h3>धनात्मक ढाल</h3></div>
+                        <div class="card-content">
+                            <p>एक रेखा जो बाएँ से दाएँ जाते हुए ऊपर चढ़ती है; x बढ़ने पर y भी बढ़ता है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📉</span><h3>ऋणात्मक ढाल</h3></div>
+                        <div class="card-content">
+                            <p>एक रेखा जो बाएँ से दाएँ जाते हुए नीचे उतरती है; x बढ़ने पर y घटता है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">⬆️</span><h3>अनिर्धारित ढाल</h3></div>
+                        <div class="card-content">
+                            <p>ऊर्ध्व रेखा की ढाल; शून्य से भाग नहीं कर सकते इसलिए गणना नहीं की जा सकती।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">➡️</span><h3>शून्य ढाल</h3></div>
+                        <div class="card-content">
+                            <p>क्षैतिज रेखा की ढाल; रेखा में कोई rise नहीं, केवल run होता है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🚂</span><h3>समांतर रेखाएँ</h3></div>
+                        <div class="card-content">
+                            <p>एक-सी ढाल वाली रेखाएँ जो कभी नहीं मिलतीं; वे निरंतर समान दूरी बनाए रखती हैं।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">➕</span><h3>लम्बवत रेखाएँ</h3></div>
+                        <div class="card-content">
+                            <p>रेखाएँ जो 90° पर मिलती हैं; उनकी ढालें -1 के बराबर होती हैं (ऋणात्मक व्युत्क्रम)।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📐</span><h3>ढाल-अव intercept रूप</h3></div>
+                        <div class="card-content">
+                            <p>y = mx + b, जहाँ m ढाल है और b y-अव intercept है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📌</span><h3>बिन्दु-ढाल रूप</h3></div>
+                        <div class="card-content">
+                            <p>y - y₁ = m(x - x₁), जब आप एक बिन्दु (x₁, y₁) और ढाल m जानते हैं।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">📋</span><h3>मानक रूप</h3></div>
+                        <div class="card-content">
+                            <p>Ax + By = C, जहाँ A, B, और C पूर्णांक हैं और A और B दोनों शून्य नहीं हैं।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🔄</span><h3>रैखिक समीकरण</h3></div>
+                        <div class="card-content">
+                            <p>एक समीकरण जिसका ग्राफ सीधी रेखा है; चरों की अधिकतम घात 1 होती है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🎲</span><h3>क्रमित युग्म</h3></div>
+                        <div class="card-content">
+                            <p>संख्याओं की जोड़ी (x, y) जहाँ क्रम महत्वपूर्ण है; किसी बिन्दु के निर्देशांकों का प्रतिनिधित्व करता है।</p>
+                        </div>
+                    </div>
+                    <div class="memory-card">
+                        <div class="card-header"><span class="card-icon">🌐</span><h3>निर्देशांक तल</h3></div>
+                        <div class="card-content">
+                            <p>लम्बवत x और y अक्षों के प्रतिच्छेदन द्वारा बनाया गया द्वि-आयामी तल।</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+    
+    <footer class="site-footer">
+        <p class="footer-copy">© 2025 Beyond Dictionary. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Reading progress indicator
+            const progressFill = document.getElementById('readingProgress');
+            
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                progressFill.style.width = scrolled + '%';
+            });
+
+            // Interactive coordinate plotting canvas
+            const canvas = document.getElementById('coordinateCanvas');
+            const ctx = canvas.getContext('2d');
+            const clickedPointDiv = document.getElementById('clickedPoint');
+
+            function drawGrid() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Set up coordinate system (center of canvas is origin)
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const gridSize = 25;
+
+                // Draw grid lines
+                ctx.strokeStyle = '#e9ecef';
+                ctx.lineWidth = 1;
+                
+                // Vertical lines
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+
+                // Draw axes with arrows at both ends
+                ctx.strokeStyle = '#212529';
+                ctx.lineWidth = 2;
+                
+                // X-axis with arrows at both ends
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.stroke();
+                
+                // X-axis arrows (left and right)
+                const arrowSize = 8;
+                // Right arrow (positive x direction)
+                ctx.beginPath();
+                ctx.moveTo(canvas.width - arrowSize, centerY - arrowSize/2);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.lineTo(canvas.width - arrowSize, centerY + arrowSize/2);
+                ctx.stroke();
+                // Left arrow (negative x direction)
+                ctx.beginPath();
+                ctx.moveTo(arrowSize, centerY - arrowSize/2);
+                ctx.lineTo(0, centerY);
+                ctx.lineTo(arrowSize, centerY + arrowSize/2);
+                ctx.stroke();
+                
+                // Y-axis with arrows at both ends
+                ctx.beginPath();
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.stroke();
+                
+                // Y-axis arrows (top and bottom)
+                // Top arrow (positive y direction)
+                ctx.beginPath();
+                ctx.moveTo(centerX - arrowSize/2, arrowSize);
+                ctx.lineTo(centerX, 0);
+                ctx.lineTo(centerX + arrowSize/2, arrowSize);
+                ctx.stroke();
+                // Bottom arrow (negative y direction)
+                ctx.beginPath();
+                ctx.moveTo(centerX - arrowSize/2, canvas.height - arrowSize);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.lineTo(centerX + arrowSize/2, canvas.height - arrowSize);
+                ctx.stroke();
+
+                // Label axes with proper academic notation
+                ctx.fillStyle = '#212529';
+                ctx.font = 'bold 14px Inter';
+                ctx.textAlign = 'center';
+                // X-axis labels
+                ctx.fillText('x', canvas.width - 20, centerY - 15); // Positive x
+                ctx.fillText('-x', 20, centerY - 15); // Negative x
+                // Y-axis labels
+                ctx.fillText('y', centerX + 15, 20); // Positive y
+                ctx.fillText('-y', centerX + 15, canvas.height - 10); // Negative y
+                // Origin label
+                ctx.fillText('(0,0)', centerX + 5, centerY + 15);
+                
+                // Reset text alignment
+                ctx.textAlign = 'left';
+            }
+
+            function plotPoint(x, y) {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const gridSize = 25;
+                
+                ctx.fillStyle = '#fd7e14';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Convert canvas coordinates to mathematical coordinates
+                const mathX = Math.round((x - centerX) / gridSize);
+                const mathY = Math.round((centerY - y) / gridSize);
+                
+                clickedPointDiv.textContent = `Point clicked: (${mathX}, ${mathY})`;
+            }
+
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                drawGrid(); // Redraw grid to clear previous points
+                plotPoint(x, y);
+            });
+
+            drawGrid(); // Initial grid draw
+
+            // Accordion Logic
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const expanded = header.getAttribute('aria-expanded') === 'true';
+                    header.setAttribute('aria-expanded', !expanded);
+                    const content = header.nextElementSibling;
+                    if (content) {
+                       content.style.display = expanded ? 'none' : 'block';
+                    }
+                });
+            });
+
+            // Language Switching
+            const langButtons = document.querySelectorAll('.lang-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            langButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetLang = button.dataset.lang;
+                    langButtons.forEach(btn => btn.classList.toggle('active', btn === button));
+                    contentSections.forEach(sec => sec.classList.toggle('active-lang', sec.dataset.lang === targetLang));
+                });
+            });
+
+            // Universal Quiz Logic
+            document.querySelectorAll('.quiz-section').forEach(section => {
+                const quizType = section.dataset.type;
+                let answered = false;
+
+                const showFeedback = (isCorrect, message) => {
+                    const feedbackEl = section.querySelector('.quiz-feedback');
+                    if (!feedbackEl) return;
+                    feedbackEl.innerHTML = message;
+                    feedbackEl.classList.add('visible', isCorrect ? 'correct' : 'incorrect');
+                    feedbackEl.classList.remove(isCorrect ? 'incorrect' : 'correct');
+                };
+
+                function buildIncorrectFeedback(correctOption) {
+                    const correctText = correctOption ? correctOption.textContent.trim() : '—';
+                    const raw = (correctOption && correctOption.dataset.feedback) ? correctOption.dataset.feedback.trim() : '';
+                    const cleaned = raw.replace(/^Correct!\s*✅\s*/i, '');
+                    const base = cleaned || 'Use the appropriate rule: slope = (y₂−y₁)/(x₂−x₁); distance = √[(Δx)²+(Δy)²]; midpoint = ((x₁+x₂)/2, (y₁+y₂)/2); perpendicular slopes are negative reciprocals. Apply the definition that matches the question details and recompute carefully.';
+                    return `Correct: <b>${correctText}</b>. ${base} This comes directly from the definitions and formulas; walk through each step methodically to verify.`;
+                }
+
+                if (quizType === 'mcq' || quizType === 'tf') {
+                    section.addEventListener('click', e => {
+                        const option = e.target.closest('.quiz-option');
+                        if (!option || answered) return;
+                        answered = true;
+                        const isCorrect = option.dataset.correct === 'true';
+                        option.classList.add('selected', isCorrect ? 'correct' : 'incorrect');
+                        if (!isCorrect) {
+                            const correctOption = section.querySelector('[data-correct="true"]');
+                            if (correctOption) correctOption.classList.add('correct');
+                            const message = buildIncorrectFeedback(correctOption);
+                            showFeedback(false, message);
+                        } else {
+                            showFeedback(true, option.dataset.feedback);
+                        }
+                        section.querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
+                    });
+                } else if (quizType === 'ftb') {
+                    const checkBtn = section.querySelector('.quiz-btn');
+                    checkBtn.addEventListener('click', () => {
+                        if (answered) return;
+                        answered = true;
+                        let allCorrect = true;
+                        section.querySelectorAll('input.ftb-input').forEach(input => {
+                            const isInputCorrect = input.value.trim().toLowerCase() === input.dataset.answer.toLowerCase();
+                            input.classList.add(isInputCorrect ? 'correct' : 'incorrect');
+                            if (!isInputCorrect) allCorrect = false;
+                            input.disabled = true;
+                        });
+                        if (allCorrect) {
+                            showFeedback(true, 'Perfect! All answers are correct! 🎉');
+                        } else {
+                            const answers = Array.from(section.querySelectorAll('input.ftb-input')).map(inp => inp.dataset.answer).join(', ');
+                            const expl = 'Distance uses the Pythagorean theorem: √[(x₂−x₁)²+(y₂−y₁)²]. The midpoint averages each coordinate: ((x₁+x₂)/2, (y₁+y₂)/2). Substitute the given values carefully, square differences, take the square root for distance, and compute simple averages for the midpoint to obtain the exact results.';
+                            showFeedback(false, `Correct answers: <b>${answers}</b>.<br>${expl}`);
+                        }
+                        checkBtn.disabled = true;
+                    });
+                }
+            });
+        });
+
+        // Poll functionality
+        function showPollResults(pollName, values, labels) {
+            // Simulate poll results with random percentages
+            const results = values.map(() => Math.floor(Math.random() * 40) + 10);
+            const total = results.reduce((a, b) => a + b, 0);
+            const percentages = results.map(r => Math.round((r / total) * 100));
+            
+            const resultsDiv = document.getElementById(pollName + '-results');
+            resultsDiv.innerHTML = '<h4 style="margin-bottom: 15px;">Poll Results:</h4>';
+            
+            values.forEach((value, index) => {
+                const barDiv = document.createElement('div');
+                barDiv.className = 'poll-bar';
+                barDiv.innerHTML = `<div class="poll-bar-fill" style="width: ${percentages[index]}%">${labels[index]}: ${percentages[index]}%</div>`;
+                resultsDiv.appendChild(barDiv);
+            });
+            
+            resultsDiv.style.display = 'block';
+            
+            // Disable poll options
+            const pollContainer = resultsDiv.parentElement;
+            pollContainer.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = true;
+            });
+            pollContainer.querySelector('.quiz-btn').disabled = true;
+        }
+    </script>
+</body>
+</html>
+</html>

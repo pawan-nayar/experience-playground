@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BODMAS Learn Component (Full Experience)</title>
+    <style>
+        :root {
+            --bd-dark-brown: #3a2e2c;
+            --bd-orange: #ff6b35;
+            --bd-cream: #fdfbf8;
+            --bd-blue: #3b82f6;
+            --header-bg: var(--bd-dark-brown); 
+            --header-text: #ffffff;
+            --background: #f4f7f9;
+            --card: #ffffff;
+            --foreground: #1a1a1a;
+            --muted-foreground: #6b7280;
+            --primary: var(--bd-orange);
+            --primary-foreground: #ffffff;
+            --accent: var(--bd-blue);
+            --accent-light: var(--bd-cream);
+            --border: #e5e7eb;
+            --radius: 0.75rem;
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-elegant: 0 10px 20px rgba(139, 92, 246, 0.15);
+            --correct: #22c55e;
+            --incorrect: #ef4444;
+            --correct-light: #dcfce7;
+            --incorrect-light: #fee2e2;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .launch-button {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 3vh 1rem; 
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-width: 580px;
+            width: 100%;
+            box-shadow: var(--shadow-elegant);
+            max-height: 94vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 { margin: 0; color: var(--header-bg); font-size: 1.25rem; }
+        
+        .close-btn {
+            background: none; border: none; color: var(--muted-foreground);
+            font-size: 1.75rem; cursor: pointer; line-height: 1;
+            transition: color 0.2s ease, transform 0.2s ease;
+            padding: 0.25rem 0.5rem;
+        }
+        .close-btn:hover { color: var(--primary); transform: scale(1.1); }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .audio-toggle-btn {
+            background: none; border: none; font-size: 1.2rem; cursor: pointer;
+            color: var(--muted-foreground); transition: color 0.2s ease;
+        }
+        .audio-toggle-btn.active { color: var(--accent); }
+
+        .modal-body {
+            overflow: auto;
+            flex-grow: 1;
+            min-height: 0; /* allow flex child to scroll inside modal */
+        }
+        /* Visible, subtle scrollbars where content overflows */
+        .modal-body::-webkit-scrollbar { width: 10px; }
+        .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; }
+        .modal-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); border-radius: 8px; }
+        .modal-body { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) rgba(0,0,0,0.06); }
+
+        .action-button {
+            width: 100%; padding: 0.75rem; font-size: 1rem;
+            background-color: var(--primary); margin-top: 1rem;
+            border: none; color: white; border-radius: var(--radius); cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .action-button:hover { background-color: #e65c2e; }
+
+        .intro-text p {
+             line-height: 1.5;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .bodmas-explanation {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0.75rem 0;
+        }
+        .bodmas-explanation strong { color: var(--header-bg); }
+
+        /* RE-IMAGINED LEARN COMPONENT STYLES */
+        .learn-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .equation-counter {
+            font-size: 0.85rem; font-weight: 600; color: var(--muted-foreground);
+            background-color: #f0f0f0; padding: 0.3rem 0.7rem; border-radius: 99px;
+        }
+        .nav-btn {
+            background-color: var(--primary); color: var(--primary-foreground); border: none;
+            padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;
+            font-size: 0.85rem; font-weight: 500; transition: background-color 0.2s ease;
+        }
+        .nav-btn:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+
+        .equation-display {
+            background-color: var(--header-bg); color: var(--header-text);
+            padding: 1rem; text-align: center; font-size: 1.75rem;
+            font-family: 'Courier New', monospace; border-radius: var(--radius);
+            margin-bottom: 1rem; font-weight: bold;
+            transition: all 0.4s ease-in-out;
+        }
+        
+        .thought-process {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            min-height: 80px;
+        }
+        .thought-process h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: var(--header-bg);
+        }
+        .thought-process p {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .solution-area {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+        }
+        .solution-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem; font-size: 0.85rem; font-weight: 600;
+            background-color: transparent; border: 2px solid var(--border);
+            color: var(--muted-foreground); border-radius: 0.5rem; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background-color: var(--accent-light);
+        }
+        
+        .solution-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .solution-step .step-icon {
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; color: white; flex-shrink: 0;
+        }
+        .solution-step .step-icon.correct { background-color: var(--correct); }
+        .solution-step .step-icon.incorrect { background-color: var(--incorrect); }
+        .solution-step .step-explanation {
+            font-size: 0.8rem;
+            font-family: sans-serif;
+            font-style: italic;
+            color: var(--muted-foreground);
+        }
+        .final-answer {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .final-answer.correct { color: var(--correct); background-color: var(--correct-light); }
+        .final-answer.incorrect { color: var(--incorrect); background-color: var(--incorrect-light); }
+
+        /* Quiz Styles */
+        #quizProgressContainer { width: 100%; background-color: var(--border); border-radius: 99px; height: 8px; margin: 0.5rem 0 1rem 0; }
+        #quizProgressBar { height: 100%; width: 0%; background-color: var(--primary); border-radius: 99px; transition: width 0.3s ease-in-out; }
+        #quizQuestionText { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; text-align: center; font-family: 'Courier New', monospace; }
+        #quizOptionsContainer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+        .quiz-option { padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; text-align: center; font-size: 1.1rem; font-weight: 500; }
+        .quiz-option:hover { border-color: var(--primary); background-color: var(--accent-light); }
+        .quiz-option.correct { border-color: var(--correct); background-color: var(--correct-light); color: var(--correct); font-weight: 700; }
+        .quiz-option.incorrect { border-color: var(--incorrect); background-color: var(--incorrect-light); color: var(--incorrect); }
+        .quiz-option.disabled { pointer-events: none; opacity: 0.8; }
+        #quizExplanationBox { margin-top: 1rem; padding: 1rem; border-radius: var(--radius); font-size: 0.9rem; line-height: 1.5; border-left: 4px solid; display: none; animation: fadeInUp 0.5s; }
+        #quizExplanationBox.correct { background-color: var(--correct-light); border-color: var(--correct); }
+        #quizExplanationBox.incorrect { background-color: var(--incorrect-light); border-color: var(--incorrect); }
+        #quizExplanationBox strong { font-weight: 700; display: block; margin-bottom: 0.5rem; font-size: 1rem; }
+        
+        #quizResultsScreen h3 { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; text-align: center; }
+        #quizScoreText { font-size: 1.1rem; text-align: center; margin-bottom: 1.5rem; }
+        #quizSummaryContainer { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem; }
+        #quizSummaryContainer::-webkit-scrollbar { width: 8px; }
+        #quizSummaryContainer::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; }
+        #quizSummaryContainer::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); border-radius: 8px; }
+        #quizSummaryContainer { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) rgba(0,0,0,0.06); }
+        .summary-item { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-question { font-weight: 600; font-family: 'Courier New', monospace; }
+        .summary-answer { margin-top: 0.5rem; }
+        .summary-answer.correct { color: var(--correct); }
+        .summary-answer.incorrect { color: var(--incorrect); }
+        .summary-answer span { font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <button class="launch-button" id="launchModalBtn">Learn BODMAS</button>
+
+    <div class="modal-overlay" id="learnModalOverlay">
+        <div class="modal" id="learnModal">
+            <!-- Screen content will be injected here by JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const equationsData = [
+            { expression: "7 + 3 * 5", thoughtProcess: ["Scan: Addition (+) and Multiplication (*).", "Plan: Multiplication is stronger, so solve <strong>3 * 5</strong> first.", "Then, solve the Addition."] },
+            { expression: "12 - 6 / 2", thoughtProcess: ["Scan: Subtraction (-) and Division (/).", "Plan: Division is stronger. Solve <strong>6 / 2</strong> first.", "Then, handle the Subtraction."] },
+            { expression: "5 * (4 + 2)", thoughtProcess: ["Scan: Brackets (), Multiplication (*), Addition (+).", "Plan: Brackets are the highest priority. Solve <strong>4 + 2</strong> first.", "Then, perform the Multiplication."] },
+            { expression: "16 / 4 * 2", thoughtProcess: ["Scan: Division (/) and Multiplication (*).", "Plan: They are partners! We solve from <strong>left to right</strong>.", "First <strong>16 / 4</strong>, then multiply the result by 2."] },
+            { expression: "20 - 5 + 3", thoughtProcess: ["Scan: Subtraction (-) and Addition (+).", "Plan: They are partners too. We solve from <strong>left to right</strong>.", "First <strong>20 - 5</strong>, then add 3 to the result."] },
+            { expression: "3 + 2 * (6 - 1)", thoughtProcess: ["Scan: Brackets, Multiplication, Addition.", "Plan: First, solve inside the brackets: <strong>6 - 1</strong>.", "Next, the Multiplication: <strong>2 * [result]</strong>.", "Finally, the Addition."] },
+            { expression: "10 / 2 + 3 * 4", thoughtProcess: ["Scan: Division, Addition, Multiplication.", "Plan: D and M are partners. Solve them left-to-right.", "First <strong>10 / 2</strong>, then <strong>3 * 4</strong>.", "Finally, add the two results."] },
+            { expression: "8 * 3 - 10 / 5", thoughtProcess: ["Scan: Multiplication, Subtraction, Division.", "Plan: M and D are partners. Solve them left-to-right.", "First <strong>8 * 3</strong>, then <strong>10 / 5</strong>.", "Finally, subtract the second result from the first."] },
+            { expression: "5 + (12 - 2 * 3)", thoughtProcess: ["Scan: Brackets with multiple operations inside!", "Plan: Inside the bracket, Multiplication is stronger. Solve <strong>2 * 3</strong> first.", "Then, finish the bracket: <strong>12 - [result]</strong>.", "Finally, do the outer addition."] },
+            { expression: "3 * 3 + 3 / 3", thoughtProcess: ["Scan: Multiplication, Addition, Division.", "Plan: M and D are partners. Solve left-to-right.", "First <strong>3 * 3</strong>, then <strong>3 / 3</strong>.", "Finally, add the results."] }
+        ];
+
+        function generateSolutionData(expression) {
+            const solutionsMap = {
+                "7 + 3 * 5": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "3 * 5", result: 15, explanation: "Multiplication first, as planned." }, { calc: "7 + 15", result: 22, explanation: "Finally, the addition." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "7 + 3", result: 10, explanation: "Mistake: Addition was done first." }, { calc: "10 * 5", result: 50, explanation: "This leads to an incorrect answer." }] }],
+                "12 - 6 / 2": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "6 / 2", result: 3, explanation: "Division first, as planned." }, { calc: "12 - 3", result: 9, explanation: "Now, subtract." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "12 - 6", result: 6, explanation: "Mistake: Solved left-to-right." }, { calc: "6 / 2", result: 3, explanation: "Incorrect result." }] }],
+                "5 * (4 + 2)": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "4 + 2", result: 6, explanation: "Brackets always come first." }, { calc: "5 * 6", result: 30, explanation: "Now, multiply." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "5 * 4", result: 20, explanation: "Mistake: The brackets were ignored." }, { calc: "20 + 2", result: 22, explanation: "This violates the main rule." }] }],
+                "16 / 4 * 2": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "16 / 4", result: 4, explanation: "Left-to-right: Division first." }, { calc: "4 * 2", result: 8, explanation: "Then multiplication." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "4 * 2", result: 8, explanation: "Mistake: Multiplication done first." }, { calc: "16 / 8", result: 2, explanation: "Wrong order for partners." }] }],
+                "20 - 5 + 3": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "20 - 5", result: 15, explanation: "Left-to-right: Subtraction first." }, { calc: "15 + 3", result: 18, explanation: "Then addition." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "5 + 3", result: 8, explanation: "Mistake: Addition done first." }, { calc: "20 - 8", result: 12, explanation: "Wrong order for partners." }] }],
+                "3 + 2 * (6 - 1)": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "6 - 1", result: 5, explanation: "Brackets first." }, { calc: "2 * 5", result: 10, explanation: "Then multiplication." }, { calc: "3 + 10", result: 13, explanation: "Finally, addition." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "3 + 2", result: 5, explanation: "Mistake: Addition before brackets." }, { calc: "5 * (6 - 1)", result: 25, explanation: "Incorrect." }] }],
+                "10 / 2 + 3 * 4": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "10 / 2", result: 5, explanation: "Division first." }, { calc: "3 * 4", result: 12, explanation: "Then multiplication." }, { calc: "5 + 12", result: 17, explanation: "Finally, add results." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "2 + 3", result: 5, explanation: "Mistake: Addition in the middle." }, { calc: "10 / 5", result: 2, explanation: "Incorrect." }] }],
+                "8 * 3 - 10 / 5": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "8 * 3", result: 24, explanation: "Multiplication first." }, { calc: "10 / 5", result: 2, explanation: "Then division." }, { calc: "24 - 2", result: 22, explanation: "Finally, subtract." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "3 - 10", result: -7, explanation: "Mistake: Subtraction in the middle." }, { calc: "8 * -7", result: -56, explanation: "Incorrect." }] }],
+                "5 + (12 - 2 * 3)": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "2 * 3", result: 6, explanation: "Inside bracket, multiply first." }, { calc: "12 - 6", result: 6, explanation: "Finish the bracket." }, { calc: "5 + 6", result: 11, explanation: "Finally, add." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "12 - 2", result: 10, explanation: "Mistake: Subtracted first in bracket." }, { calc: "5 + 10 * 3", result: 35, explanation: "Incorrect." }] }],
+                "3 * 3 + 3 / 3": [{ title: "Correct Way", isCorrect: true, steps: [{ calc: "3 * 3", result: 9, explanation: "Multiplication first." }, { calc: "3 / 3", result: 1, explanation: "Then division." }, { calc: "9 + 1", result: 10, explanation: "Finally, add." }] }, { title: "Common Mistake", isCorrect: false, steps: [{ calc: "3 + 3", result: 6, explanation: "Mistake: Addition in the middle." }, { calc: "3 * 6 / 3", result: 6, explanation: "Incorrect." }] }]
+            };
+            return solutionsMap[expression] || [];
+        }
+
+        const narrationData = {
+            "7 + 3 * 5": { thoughtProcess: ["Okay, let's look at our first problem.", "We have an addition and a multiplication.", "BODMAS tells us Multiplication is stronger, so we must solve three times five first.", "Then, we'll add. That's our plan."], "Correct Way": "Perfect, this follows our plan exactly.", "Common Mistake": "Ah, a common trap. Addition was done first here, which breaks our plan." },
+            "12 - 6 / 2": { thoughtProcess: ["Here we see subtraction and division.", "Division is the stronger operation.", "So our plan is to handle six divided by two first."], "Correct Way": "Excellent. We followed the plan.", "Common Mistake": "This is a common mistake. We have to respect the power of the division operator first." },
+            "5 * (4 + 2)": { thoughtProcess: ["This one has brackets! That's a big clue.", "The 'B' in BODMAS is the most important rule.", "So, our plan is to solve four plus two, and then multiply."], "Correct Way": "Perfect! We handled the brackets first.", "Common Mistake": "Here, the brackets were ignored completely. This shows why you must always look for brackets first." },
+            "16 / 4 * 2": { thoughtProcess: ["Here we have division and multiplication.", "They are partners with equal priority.", "So the rule is to solve from left to right. First, sixteen divided by four."], "Correct Way": "Great, we followed the left-to-right rule for partners.", "Common Mistake": "This is a tricky one. It's easy to think multiplication comes first, but for partners, the order they appear in is what matters." },
+            "20 - 5 + 3": { thoughtProcess: ["We have subtraction and addition.", "They are also partners.", "So we solve from left to right. First, twenty minus five."], "Correct Way": "Exactly right. Solving left to right gives the correct answer.", "Common Mistake": "Here, addition was done first. This breaks the left-to-right rule for partners and gives the wrong result." },
+            "3 + 2 * (6 - 1)": { thoughtProcess: ["This problem has three operations!", "First, we must solve the brackets: six minus one.", "Next, we look for multiplication or division. We have two times the result.", "Finally, we'll do the addition."], "Correct Way": "Excellent, we followed the order perfectly: Brackets, then Multiplication, then Addition.", "Common Mistake": "This is a major error. The addition was done before the brackets, which is a big no-no." },
+            "10 / 2 + 3 * 4": { thoughtProcess: ["We have division, addition, and multiplication.", "We must do division and multiplication before addition.", "So, we can solve ten divided by two, and three times four, in any order.", "Finally, we add their results together."], "Correct Way": "Perfect. We cleared all the strong operations first before adding.", "Common Mistake": "Here, the addition was done right in the middle, breaking up the stronger operations." },
+            "8 * 3 - 10 / 5": { thoughtProcess: ["Multiplication, subtraction, and division.", "Again, we must do multiplication and division before subtraction.", "So, let's solve eight times three, and ten divided by five.", "Finally, we subtract the second result from the first."], "Correct Way": "Great job. We handled the multiplication and division first.", "Common Mistake": "This is incorrect because the subtraction was done before all the multiplication and division were finished." },
+            "5 + (12 - 2 * 3)": { thoughtProcess: ["This one is tricky! We have brackets, with two operations inside.", "We must apply BODMAS inside the brackets too!", "So, inside the bracket, we do multiplication first: two times three.", "Then we finish the bracket by subtracting. Finally, we do the addition outside."], "Correct Way": "Fantastic! You remembered to use BODMAS even inside the brackets.", "Common Mistake": "This is a common error. The subtraction inside the bracket was done first, but the multiplication inside was stronger." },
+            "3 * 3 + 3 / 3": { thoughtProcess: ["Multiplication, addition, and division.", "We need to solve multiplication and division before we add.", "So, we'll solve three times three, and three divided by three.", "Finally, we add the two results."], "Correct Way": "Perfect. We solved the multiplication and division before adding.", "Common Mistake": "This is wrong because the addition was done before the division was handled." }
+        };
+        
+        const quizData = [
+            { question: "6 + 4 * 2", options: [20, 14, 12, 18], correct: 1, explanation: "<strong>Step 1 (M):</strong> 4 * 2 = 8. <br><strong>Step 2 (A):</strong> 6 + 8 = 14." },
+            { question: "10 - 3 * 2", options: [14, 7, 4, 1], correct: 2, explanation: "<strong>Step 1 (M):</strong> 3 * 2 = 6. <br><strong>Step 2 (S):</strong> 10 - 6 = 4." },
+            { question: "15 / (3 + 2)", options: [3, 5, 7, 1], correct: 0, explanation: "<strong>Step 1 (B):</strong> 3 + 2 = 5. <br><strong>Step 2 (D):</strong> 15 / 5 = 3." },
+            { question: "8 + 12 / 4", options: [5, 11, 20, 8], correct: 1, explanation: "<strong>Step 1 (D):</strong> 12 / 4 = 3. <br><strong>Step 2 (A):</strong> 8 + 3 = 11." },
+            { question: "20 / 5 * 2", options: [2, 8, 10, 20], correct: 1, explanation: "<strong>Left-to-Right Rule for D/M:</strong> <br><strong>Step 1 (D):</strong> 20 / 5 = 4. <br><strong>Step 2 (M):</strong> 4 * 2 = 8." },
+            { question: "9 - 4 + 3", options: [2, 8, 10, -1], correct: 1, explanation: "<strong>Left-to-Right Rule for A/S:</strong> <br><strong>Step 1 (S):</strong> 9 - 4 = 5. <br><strong>Step 2 (A):</strong> 5 + 3 = 8." },
+            { question: "3 * (8 - 3)", options: [21, 9, 15, 24], correct: 2, explanation: "<strong>Step 1 (B):</strong> 8 - 3 = 5. <br><strong>Step 2 (M):</strong> 3 * 5 = 15." },
+            { question: "7 + 2 * 3 - 1", options: [12, 26, 14, 10], correct: 0, explanation: "<strong>Step 1 (M):</strong> 2 * 3 = 6. <br><strong>Step 2 (A):</strong> 7 + 6 = 13. <br><strong>Step 3 (S):</strong> 13 - 1 = 12." },
+            { question: "18 / 6 + 7", options: [2, 10, 1.8, 12], correct: 1, explanation: "<strong>Step 1 (D):</strong> 18 / 6 = 3. <br><strong>Step 2 (A):</strong> 3 + 7 = 10." },
+            { question: "4 * 5 - 10 / 2", options: [15, 5, 10, 20], correct: 0, explanation: "<strong>Step 1 (M):</strong> 4 * 5 = 20. <br><strong>Step 2 (D):</strong> 10 / 2 = 5. <br><strong>Step 3 (S):</strong> 20 - 5 = 15." },
+            { question: "2 + (5 - 1) * 3", options: [14, 18, 12, 11], correct: 0, explanation: "<strong>Step 1 (B):</strong> 5 - 1 = 4. <br><strong>Step 2 (M):</strong> 4 * 3 = 12. <br><strong>Step 3 (A):</strong> 2 + 12 = 14." },
+            { question: "36 / (3 * 3)", options: [4, 12, 108, 1], correct: 0, explanation: "<strong>Step 1 (B):</strong> 3 * 3 = 9. <br><strong>Step 2 (D):</strong> 36 / 9 = 4." },
+            { question: "16 - 10 + 4 * 2", options: [20, 14, 4, -2], correct: 1, explanation: "<strong>Step 1 (M):</strong> 4 * 2 = 8. <br><strong>Step 2 (S):</strong> 16 - 10 = 6. <br><strong>Step 3 (A):</strong> 6 + 8 = 14." },
+            { question: "5 * 2 + 8 / 4", options: [12, 4.5, 10, 8], correct: 0, explanation: "<strong>Step 1 (M):</strong> 5 * 2 = 10. <br><strong>Step 2 (D):</strong> 8 / 4 = 2. <br><strong>Step 3 (A):</strong> 10 + 2 = 12." },
+            { question: "24 / 8 + 2 * 5", options: [13, 2.4, 25, 10], correct: 0, explanation: "<strong>Step 1 (D):</strong> 24 / 8 = 3. <br><strong>Step 2 (M):</strong> 2 * 5 = 10. <br><strong>Step 3 (A):</strong> 3 + 10 = 13." },
+            { question: "10 + 20 / (2 + 3)", options: [6, 14, 12, 10], correct: 1, explanation: "<strong>Step 1 (B):</strong> 2 + 3 = 5. <br><strong>Step 2 (D):</strong> 20 / 5 = 4. <br><strong>Step 3 (A):</strong> 10 + 4 = 14." },
+            { question: "8 * (4 - 2) / 4", options: [16, 4, 8, 2], correct: 1, explanation: "<strong>Step 1 (B):</strong> 4 - 2 = 2. <br><strong>Step 2 (M):</strong> 8 * 2 = 16. <br><strong>Step 3 (D):</strong> 16 / 4 = 4." },
+            { question: "19 - 5 * 3 + 1", options: [43, 5, 15, 3], correct: 1, explanation: "<strong>Step 1 (M):</strong> 5 * 3 = 15. <br><strong>Step 2 (S):</strong> 19 - 15 = 4. <br><strong>Step 3 (A):</strong> 4 + 1 = 5." },
+            { question: "2 * (10 / 5) + 6", options: [10, 11, 12, 8], correct: 0, explanation: "<strong>Step 1 (B):</strong> 10 / 5 = 2. <br><strong>Step 2 (M):</strong> 2 * 2 = 4. <br><strong>Step 3 (A):</strong> 4 + 6 = 10." },
+            { question: "30 - 10 / 2 * 3", options: [30, 15, 0, 10], correct: 1, explanation: "<strong>Step 1 (D):</strong> 10 / 2 = 5. <br><strong>Step 2 (M):</strong> 5 * 3 = 15. <br><strong>Step 3 (S):</strong> 30 - 15 = 15." },
+            { question: "4 + 4 / 4 + 4", options: [2, 6, 9, 4.5], correct: 2, explanation: "<strong>Step 1 (D):</strong> 4 / 4 = 1. <br><strong>Step 2 (A):</strong> 4 + 1 = 5. <br><strong>Step 3 (A):</strong> 5 + 4 = 9." },
+            { question: "(5 + 5) * (5 - 5)", options: [10, 0, 25, 50], correct: 1, explanation: "<strong>Step 1 (B1):</strong> 5 + 5 = 10. <br><strong>Step 2 (B2):</strong> 5 - 5 = 0. <br><strong>Step 3 (M):</strong> 10 * 0 = 0." },
+            { question: "100 / 10 * 10", options: [1, 10, 100, 1000], correct: 2, explanation: "<strong>Left-to-Right Rule:</strong> <br><strong>Step 1 (D):</strong> 100 / 10 = 10. <br><strong>Step 2 (M):</strong> 10 * 10 = 100." },
+            { question: "7 * 7 - 7 / 7", options: [0, 48, 7, 49], correct: 1, explanation: "<strong>Step 1 (M):</strong> 7 * 7 = 49. <br><strong>Step 2 (D):</strong> 7 / 7 = 1. <br><strong>Step 3 (S):</strong> 49 - 1 = 48." },
+            { question: "3 + 3 * 3 - 3 / 3", options: [3, 5, 11, 1], correct: 2, explanation: "<strong>Step 1 (M):</strong> 3 * 3 = 9. <br><strong>Step 2 (D):</strong> 3 / 3 = 1. <br><strong>Step 3 (A):</strong> 3 + 9 = 12. <br><strong>Step 4 (S):</strong> 12 - 1 = 11." }
+        ];
+
+        // --- DOM Elements & State ---
+        const launchModalBtn = document.getElementById('launchModalBtn');
+        const learnModalOverlay = document.getElementById('learnModalOverlay');
+        const modal = document.getElementById('learnModal');
+        let currentEquationIndex = 0, currentSolutionIndex = 0, isAudioEnabled = false, speechQueue = [], isSpeaking = false;
+        let currentQuizQuestionIndex = 0, userQuizAnswers = [], quizScore = 0;
+
+        // --- TEMPLATE LITERALS FOR SCREENS ---
+        const getHeaderHTML = (titleKey) => `
+            <div class="modal-header">
+                <h2>${titleKey}</h2>
+                <div class="header-controls">
+                    <button class="hear-again-btn" title="Hear again">🔁</button>
+                    <button class="audio-toggle-btn">🔇</button>
+                </div>
+                <button class="close-btn">&times;</button>
+            </div>`;
+
+        const introScreenHTML = `
+            ${getHeaderHTML('Guided Practice')}
+            <div class="modal-body intro-text">
+                <p>Welcome! This module will help you master the Order of Operations, known as BODMAS.</p>
+                <div class="bodmas-explanation">
+                    <strong>B</strong>rackets first<br>
+                    <strong>O</strong>rders (Powers, Roots)<br>
+                    <strong>D</strong>ivision & <strong>M</strong>ultiplication (left-to-right)<br>
+                    <strong>A</strong>ddition & <strong>S</strong>ubtraction (left-to-right)
+                </div>
+                <p>We'll start with 10 guided examples, then you can test your skills with a 25-question quiz.</p>
+                <button class="action-button" id="startPracticeBtn">Start Guided Practice</button>
+            </div>`;
+        
+        const learnScreenHTML = `
+            ${getHeaderHTML('Guided Practice')}
+            <div class="modal-body">
+                <div class="learn-nav">
+                    <button class="nav-btn" id="prevEquationBtn">Previous</button>
+                    <div class="equation-counter" id="equationCounter"></div>
+                    <button class="nav-btn" id="nextEquationBtn">Next</button>
+                </div>
+                <div class="equation-display" id="equationDisplay"></div>
+                <div class="thought-process" id="thoughtProcess">
+                    <h3>Our Game Plan</h3>
+                    <div id="thoughtProcessSteps"></div>
+                </div>
+                <div class="solution-area">
+                    <div class="solution-tabs" id="solutionTabs"></div>
+                    <div class="solution-content" id="solutionContent"></div>
+                </div>
+                <button class="action-button" id="startQuizBtn" style="display:none;">Test Your Knowledge!</button>
+            </div>`;
+
+        const quizScreenHTML = `
+            ${getHeaderHTML('BODMAS Quiz')}
+            <div class="modal-body">
+                <div id="quizProgressContainer"><div id="quizProgressBar"></div></div>
+                <p id="quizProgressText"></p>
+                <div id="quizQuestionText"></div>
+                <div id="quizOptionsContainer"></div>
+                <div id="quizExplanationBox"></div>
+                <button class="action-button" id="quizNextBtn" style="display: none;"></button>
+            </div>`;
+
+        const resultsScreenHTML = `
+            ${getHeaderHTML('Quiz Results')}
+            <div class="modal-body">
+                <h3>Your Score</h3>
+                <p id="quizScoreText"></p>
+                <h3>Review Your Answers</h3>
+                <div id="quizSummaryContainer"></div>
+                <button class="action-button" id="restartModuleBtn">Start Over</button>
+            </div>`;
+
+        // --- CORE APP LOGIC ---
+        function showScreen(screenHTML) {
+            modal.innerHTML = screenHTML;
+            attachCommonListeners();
+        }
+
+        function openModal() {
+            // Enter cleanly: stop any ongoing speech
+            stopSpeech(true);
+            learnModalOverlay.classList.add('show');
+            showScreen(introScreenHTML);
+            // Intro narration
+            if (isAudioEnabled) {
+                // Force resume in case engine is paused by prior page interaction
+                try { if (window.speechSynthesis?.resume) window.speechSynthesis.resume(); } catch {}
+                queueSpeech('Welcome! This module will help you master the Order of Operations, known as BODMAS.');
+                queueSpeech('B stands for Brackets, O for Orders, D for Division, M for Multiplication, A for Addition, and S for Subtraction.');
+                queueSpeech('We will start with ten guided examples, then a quiz.');
+                playNextInQueue();
+            }
+            document.getElementById('startPracticeBtn').addEventListener('click', () => {
+                stopSpeech(true);
+                showScreen(learnScreenHTML);
+                currentEquationIndex = 0;
+                renderLearnComponent();
+            });
+        }
+
+        function closeModal() {
+            window.speechSynthesis.cancel();
+            learnModalOverlay.classList.remove('show');
+        }
+        
+        function attachCommonListeners() {
+            modal.querySelector('.close-btn').addEventListener('click', closeModal);
+            const audioBtn = modal.querySelector('.audio-toggle-btn');
+            const hearBtn = modal.querySelector('.hear-again-btn');
+            if (audioBtn) {
+                audioBtn.textContent = isAudioEnabled ? '🔊' : '🔇';
+                audioBtn.classList.toggle('active', isAudioEnabled);
+                audioBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleAudio(e); });
+            }
+            if (hearBtn) {
+                hearBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (!isAudioEnabled) return;
+                    // Replay the current context
+                    const equationEl = modal.querySelector('#equationDisplay');
+                    const equation = equationEl ? equationEl.textContent.replace(' = ?', '') : '';
+                    if (equation) {
+                        stopSpeech(true);
+                        queueSpeech(`This BODMAS learning is for the equation ${equation}. Select one of the two buttons: Correct Way or Common Mistake.`);
+                        playNextInQueue();
+                    } else if (modal.querySelector('.intro-text')) {
+                        stopSpeech(true);
+                        queueSpeech('Welcome! This module will help you master BODMAS. We will start with ten guided examples, then a quiz.');
+                        playNextInQueue();
+                    }
+                });
+            }
+        }
+
+        // --- LEARN COMPONENT LOGIC ---
+        function renderLearnComponent() {
+            const equationData = equationsData[currentEquationIndex];
+            modal.querySelector('#equationCounter').textContent = `${currentEquationIndex + 1} / ${equationsData.length}`;
+            modal.querySelector('#equationDisplay').innerHTML = equationData.expression + " = ?";
+            
+            const nextBtn = modal.querySelector('#nextEquationBtn');
+            const prevBtn = modal.querySelector('#prevEquationBtn');
+            const quizBtn = modal.querySelector('#startQuizBtn');
+
+            prevBtn.disabled = currentEquationIndex === 0;
+            nextBtn.style.display = (currentEquationIndex === equationsData.length - 1) ? 'none' : 'inline-block';
+            quizBtn.style.display = (currentEquationIndex === equationsData.length - 1) ? 'block' : 'none';
+
+            prevBtn.onclick = () => { if (currentEquationIndex > 0) { stopSpeech(true); currentEquationIndex--; renderLearnComponent(); } };
+            nextBtn.onclick = () => { if (currentEquationIndex < equationsData.length - 1) { stopSpeech(true); currentEquationIndex++; renderLearnComponent(); } };
+            quizBtn.onclick = () => { stopSpeech(true); startQuiz(); };
+            
+            // Always start with the problem prompt
+            stopSpeech(true);
+            queueSpeech(`This BODMAS learning is for the equation ${equationData.expression}. Select one of the two buttons: Correct Way or Common Mistake.`);
+            renderThoughtProcess(equationData);
+            renderSolutionTabs(equationData);
+        }
+
+        function renderThoughtProcess(equationData) {
+            const stepsEl = modal.querySelector('#thoughtProcessSteps');
+            stepsEl.innerHTML = '';
+            const narration = narrationData[equationData.expression]?.thoughtProcess || [];
+            const total = equationData.thoughtProcess.length;
+            function formatSequencedStep(raw, idx) {
+                if (/^(Scan:|Plan:)/i.test(raw)) return raw; // keep meta lines
+                let cleaned = String(raw).replace(/^\s*(First|Then|Next|Finally|Lastly)\s*[:,]?\s*/i, '');
+                if (idx === 0) return `First, ${cleaned}`;
+                if (idx === total - 1) return `Finally, ${cleaned}`;
+                return `Next, ${cleaned}`;
+            }
+            let delay = 500;
+            equationData.thoughtProcess.forEach((raw, index) => {
+                setTimeout(() => {
+                    const p = document.createElement('p');
+                    p.innerHTML = formatSequencedStep(raw, index);
+                    stepsEl.appendChild(p);
+                    queueSpeech(narration[index]);
+                }, delay);
+                delay += 2500;
+            });
+        }
+        
+        function renderSolutionTabs(equationData) {
+            const solutions = generateSolutionData(equationData.expression);
+            const tabsEl = modal.querySelector('#solutionTabs');
+            tabsEl.innerHTML = '';
+            const correctSol = solutions.find(s => s.isCorrect) || solutions[0];
+            function describeOrder(sol){
+                if (!sol || !sol.steps) return '';
+                const parts = sol.steps.map(st => st.calc);
+                if (parts.length === 1) return `Do ${parts[0]}.`;
+                return `First ${parts[0]}, then ${parts.slice(1, -1).map(p=>p).join(', then ')}${parts.length>1? (parts.length>2?', then ':'') : ''}${parts[parts.length-1]}.`;
+            }
+            function opType(calc){
+                if (/\(|\)/.test(calc)) return 'brackets';
+                if (calc.includes('*')) return 'multiplication';
+                if (calc.includes('/')) return 'division';
+                if (calc.includes('+')) return 'addition';
+                if (calc.includes('-')) return 'subtraction';
+                return 'operation';
+            }
+            solutions.forEach((sol) => {
+                const tab = document.createElement('button');
+                tab.className = 'tab-btn';
+                tab.textContent = sol.title;
+                tab.onclick = () => {
+                    tabsEl.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    // On user selection, stop current narration and speak appropriate guidance
+                    stopSpeech(true);
+                    renderSolution(sol, equationData.expression);
+                    const order = describeOrder(sol).replace(/\s+/g,' ').trim();
+                    if (sol.isCorrect) {
+                        const rightFinal = sol.steps[sol.steps.length - 1]?.result;
+                        const spokenOrder = speakifyExpr(order);
+                        queueSpeech(`Right order. ${spokenOrder} Total equals ${rightFinal}. That is correct.`);
+                    } else {
+                        const rightOrder = describeOrder(correctSol);
+                        const wrongType = opType(sol.steps[0]?.calc || '');
+                        const rightType = opType(correctSol.steps[0]?.calc || '');
+                        const wrongFinal = sol.steps[sol.steps.length - 1]?.result;
+                        const rightFinal = correctSol.steps[correctSol.steps.length - 1]?.result;
+                        const ruleHint = (rightType === 'multiplication' || rightType === 'division') && (wrongType === 'addition' || wrongType === 'subtraction')
+                            ? 'Remember: multiplication and division come before addition and subtraction.'
+                            : (rightType === 'brackets' ? 'Remember: always solve inside brackets first.' : 'Remember the left-to-right rule for partner operations.');
+                        const spokenWrong = speakifyExpr(order);
+                        const spokenRight = speakifyExpr(rightOrder);
+                        queueSpeech(`Wrong order. ${spokenWrong} Correct order is: ${spokenRight} You did ${wrongType} before ${rightType}. ${ruleHint} Let\'s compare: your path gives ${wrongFinal}, correct gives ${rightFinal}.`);
+                    }
+                };
+                tabsEl.appendChild(tab);
+            });
+            // Do not auto-select. Prompt the learner to pick a button.
+            const contentEl = modal.querySelector('#solutionContent');
+            contentEl.innerHTML = '<div style="padding:0.5rem; color:#555;">Select one of the two buttons above to explore the solution.</div>';
+        }
+
+        function renderSolution(solution, expression) {
+            const contentEl = modal.querySelector('#solutionContent');
+            contentEl.innerHTML = '';
+            let currentExpression = expression;
+            solution.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'solution-step';
+                stepDiv.style.animationDelay = `${index * 0.3}s`;
+                stepDiv.innerHTML = `
+                    <div class="step-icon ${solution.isCorrect ? 'correct' : 'incorrect'}">${solution.isCorrect ? '✓' : '✖'}</div>
+                    <div>
+                        <code>${currentExpression.replace(step.calc, `<strong>${step.calc}</strong>`)}</code>
+                        <div class="step-explanation">${step.explanation}</div>
+                    </div>`;
+                contentEl.appendChild(stepDiv);
+                currentExpression = currentExpression.replace(step.calc, step.result);
+            });
+            const finalResult = solution.steps[solution.steps.length - 1].result;
+            contentEl.innerHTML += `<div class="final-answer ${solution.isCorrect ? 'correct' : 'incorrect'}">Final Answer: ${finalResult}</div>`;
+        }
+
+        // --- QUIZ COMPONENT LOGIC ---
+        function startQuiz() {
+            stopSpeech(true);
+            showScreen(quizScreenHTML);
+            currentQuizQuestionIndex = 0;
+            userQuizAnswers = new Array(quizData.length).fill(null);
+            quizScore = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const q = quizData[currentQuizQuestionIndex];
+            modal.querySelector('#quizProgressBar').style.width = `${(currentQuizQuestionIndex / quizData.length) * 100}%`;
+            modal.querySelector('#quizProgressText').textContent = `Question ${currentQuizQuestionIndex + 1} of ${quizData.length}`;
+            modal.querySelector('#quizQuestionText').textContent = q.question;
+            const optionsContainer = modal.querySelector('#quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'quiz-option';
+                optionEl.textContent = option;
+                optionEl.onclick = () => selectQuizAnswer(index);
+                optionsContainer.appendChild(optionEl);
+            });
+            modal.querySelector('#quizExplanationBox').style.display = 'none';
+            modal.querySelector('#quizNextBtn').style.display = 'none';
+        }
+
+        function selectQuizAnswer(selectedIndex) {
+            const q = quizData[currentQuizQuestionIndex];
+            const isCorrect = selectedIndex === q.correct;
+            if (isCorrect) quizScore++;
+            userQuizAnswers[currentQuizQuestionIndex] = { question: q.question, selected: q.options[selectedIndex], correctAnswer: q.options[q.correct], isCorrect };
+            
+            const options = modal.querySelectorAll('.quiz-option');
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) opt.classList.add('correct');
+                else if (index === selectedIndex) opt.classList.add('incorrect');
+            });
+
+            const explanationBox = modal.querySelector('#quizExplanationBox');
+            explanationBox.innerHTML = `<strong>Explanation:</strong><br>${q.explanation}`;
+            explanationBox.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
+            explanationBox.style.display = 'block';
+
+            const nextBtn = modal.querySelector('#quizNextBtn');
+            nextBtn.style.display = 'block';
+            if (currentQuizQuestionIndex < quizData.length - 1) {
+                nextBtn.textContent = 'Next Question';
+                nextBtn.onclick = () => { currentQuizQuestionIndex++; renderQuizQuestion(); };
+            } else {
+                nextBtn.textContent = 'Show Results';
+                nextBtn.onclick = showQuizResults;
+            }
+        }
+
+        function showQuizResults() {
+            showScreen(resultsScreenHTML);
+            modal.querySelector('#quizScoreText').textContent = `You scored ${quizScore} out of ${quizData.length}!`;
+            const summaryContainer = modal.querySelector('#quizSummaryContainer');
+            summaryContainer.innerHTML = '';
+            userQuizAnswers.forEach(answer => {
+                const resultClass = answer.isCorrect ? 'correct' : 'incorrect';
+                summaryContainer.innerHTML += `
+                    <div class="summary-item">
+                        <div class="summary-question">${answer.question}</div>
+                        <div class="summary-answer ${resultClass}">
+                            Your answer: <span>${answer.selected}</span> 
+                            ${!answer.isCorrect ? `| Correct: <span>${answer.correctAnswer}</span>` : ''}
+                        </div>
+                    </div>`;
+            });
+            modal.querySelector('#restartModuleBtn').addEventListener('click', openModal);
+        }
+
+        // --- SPEECH & UTILITIES ---
+        function speakifyExpr(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/\*/g, ' times ')
+                .replace(/\//g, ' divided by ')
+                .replace(/\+/g, ' plus ')
+                .replace(/-/g, ' minus ')
+                .replace(/\(/g, ' open bracket ')
+                .replace(/\)/g, ' close bracket ')
+                .replace(/\s+/g, ' ') // collapse spaces
+                .trim();
+        }
+        function toggleAudio(e) {
+            isAudioEnabled = !isAudioEnabled;
+            e.target.textContent = isAudioEnabled ? '🔊' : '🔇';
+            e.target.classList.toggle('active', isAudioEnabled);
+            // Note: Speech queue preserved, only playback state changes
+            if (isAudioEnabled) {
+                try { if (window.speechSynthesis?.resume) window.speechSynthesis.resume(); } catch {}
+                // If currently on intro screen, auto-narrate
+                if (modal.querySelector('.intro-text')) {
+                    queueSpeech('Welcome! This module will help you master the Order of Operations, known as BODMAS.');
+                    queueSpeech('B stands for Brackets, O for Orders, D for Division, M for Multiplication, A for Addition, and S for Subtraction.');
+                    queueSpeech('We will start with ten guided examples, then a quiz.');
+                    playNextInQueue();
+                }
+            } else {
+                try { if (window.speechSynthesis?.pause) window.speechSynthesis.pause(); } catch {}
+            }
+        }
+        function stopSpeech(clearQueue=false) {
+            try {
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+            } catch {}
+            isSpeaking = false;
+            if (clearQueue) speechQueue = [];
+        }
+        
+        function queueSpeech(text) {
+            if (!text) return;
+            speechQueue.push(text);
+            if (isAudioEnabled && !isSpeaking) {
+                playNextInQueue();
+            }
+        }
+        function playNextInQueue() {
+            if (speechQueue.length === 0) { isSpeaking = false; return; }
+            if (!isAudioEnabled) { isSpeaking = false; return; }
+            isSpeaking = true;
+            speak(speechQueue.shift(), playNextInQueue);
+        }
+        function speak(text, callback) {
+            try {
+                if (!isAudioEnabled || !window.speechSynthesis) {
+                    isSpeaking = false;
+                    return;
+                }
+                // interrupt current utterance only, do not wipe queue here
+                try { window.speechSynthesis.cancel(); } catch {}
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.onend = () => { isSpeaking = false; if (callback) callback(); };
+                utterance.onerror = (e) => { console.error('Speech error', e); isSpeaking = false; if (callback) callback(); };
+                window.speechSynthesis.speak(utterance);
+            } catch (err) {
+                console.warn('Speak failed:', err);
+                isSpeaking = false;
+                if (callback) callback();
+            }
+        }
+
+        // --- INITIALIZATION ---
+        launchModalBtn.addEventListener('click', openModal);
+
+    </script>
+</body>
+</html>

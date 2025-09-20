@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brilliant Bowl</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #444;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      padding: 0.5rem 1rem 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.9rem;
+    }
+    header .title-block {
+      flex: 1;
+    }
+    h1 { font-size: 1.5rem; font-weight: 700; }
+    p { font-style: italic; font-size: 0.9rem; }
+    .speech-toggle {
+      border-radius: 50%; background: #666; padding: 0.5rem;
+      border: none; cursor: pointer;
+    }
+    .speech-enabled { background: #22c55e; }
+    .bowl-section {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+    }
+    .bowl-container {
+      width: 70vmin; height: 70vmin; position: relative;
+    }
+    .bowl-shape {
+      position: absolute; background: #111; width: 100%; height: 100%; border-radius: 50%;
+      clip-path: polygon(0 43.75%, 100% 43.75%, 100% 100%, 0 100%);
+    }
+    .bowl-label {
+      position: absolute; top: 91%; left: 50%; transform: translate(-50%, -50%) rotateX(18deg);
+      text-align: center; font-size: 1rem; font-weight: 600; color: #bbb;
+      font-style: italic; text-shadow: 0 1px 3px #000; z-index: 2;
+    }
+    .bowl-rim {
+      position: absolute; width: 100%; height: 62.5%; top: 16.25%; background: #333;
+      border-radius: 50%; overflow: hidden;
+    }
+    .bowl-inside {
+      position: absolute; width: 75%; height: 80%; top: 10%; left: 12.5%; background: #222;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .fluid {
+      position: absolute; border-radius: 50%; background: radial-gradient(circle at center, #ff6a00, #b54201);
+      background-size: 200% 200%; animation: ripple 4s infinite;
+    }
+    .word-text {
+      position: absolute; text-align: center; font-weight: 700; font-size: 1.6rem;
+      z-index: 10; width: 100%; transform: translateY(-50%);
+      animation: wordRipple 1.5s ease-out;
+    }
+    .controls {
+      padding: 0.5rem 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;
+    }
+    button {
+      border: none; padding: 0.5rem 1rem; border-radius: 9999px;
+      font-weight: 600; cursor: pointer;
+    }
+    .start-btn { background: #2563eb; color: white; }
+    .reset-btn { background: #dc2626; color: white; }
+    @keyframes ripple {
+      0%, 100% { background-position: 50% 50%; }
+      50% { background-position: 48% 52%; }
+    }
+    @keyframes wordRipple {
+      0% { transform: scale(0.8) translateY(-50%); opacity: 0; }
+      50% { transform: scale(1.1) translateY(-50%); opacity: 1; }
+      100% { transform: scale(1) translateY(-50%); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-block">
+      <h1>Brilliant</h1>
+      <p>An exploration of its meaning</p>
+    </div>
+    <button id="speechToggle" class="speech-toggle" aria-label="Toggle speech">🔊</button>
+  </header>
+  <div class="bowl-section">
+    <div class="bowl-container">
+      <div class="bowl-shape"></div>
+      <div id="bowlLabel" class="bowl-label"></div>
+      <div class="bowl-rim">
+        <div class="bowl-inside">
+          <div id="fluid" class="fluid"></div>
+          <div id="wordText" class="word-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="start-btn" id="startBtn">Start</button>
+    <button class="reset-btn" id="resetBtn" style="display: none;">Reset</button>
+  </div>
+  <script>
+    const synonyms = ['Smart', 'Shining', 'Radiant', 'Gleaming', 'Luminous', 'Sparkling', 'Dazzling', 'Intelligent'];
+    const antonyms = ['Foolish', 'Incompetent', 'Mediocre', 'Ignorant', 'Unintelligent', 'Obscure', 'Dull', 'Dark'];
+    const fluid = document.getElementById('fluid');
+    const wordText = document.getElementById('wordText');
+    const bowlLabel = document.getElementById('bowlLabel');
+    const speechToggle = document.getElementById('speechToggle');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    let isSpeakingEnabled = false;
+    const maxWidth = document.querySelector('.bowl-inside').clientWidth;
+    const maxHeight = document.querySelector('.bowl-inside').clientHeight;
+
+    speechToggle.onclick = () => {
+      isSpeakingEnabled = !isSpeakingEnabled;
+      speechToggle.classList.toggle('speech-enabled', isSpeakingEnabled);
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+    };
+
+    startBtn.onclick = () => {
+      startBtn.style.display = 'none';
+      resetBtn.style.display = 'inline-block';
+      wordText.textContent = '';
+      bowlLabel.textContent = '';
+      if (isSpeakingEnabled) {
+        speak("Experience the synonyms and antonyms of Brilliant. Let's start.", () => {
+          runPhase(synonyms, 'fill', () => {
+            celebrateRipple(() => {
+              setTimeout(() => runPhase(antonyms, 'drain', () => {
+                startBtn.style.display = 'inline-block';
+                resetBtn.style.display = 'none';
+              }), 3000);
+            });
+          });
+        });
+      } else {
+        runPhase(synonyms, 'fill', () => {
+          celebrateRipple(() => {
+            setTimeout(() => runPhase(antonyms, 'drain', () => {
+              startBtn.style.display = 'inline-block';
+              resetBtn.style.display = 'none';
+            }), 3000);
+          });
+        });
+      }
+    };
+
+    resetBtn.onclick = () => {
+      fluid.style.cssText = `top:${maxHeight}px;left:${maxWidth / 2}px;width:0px;height:0px;`;
+      wordText.textContent = '';
+      bowlLabel.textContent = '';
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      startBtn.style.display = 'inline-block';
+      resetBtn.style.display = 'none';
+    };
+
+    function runPhase(words, mode, onDone) {
+      let idx = 0;
+      const delayPerWord = 2000;
+      const total = words.length;
+      const wordDelayOffset = 2000; // Wait 2s before first word
+      bowlLabel.textContent = mode === 'fill' ? 'Synonym' : 'Antonym';
+      const startTime = Date.now();
+
+      function frame() {
+        const elapsed = Date.now() - startTime;
+        const p = Math.min(elapsed / (delayPerWord * total), 1);
+        const factor = mode === 'fill' ? p : 1 - p;
+        const w = maxWidth * factor;
+        const h = w * (maxHeight / maxWidth);
+        const top = maxHeight - h;
+        const left = (maxWidth - w) / 2;
+        fluid.style.cssText = `top:${top}px;left:${left}px;width:${w}px;height:${h}px;`;
+        wordText.style.top = `${top + h / 2}px`;
+
+        if ((elapsed - wordDelayOffset) >= idx * delayPerWord && idx < total) {
+          wordText.textContent = words[idx];
+          wordText.style.animation = 'none'; wordText.offsetHeight;
+          wordText.style.animation = 'wordRipple 1.5s ease-out';
+          speak(words[idx]);
+          idx++;
+        }
+        if (p < 1) requestAnimationFrame(frame);
+        else onDone();
+      }
+      frame();
+    }
+
+    function celebrateRipple(cb) {
+      wordText.style.animation = 'none'; wordText.offsetHeight;
+      wordText.style.animation = 'wordRipple 1.5s ease-out';
+      setTimeout(cb, 2000);
+    }
+
+    function speak(text, cb = () => {}) {
+      if (!isSpeakingEnabled || !window.speechSynthesis) return cb();
+      const u = new SpeechSynthesisUtterance(text);
+      u.onend = cb;
+      window.speechSynthesis.speak(u);
+    }
+  </script>
+</body>
+</html>

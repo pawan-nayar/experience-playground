@@ -1,0 +1,2328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Virtual Counting App — Beyond Dictionary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ================= Base / Theme (Original) ================= */
+  :root{ 
+    --text:#212529; --bg:#fff; --muted:#f8f9fa; --border:#e9ecef; --accent:#ffb86b; --accent-2:#ffa94d; 
+    --ok:#16a34a; --ok-soft:#dcfce7; --bad:#dc2626; --bad-soft:#fee2e2; 
+    --pair1:#fff3bf; --pair2:#e6fcf5; --pair3:#e7f5ff; --pair4:#f3d9fa;
+  }
+  
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;}
+  
+  .container{max-width:900px;margin:auto;padding:16px}
+  @media (max-width:600px){.container{padding:12px}}
+
+  /* Header / Footer */
+  .site-header,.site-footer{
+    background:#212529;
+    color:#fff;
+    padding:14px 18px;
+    transition: height 0.4s ease-in-out, padding 0.4s ease-in-out;
+  }
+  .site-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:60}
+  .logo{font-weight:700;font-size:1.15rem;color:#fff}
+  .site-header nav{display:flex;gap:14px}
+  .site-header nav a{color:#ced4da}
+  .site-header nav a:hover{color:#fff}
+  
+  /* App-specific styles using calculator framework */
+  .counting-app{max-width:900px;margin:0 auto;}
+  
+  /* Home Screen */
+  .home-screen{text-align:center;}
+  .mascot{font-size:6rem;animation:bounce 2s infinite;margin-bottom:20px}
+  @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-20px)}60%{transform:translateY(-10px)}}
+  
+  .welcome-title{font-size:2.5rem;color:var(--heading);margin-bottom:12px;font-weight:700}
+  .welcome-subtitle{font-size:1.2rem;color:var(--text);margin-bottom:30px}
+  
+  .start-button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:20px 40px;
+    border-radius:10px;
+    font-size:1.5rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.3s;
+  }
+  .start-button:hover{
+    background:var(--accent-2);
+  }
+  
+  .grownup-toggle{
+    margin-top:30px;
+    background:var(--muted);
+    border:1px solid var(--border);
+    padding:12px 24px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:0.9rem;
+    color:var(--text);
+  }
+  .grownup-toggle:hover{background:#f1f3f5}
+  
+  /* Game Screen Layout */
+  .game-screen{display:none;}
+  .game-screen.active{display:flex; flex-direction: column;}
+  
+  .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:nowrap; gap: 10px;}
+  .game-title{font-size:clamp(1.2rem, 3vw, 1.5rem);color:var(--text);font-weight:600; text-align: center; flex-grow: 1;}
+  
+  .nav-btn{
+    background:var(--muted);
+    border:1px solid var(--border);
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:all 0.3s;
+    color:var(--text);
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .nav-btn:hover{background:#f1f3f5}
+  
+  .home-btn{
+    background:var(--accent);
+    color:#fff;
+    border:1px solid var(--accent);
+  }
+  .home-btn:hover{background:var(--accent-2)}
+  
+  /* Game Area */
+  .game-area{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:10px;
+    text-align:center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+  }
+  
+  .activity-instruction{
+    font-size:1.1rem;
+    color:var(--text);
+    margin-bottom:15px;
+    font-weight:600;
+  }
+  
+  /* Count-Them Game */
+  .objects-container{
+    display:flex; /* Changed from grid */
+    flex-wrap: wrap; /* Allows wrapping */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    gap:15px;
+    max-width:500px;
+    margin: auto; /* Helps with centering */
+  }
+  
+  .counting-object{
+    width:60px;
+    height:60px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2rem;
+    transition:all 0.3s;
+    border:2px solid var(--border);
+    user-select:none;
+    background:#fff;
+  }
+  .counting-object:hover{border-color:var(--accent)}
+  .counting-object.counted{
+    border-color:var(--accent);
+    background:var(--ok-soft);
+    color:var(--ok);
+  }
+  
+  /* Subitize Game */
+  .dot-pattern{
+    display:flex; /* Changed from grid */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap:15px;
+    max-width:200px;
+    margin: auto;
+  }
+  
+  .dot{
+    width:40px;
+    height:40px;
+    background:var(--accent);
+    border-radius:8px;
+    animation:flash 0.5s ease-in-out;
+  }
+  @keyframes flash{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+  
+  .number-choices{
+    display:flex;
+    gap:15px;
+    justify-content:center;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  
+  .number-button{
+    width:60px;
+    height:60px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:2rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.3s;
+    color:var(--text);
+    background:#fff;
+  }
+  .number-button:hover{border-color:var(--accent)}
+  
+  /* Ten Frame */
+  .ten-frame{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:8px;
+    max-width:350px;
+    margin: auto;
+    padding:15px;
+    background:var(--muted);
+    border-radius:12px;
+    border:1px solid var(--border);
+  }
+  
+  .frame-cell{
+    width:50px;
+    height:50px;
+    border:2px dashed var(--border);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:all 0.3s;
+    background:#fff;
+  }
+  .frame-cell:hover{border-color:var(--accent)}
+  .frame-cell.filled{
+    background:var(--ok-soft);
+    border-color:var(--ok);
+    color:var(--ok);
+    font-size:1.5rem;
+    font-weight:700;
+  }
+  
+  /* How Many Game */
+  .scattered-objects{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin: auto;
+    max-width:400px;
+  }
+  
+  .scattered-object{
+    width:45px;
+    height:45px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.5rem;
+    border:2px solid var(--border);
+    background:#fff;
+    animation:scatter 0.6s ease-out;
+  }
+  @keyframes scatter{
+    0%{transform:scale(0)}
+    100%{transform:scale(1)}
+  }
+  
+  /* Tens Game Styles */
+.tens-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin: auto;
+  max-width: 600px;
+}
+
+.tens-group {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  padding: 10px;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+  position: relative;
+}
+
+.tens-group:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.tens-group.next-to-click {
+  animation: pulse 1.5s infinite;
+  border-color: var(--accent);
+  background: var(--pair1);
+}
+
+.tens-group.counted {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.tens-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  transition: all 0.3s;
+  color: #666;
+}
+
+.tens-label {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: #fff;
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+}
+
+/* Teen Numbers Game Styles */
+.teens-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin: auto;
+  max-width: 700px;
+}
+
+.teen-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+  position: relative;
+  min-width: 120px;
+}
+
+.teen-block:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.teen-block.next-to-click {
+  animation: pulse 1.5s infinite;
+  border-color: var(--accent);
+  background: var(--pair1);
+}
+
+.teen-block.counted {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.teen-tens {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin-bottom: 8px;
+  padding: 5px;
+  background: var(--ok-soft);
+  border: 2px solid var(--ok);
+  border-radius: 6px;
+}
+
+.teen-ones {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+
+.teen-ten-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ok);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6px;
+  color: white;
+  transition: all 0.3s;
+}
+
+.teen-one-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: white;
+  transition: all 0.3s;
+}
+
+.teen-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  background: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+  margin-top: 5px;
+}
+
+@media (max-width:600px) {
+  .teens-container {
+    gap: 10px;
+  }
+  
+  .teen-block {
+    min-width: 100px;
+    padding: 10px;
+  }
+  
+  .teen-tens {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  .teen-ten-dot {
+    width: 10px;
+    height: 10px;
+    font-size: 5px;
+  }
+  
+  .teen-one-dot {
+    width: 12px;
+    height: 12px;
+    font-size: 6px;
+  }
+  
+  .teen-label {
+    font-size: 1.2rem;
+  }
+}
+
+/* Big Numbers Game Styles */
+.big-numbers-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin: auto auto 20px auto;
+  max-width: 800px;
+}
+
+.big-number-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+  min-width: 140px;
+}
+
+.big-number-block:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.big-number-block.next-to-click {
+  animation: pulse 1.5s infinite;
+  border-color: var(--accent);
+  background: var(--pair1);
+}
+
+.big-number-block.counted {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.big-tens-display {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 8px;
+  justify-content: center;
+}
+
+.big-tens-group {
+  font-size: 1.2rem;
+  color: var(--ok);
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.big-ones-display {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  margin-bottom: 8px;
+  min-height: 20px;
+  flex-wrap: wrap;
+}
+
+.big-ones-block {
+  font-size: 0.8rem;
+  color: var(--accent);
+  transition: all 0.3s;
+}
+
+.big-number-label {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  background: #fff;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+  margin-bottom: 5px;
+}
+
+.number-breakdown {
+  font-size: 0.7rem;
+  color: #666;
+  text-align: center;
+}
+
+.number-line {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 10px;
+  background: var(--muted);
+  border-radius: 10px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.line-number {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #fff;
+  transition: all 0.3s;
+}
+
+.line-number.target-number {
+  border-color: var(--accent);
+  background: var(--pair1);
+}
+
+/* Place Value Game Styles */
+.place-value-visual {
+  display: flex;
+  justify-content: space-around;
+  gap: 30px;
+  margin: 20px auto;
+  max-width: 500px;
+  padding: 20px;
+  background: var(--muted);
+  border-radius: 15px;
+  border: 2px solid var(--border);
+}
+
+.place-value-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 150px;
+}
+
+.place-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  padding: 5px 15px;
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+}
+
+.place-display {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  min-height: 80px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  align-content: flex-start;
+}
+
+.tens-display {
+  border-color: var(--ok);
+}
+
+.ones-display {
+  border-color: var(--accent);
+}
+
+.place-tens-block {
+  font-size: 1.5rem;
+  color: var(--ok);
+  font-weight: 900;
+  transition: all 0.5s;
+  animation: placeValuePop 0.5s ease-out;
+  cursor: default;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.place-ones-block {
+  font-size: 1rem;
+  color: var(--accent);
+  transition: all 0.5s;
+  animation: placeValuePop 0.5s ease-out;
+  cursor: default;
+}
+
+@keyframes placeValuePop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.place-value-choices {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.place-value-button {
+  width: 80px;
+  height: 60px;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text);
+  background: #fff;
+}
+
+.place-value-button:hover {
+  border-color: var(--accent);
+  background: var(--muted);
+  transform: scale(1.05);
+}
+
+@media (max-width:600px) {
+  .place-value-visual {
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+  }
+  
+  .place-value-section {
+    min-width: auto;
+  }
+  
+  .place-display {
+    min-height: 60px;
+  }
+  
+  .place-tens-block {
+    font-size: 1.2rem;
+  }
+  
+  .place-ones-block {
+    font-size: 0.8rem;
+  }
+  
+  .place-value-button {
+    width: 70px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .place-value-choices {
+    gap: 10px;
+  }
+}
+
+@media (max-width:600px) {
+  .big-numbers-container {
+    gap: 10px;
+  }
+  
+  .big-number-block {
+    min-width: 120px;
+    padding: 10px;
+  }
+  
+  .big-tens-group {
+    font-size: 1rem;
+  }
+  
+  .big-ones-block {
+    font-size: 0.7rem;
+  }
+  
+  .big-number-label {
+    font-size: 1.5rem;
+  }
+  
+  .number-breakdown {
+    font-size: 0.6rem;
+  }
+  
+  .line-number {
+    width: 25px;
+    height: 25px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width:600px) {
+  .tens-container {
+    gap: 15px;
+  }
+  
+  .tens-group {
+    grid-template-columns: repeat(5, 1fr);
+    padding: 8px;
+  }
+  
+  .tens-dot {
+    width: 12px;
+    height: 12px;
+    font-size: 6px;
+  }
+  
+  .tens-label {
+    font-size: 1rem;
+  }
+}
+
+  /* Results and Feedback */
+  .result-display{
+    background:var(--ok-soft);
+    border:1px solid var(--ok);
+    border-radius:12px;
+    padding:15px;
+    margin:10px 0;
+    display:none;
+  }
+  .result-display.show{display:block}
+  
+  .big-number{
+    font-size:3rem;
+    font-weight:700;
+    color:var(--accent);
+    text-align:center;
+    margin:5px 0;
+  }
+  
+  .result-message{
+    font-size:1.1rem;
+    color:var(--text);
+    text-align:center;
+    font-weight:600;
+  }
+  
+  /* Action Buttons */
+  .action-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:10px;
+    flex-wrap:wrap;
+    flex-shrink: 0;
+  }
+  
+  .action-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:0.9rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.3s;
+    min-width:100px;
+  }
+  .action-btn:hover{background:var(--accent-2)}
+  .action-btn.secondary{
+    background:var(--muted);
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .action-btn.secondary:hover{background:#f1f3f5}
+  
+  /* Audio Controls */
+  .audio-toggle{
+    background:var(--muted);
+    border:1px solid var(--border);
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+    z-index:50;
+    width:45px;
+    height:45px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .audio-toggle:hover{background:#f1f3f5}
+  .audio-toggle.muted{opacity:0.5}
+  
+  /* Progress Badges */
+  .progress-badge{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    background:var(--ok-soft);
+    color:var(--ok);
+    border:1px solid var(--ok);
+    padding:20px 30px;
+    border-radius:12px;
+    font-size:1.1rem;
+    font-weight:700;
+    z-index:100;
+    animation:badgeShow 3s ease-in-out forwards;
+    opacity:0;
+  }
+  @keyframes badgeShow{
+    0%{opacity:0;transform:translate(-50%, -50%) scale(0.8)}
+    20%{opacity:1;transform:translate(-50%, -50%) scale(1)}
+    80%{opacity:1;transform:translate(-50%, -50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%, -50%) scale(0.8)}
+  }
+  
+  /* Grownup Zone */
+  .grownup-zone{display:none;padding:20px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-top:20px}
+  .grownup-zone.active{display:block}
+  .grownup-zone h3{color:var(--text);margin-bottom:12px;font-size:1.15rem}
+  .grownup-zone p{margin-bottom:12px;line-height:1.6}
+  .grownup-zone ul{margin-left:20px;margin-bottom:16px}
+  .grownup-zone li{margin-bottom:8px}
+  
+  /* Confetti Animation */
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: confettiFall 3s linear forwards;
+    z-index: 200;
+    pointer-events: none;
+  }
+  
+  @keyframes confettiFall {
+    0% {
+      transform: translateY(-100vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+  
+  /* Comparison Game Styles */
+  .comparison-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    margin: auto;
+    flex-wrap: wrap;
+  }
+  
+  .comparison-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .comparison-objects {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    min-height: 100px;
+    justify-items: center;
+    align-items: center;
+  }
+  
+  .comparison-object {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 2px solid transparent;
+    animation: popIn 0.5s ease-out;
+  }
+  
+  @keyframes popIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  
+  .vs-symbol {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+  }
+  
+  .comparison-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .comparison-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 90px;
+  }
+  .comparison-btn:hover {
+    background: var(--accent-2);
+    transform: scale(1.05);
+  }
+  
+  /* Dot counting animation */
+  .counting-dot {
+    transition: all 0.5s ease;
+    transform: scale(1);
+  }
+  
+  .counting-dot.highlight {
+    transform: scale(1.5);
+    box-shadow: 0 0 20px rgba(234, 122, 39, 0.8);
+    border: 3px solid var(--accent);
+  }
+  
+  /* Hide elements initially */
+  .hidden{display:none !important}
+  
+  /* ======================================================= */
+  /* === Viewport Tightening & Sticky Controls (RE-FIXED) === */
+  /* ======================================================= */
+  html, body {
+    height: 100%;
+    overflow: hidden; /* Prevent the main body from scrolling */
+  }
+
+  .app-container {
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Needed for the overlay */
+  }
+  
+  #homeScreen {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+  }
+
+  .site-header, .site-footer {
+    flex-shrink: 0; /* Prevent header/footer from shrinking */
+    overflow: hidden;
+  }
+
+  /* Make the game screen fill the available space */
+  .game-screen.active {
+    flex-grow: 1;
+    min-height: 0; /* Override any minimum height */
+  }
+
+  /* Make the game area the primary flexible and scrollable content */
+  .game-area {
+    flex-grow: 1;
+    min-height: 0; /* Critical for flexbox grow to work */
+    overflow-y: auto; /* Allow scrolling only within this area */
+  }
+
+  /* Ensure bottom controls don't shrink */
+  .result-display, .action-buttons {
+    flex-shrink: 0;
+  }
+
+  /* Further whitespace reduction */
+  .counting-app {
+    padding: 10px;
+  }
+
+  .game-header {
+    padding: 0 10px;
+  }
+  
+  .game-area {
+    padding: 15px;
+    margin-bottom: 10px;
+  }
+
+  .home-screen {
+    padding: 20px 10px;
+  }
+
+  .welcome-title {
+    margin-bottom: 8px;
+  }
+
+  .welcome-subtitle {
+    margin-bottom: 20px;
+  }
+
+  /* === UI Lock Overlay for Synchronization === */
+  #ui-lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0); /* Transparent */
+    z-index: 999;
+    pointer-events: none; /* Allows clicks to pass through by default */
+  }
+
+  #ui-lock-overlay.active {
+    pointer-events: auto; /* Blocks clicks when active */
+  }
+
+  /* === Dynamic Minimized Header/Footer === */
+  .header-expander, .footer-expander {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+  }
+
+  .site-header.minimized {
+    height: 6vh;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+  }
+  .site-header.minimized .logo,
+  .site-header.minimized nav {
+    display: none;
+  }
+  .site-header.minimized .header-expander {
+    display: block;
+    margin-left: auto;
+  }
+
+  .site-footer.minimized {
+    height: 6vh;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+    justify-content: flex-end;
+    display: flex;
+  }
+  .site-footer.minimized small {
+    display: none;
+  }
+  .site-footer.minimized .footer-expander {
+    display: block;
+  }
+
+  /* === Visual Indicator for Next Click === */
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 184, 107, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 10px 10px rgba(255, 184, 107, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 184, 107, 0); }
+  }
+  .counting-object.next-to-click {
+    animation: pulse 1.5s infinite;
+    border-color: var(--accent);
+  }
+  
+  /* Responsive Design */
+  
+// Say the number after the sound
+setTimeout(() => {
+  // Special handling for bigger numbers
+  let speechText;
+  if (number >= 20) {
+    const tens = Math.floor(number / 10);
+    const ones = number % 10;
+    if (ones === 0) {
+      speechText = `${number}`; // Just say "twenty", "thirty", etc.
+    } else {
+      speechText = `${number}`; // Let browser handle pronunciation
+    }
+  } else {
+    speechText = number.toString();
+  }
+  speak(speechText, callback);
+}, 150);
+
+</style>
+</head>
+<body>
+<div class="app-container">
+<!-- UI Lock Overlay -->
+<div id="ui-lock-overlay"></div>
+
+<header class="site-header" id="site-header">
+  <a class="logo" href="#">Beyond Dictionary</a>
+  <nav>
+    <a href="#">Learning</a>
+    <a href="#">Games</a>
+    <a href="#">Blog</a>
+  </nav>
+  <!-- Expander Icon -->
+  <div class="header-expander">☰</div>
+</header>
+
+<!-- Home Screen -->
+<div id="homeScreen" class="counting-app">
+  <div class="home-screen">
+    <div class="mascot">🦁</div>
+    <h1 class="welcome-title">Let's Count Together!</h1>
+    <p class="welcome-subtitle">Fun counting games for little learners</p>
+    <button class="start-button" onclick="startGame()">Start Counting</button>
+    
+    <button class="grownup-toggle" onclick="toggleGrownupZone()">
+      👨‍👩‍👧‍👦 Grown-up Zone
+    </button>
+    
+    <div class="grownup-zone" id="grownupZone">
+      <h3>How to Play</h3>
+      <p>This app helps children ages 2-4 develop counting skills through interactive games:</p>
+      <ul>
+<li><strong>Count-Them:</strong> Click objects one by one to practice counting 1-10</li>
+<li><strong>Quick Look:</strong> Recognize small groups without counting (subitizing)</li>
+<li><strong>Fill the Frame:</strong> Build numbers using a ten-frame visual</li>
+<li><strong>How Many?:</strong> Estimate and count scattered groups</li>
+<li><strong>More or Less:</strong> Compare numbers and learn > < symbols</li>
+<li><strong>Count by 10s:</strong> Skip counting with visual ten-groups</li>
+<li><strong>Teen Numbers:</strong> Master tricky 11-19 with tens+ones</li>
+<li><strong>Big Numbers:</strong> Count 20-99 with place value understanding</li>
+<li><strong>Tens & Ones:</strong> Break down numbers into place value parts</li>
+      </ul>
+      <h3>Counting Talk to Try</h3>
+      <p>Encourage your child with phrases like:</p>
+      <ul>
+        <li>"Let's count together: 1, 2, 3..."</li>
+        <li>"How many do you see?"</li>
+        <li>"The last number tells us how many there are!"</li>
+        <li>"Great counting! You found 5 apples!"</li>
+      </ul>
+      <h3>What's Next?</h3>
+      <p>After mastering counting to 10, try:</p>
+      <ul>
+        <li>Counting objects around the house</li>
+        <li>Simple addition with small numbers</li>
+        <li>Recognizing numbers in books and signs</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen" class="counting-app game-screen">
+  <div class="game-header">
+    <!-- UPDATED: Simplified Header Structure -->
+    <button class="nav-btn home-btn" onclick="goHome()">🏠 Home</button>
+    <h2 class="game-title" id="gameTitle">Count-Them Game</h2>
+    <button class="audio-toggle" id="audioToggle" title="Toggle Sound">🔊</button>
+  </div>
+  
+  <div class="game-area" id="gameArea">
+    <!-- Game content will be dynamically inserted here -->
+  </div>
+  
+  <div class="result-display" id="resultDisplay">
+    <div class="big-number" id="bigNumber">5</div>
+    <div class="result-message" id="resultMessage">You counted 5 apples!</div>
+  </div>
+  
+  <div class="action-buttons" id="actionButtons">
+    <button class="action-btn" onclick="nextGame()">Next Game</button>
+    <button class="action-btn secondary" onclick="repeatGame()">Play Again</button>
+  </div>
+</div>
+
+<footer class="site-footer" id="site-footer">
+  <small>© 2025 Beyond Dictionary</small>
+  <!-- Expander Icon -->
+  <div class="footer-expander">⋮</div>
+</footer>
+</div>
+
+<script>
+// =================================================
+// === UPDATED: Pacing and Synchronization Logic ===
+// =================================================
+const uiLockOverlay = document.getElementById('ui-lock-overlay');
+const siteHeader = document.getElementById('site-header');
+const siteFooter = document.getElementById('site-footer');
+const audioToggle = document.getElementById('audioToggle');
+
+
+function lockUI() { uiLockOverlay.classList.add('active'); }
+function unlockUI() { uiLockOverlay.classList.remove('active'); }
+
+// Game State Management
+let gameState = {
+  currentGame: 0,
+  audioEnabled: true,
+  currentCount: 0,
+  targetNumber: 0,
+  isCounting: false,
+  // More/Less game state
+  comparisonRound: 1,
+  maxComparisonRounds: 3,
+  comparisonCorrect: 0,
+  showingSymbols: false,
+  // NEW: Big numbers state
+  currentTens: 0,
+  currentOnes: 0,
+  tensCount: 0,
+  onesCount: 0,
+  isCountingTens: false
+};
+
+// Game definitions
+const games = [
+  { name: 'Count-Them Game', type: 'counting', icon: '🟡' },
+  { name: 'Quick Look', type: 'subitize', icon: '👀' },
+  { name: 'Fill the Frame', type: 'tenframe', icon: '⬜' },
+  { name: 'How Many?', type: 'howmany', icon: '❓' },
+  { name: 'More or Less?', type: 'compare', icon: '⚖️' },
+  { name: 'Count by 10s', type: 'tens', icon: '🔢' },
+  { name: 'Teen Numbers', type: 'teens', icon: '🔟' },
+  { name: 'Big Numbers', type: 'bignumbers', icon: '💯' },
+  { name: 'Tens & Ones', type: 'placevalue', icon: '🧮' }
+];
+
+// Number colors
+const numberColors = {
+  1: 'var(--accent)', 2: 'var(--info)', 3: 'var(--ok)', 4: 'var(--warn)', 5: 'var(--calc)',
+  6: 'var(--accent)', 7: 'var(--info)', 8: 'var(--ok)', 9: 'var(--warn)', 10: 'var(--calc)'
+};
+
+// Audio system
+let audioContext;
+function initAudio() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playSound(type, number = null, callback) {
+  if (!gameState.audioEnabled) {
+      if(callback) callback();
+      return;
+  }
+  initAudio();
+  try {
+    if (type === 'number' && number) {
+      const frequency = 200 + (number * 50);
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+      speak(number.toString(), callback); // Pass callback to speak
+    } else if (type === 'celebration') {
+      // celebration sound logic...
+      if(callback) callback();
+    } else if (type === 'click') {
+      // click sound logic...
+      if(callback) callback();
+    }
+  } catch (e) {
+    console.log('Audio not supported');
+    if(callback) callback();
+  }
+}
+
+// `speak` function with callbacks
+function speak(text, onEndCallback) {
+  if (!gameState.audioEnabled || !window.speechSynthesis) {
+    if (onEndCallback) onEndCallback();
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.9;
+  utterance.pitch = 1.2;
+  utterance.volume = 0.8;
+  const voices = speechSynthesis.getVoices();
+  const preferredVoice = voices.find(voice => voice.name.includes('Google') && voice.lang.startsWith('en')) || voices.find(voice => voice.lang.startsWith('en'));
+  if (preferredVoice) utterance.voice = preferredVoice;
+
+  lockUI();
+  utterance.onend = () => {
+    unlockUI();
+    if (onEndCallback) onEndCallback();
+  };
+  speechSynthesis.speak(utterance);
+}
+
+// Game Management Functions
+function startGame() {
+  siteHeader.classList.add('minimized');
+  siteFooter.classList.add('minimized');
+  document.getElementById('homeScreen').style.display = 'none';
+  document.getElementById('gameScreen').classList.add('active');
+  gameState.currentGame = 0;
+  speak("Let's start counting!", loadGame);
+}
+
+function goHome() {
+  siteHeader.classList.remove('minimized');
+  siteFooter.classList.remove('minimized');
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('homeScreen').style.display = 'flex';
+  speak("Great job counting today!");
+}
+
+function loadGame() {
+  const game = games[gameState.currentGame];
+  document.getElementById('gameTitle').textContent = game.name;
+  document.getElementById('resultDisplay').classList.remove('show');
+  const gameArea = document.getElementById('gameArea');
+  gameArea.innerHTML = '';
+  gameState.isCounting = false;
+  
+switch(game.type) {
+  case 'counting': loadCountingGame(); break;
+  case 'subitize': loadSubitizeGame(); break;
+  case 'tenframe': loadTenFrameGame(); break;
+  case 'howmany': loadHowManyGame(); break;
+  case 'compare': loadComparisonGame(); break;
+  case 'tens': loadTensGame(); break;
+  case 'teens': loadTeensGame(); break;
+  case 'bignumbers': loadBigNumbersGame(); break;
+  case 'placevalue': loadPlaceValueGame(); break;
+}
+}
+
+// =================================================
+// === UPDATED: Count-Them Game with Visual Cue  ===
+// =================================================
+function loadCountingGame() {
+  const gameArea = document.getElementById('gameArea');
+  gameState.targetNumber = Math.floor(Math.random() * 8) + 3;
+  gameState.currentCount = 0;
+  const objectSets = [['🍎', '🍊', '🍌'], ['🚗', '🚙', '🚕'], ['🦋', '🐛', '🐞'], ['⭐', '❤️', '🟡'], ['🐶', '🐱', '🐰'], ['🎈', '🎁', '🧁']];
+  const chosenSet = objectSets[Math.floor(Math.random() * objectSets.length)];
+  const chosenObject = chosenSet[Math.floor(Math.random() * chosenSet.length)];
+  
+  gameArea.innerHTML = `
+    <div class="activity-instruction" id="instructionText"></div>
+    <div class="objects-container" id="objectsContainer"></div>
+  `;
+  document.getElementById('instructionText').textContent = `Click each ${chosenObject} to count them!`;
+  const container = document.getElementById('objectsContainer');
+  for (let i = 0; i < gameState.targetNumber; i++) {
+    const obj = document.createElement('div');
+    obj.className = 'counting-object';
+    obj.textContent = chosenObject;
+    obj.onclick = () => countObject(obj);
+    container.appendChild(obj);
+  }
+  
+  speak(`Count the ${chosenObject}s! Click each one.`, () => {
+    // After instruction, highlight the first item
+    const firstObject = document.querySelector('.counting-object:not(.counted)');
+    if (firstObject) {
+      firstObject.classList.add('next-to-click');
+    }
+  });
+}
+
+function countObject(element) {
+  // Only allow clicking if it's the highlighted element and not already counting
+  if (!element.classList.contains('next-to-click') || gameState.isCounting) return;
+  
+  gameState.isCounting = true; // Lock further clicks
+  element.classList.remove('next-to-click');
+  
+  gameState.currentCount++;
+  element.classList.add('counted');
+  
+  playSound('number', gameState.currentCount, () => {
+    // After sound finishes, find and highlight the next item
+    const nextObject = document.querySelector('.counting-object:not(.counted)');
+    if (nextObject) {
+      nextObject.classList.add('next-to-click');
+      gameState.isCounting = false; // Unlock for next click
+    } else {
+      // All items counted
+      setTimeout(() => {
+        showResult(gameState.targetNumber, `You counted ${gameState.targetNumber} objects!`);
+        playSound('celebration');
+        speak(`Great job! You counted ${gameState.targetNumber}!`);
+        showProgressBadge('Counting Star! ⭐');
+        createConfetti();
+      }, 500);
+    }
+  });
+}
+
+// Subitize Game
+function loadSubitizeGame() {
+  const gameArea = document.getElementById('gameArea');
+  gameState.targetNumber = Math.floor(Math.random() * 5) + 1;
+  gameArea.innerHTML = `
+    <div class="activity-instruction">How many dots do you see?</div>
+    <div class="dot-pattern" id="dotPattern"></div>
+    <div class="number-choices" id="numberChoices"></div>
+  `;
+  const dotPattern = document.getElementById('dotPattern');
+  for (let i = 0; i < gameState.targetNumber; i++) {
+      const dotEl = document.createElement('div');
+      dotEl.className = 'dot';
+      dotPattern.appendChild(dotEl);
+  }
+  const choices = generateNumberChoices(gameState.targetNumber);
+  const choicesContainer = document.getElementById('numberChoices');
+  choices.forEach(num => {
+    const btn = document.createElement('button');
+    btn.className = 'number-button';
+    btn.textContent = num;
+    btn.onclick = () => checkSubitizeAnswer(num);
+    choicesContainer.appendChild(btn);
+  });
+  speak("How many dots did you see? Pick the right number!");
+}
+
+function generateNumberChoices(correct, numChoices = 4) {
+  const choices = new Set([correct]);
+  while (choices.size < numChoices) {
+    const random = Math.floor(Math.random() * 9) + 1;
+    choices.add(random);
+  }
+  return Array.from(choices).sort((a, b) => a - b);
+}
+
+function checkSubitizeAnswer(chosen) {
+  if (gameState.isCounting) return;
+  gameState.isCounting = true;
+
+  if (chosen === gameState.targetNumber) {
+    showResult(gameState.targetNumber, `That's right! ${gameState.targetNumber} dots!`);
+    playSound('celebration');
+    speak(`Perfect! That's ${gameState.targetNumber}!`, () => gameState.isCounting = false);
+    showProgressBadge('Quick Eyes! 👀');
+    createConfetti();
+  } else {
+    speak(`Sorry, it's not ${chosen}.`, () => {
+      speak(`Let's count together!`, () => {
+        animateDotCounting(() => {
+          showResult(gameState.targetNumber, `Let's count: there are ${gameState.targetNumber} dots!`);
+          gameState.isCounting = false;
+        });
+      });
+    });
+  }
+}
+
+// Ten Frame Game
+function loadTenFrameGame() {
+  const gameArea = document.getElementById('gameArea');
+  gameState.targetNumber = Math.floor(Math.random() * 8) + 3;
+  gameState.currentCount = 0;
+  const objectSets = [['🟡', '🔴', '🟢'], ['🚗', '🚙', '🚕'], ['🪆', '👸', '🧸'], ['⭐', '❤️', '🌟'], ['🍎', '🍊', '🍌']];
+  const chosenSet = objectSets[Math.floor(Math.random() * objectSets.length)];
+  const chosenObject = chosenSet[Math.floor(Math.random() * chosenSet.length)];
+  gameArea.innerHTML = `
+    <div class="activity-instruction">Fill ${gameState.targetNumber} spaces with ${chosenObject}!</div>
+    <div class="ten-frame" id="tenFrame"></div>
+  `;
+  const tenFrame = document.getElementById('tenFrame');
+  for (let i = 0; i < 10; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'frame-cell';
+    cell.onclick = () => fillCell(cell, chosenObject);
+    tenFrame.appendChild(cell);
+  }
+  speak(`Click to fill ${gameState.targetNumber} spaces!`);
+}
+
+function fillCell(cell, object) {
+  if (gameState.isCounting || cell.classList.contains('filled') || gameState.currentCount >= gameState.targetNumber) return;
+  gameState.isCounting = true;
+  
+  gameState.currentCount++;
+  cell.classList.add('filled');
+  cell.textContent = object;
+  
+  playSound('number', gameState.currentCount, () => {
+      gameState.isCounting = false;
+      if (gameState.currentCount === gameState.targetNumber) {
+        setTimeout(() => {
+          showResult(gameState.targetNumber, `Perfect! You made ${gameState.targetNumber}!`);
+          playSound('celebration');
+          speak(`Wonderful! You filled ${gameState.targetNumber} spaces!`);
+          showProgressBadge('Frame Builder! 🏗️');
+          createConfetti();
+        }, 500);
+      }
+  });
+}
+
+// Other game functions (How Many, Comparison, etc.) would be updated similarly...
+
+// How Many Game
+function loadHowManyGame() {
+  const gameArea = document.getElementById('gameArea');
+  gameState.targetNumber = Math.floor(Math.random() * 7) + 4;
+  const objectSets = [{ objects: ['⭐', '❤️', '🦋'], name: 'shapes' }, { objects: ['🚗', '🚙', '🏎️'], name: 'cars' }, { objects: ['🪆', '👸', '🧸'], name: 'dolls' }];
+  const chosenSet = objectSets[Math.floor(Math.random() * objectSets.length)];
+  const chosenObject = chosenSet[Math.floor(Math.random() * chosenSet.objects.length)];
+  gameArea.innerHTML = `
+    <div class="activity-instruction">How many ${chosenObject}s do you see?</div>
+    <div class="scattered-objects" id="scatteredObjects"></div>
+    <div class="number-choices" id="numberChoices"></div>
+  `;
+  const container = document.getElementById('scatteredObjects');
+  for (let i = 0; i < gameState.targetNumber; i++) {
+    const obj = document.createElement('div');
+    obj.className = 'scattered-object';
+    obj.textContent = chosenObject;
+    obj.style.animationDelay = `${i * 0.1}s`;
+    container.appendChild(obj);
+  }
+  const choices = generateNumberChoices(gameState.targetNumber, 4);
+  const choicesContainer = document.getElementById('numberChoices');
+  choices.forEach(num => {
+    const btn = document.createElement('button');
+    btn.className = 'number-button';
+    btn.textContent = num;
+    btn.onclick = () => checkHowManyAnswer(num, chosenObject);
+    choicesContainer.appendChild(btn);
+  });
+  speak(`Count the ${chosenObject}s and pick the right number!`);
+}
+
+function checkHowManyAnswer(chosen, object) {
+  if (gameState.isCounting) return;
+  gameState.isCounting = true;
+
+  if (chosen === gameState.targetNumber) {
+    animateCountingReveal(() => {
+      showResult(gameState.targetNumber, `Excellent! ${gameState.targetNumber} ${object}s!`);
+      playSound('celebration');
+      speak(`Amazing! You found all ${gameState.targetNumber}!`, () => gameState.isCounting = false);
+      showProgressBadge('Number Detective! 🕵️');
+      createConfetti();
+    });
+  } else {
+    speak(`Sorry, it's not ${chosen}.`, () => {
+        speak(`Let's count them together!`, () => {
+            animateCountingReveal(() => {
+                showResult(gameState.targetNumber, `Let's see... there are ${gameState.targetNumber} ${object}s!`);
+                gameState.isCounting = false;
+            });
+        });
+    });
+  }
+}
+
+// Animation functions with locking
+function animateCountingReveal(callback) {
+  lockUI();
+  const objects = document.querySelectorAll('.scattered-object');
+  let count = 0;
+  const countNext = () => {
+    if (count < objects.length) {
+      objects[count].style.border = '3px solid var(--accent)';
+      objects[count].style.transform = 'scale(1.2)';
+      playSound('number', count + 1);
+      count++;
+      setTimeout(countNext, 600);
+    } else {
+      setTimeout(() => {
+        unlockUI();
+        if(callback) callback();
+      }, 500);
+    }
+  };
+  countNext();
+}
+
+function animateDotCounting(callback) {
+  lockUI();
+  const dots = document.querySelectorAll('.dot');
+  let count = 0;
+  dots.forEach(dot => {
+    dot.classList.remove('highlight', 'counting-dot');
+    dot.classList.add('counting-dot');
+  });
+  const countNext = () => {
+    if (count < dots.length) {
+      dots[count].classList.add('highlight');
+      playSound('number', count + 1);
+      if (count > 0) dots[count - 1].classList.remove('highlight');
+      count++;
+      setTimeout(countNext, 800);
+    } else {
+      if (count > 0) dots[count - 1].classList.remove('highlight');
+      setTimeout(() => {
+        unlockUI();
+        if(callback) callback();
+      }, 500);
+    }
+  };
+  setTimeout(countNext, 500);
+}
+
+
+// More or Less Comparison Game
+function loadComparisonGame() {
+  const gameArea = document.getElementById('gameArea');
+  let num1, num2;
+  do {
+    num1 = Math.floor(Math.random() * 7) + 3;
+    num2 = Math.floor(Math.random() * 7) + 3;
+  } while (num1 === num2);
+  gameState.num1 = num1;
+  gameState.num2 = num2;
+  const objectSets = [{ objects: ['🚗', '🚙'], name: 'cars' }, { objects: ['🪆', '🧸'], name: 'toys' }, { objects: ['⭐', '❤️'], name: 'stars' }];
+  const set1 = objectSets[Math.floor(Math.random() * objectSets.length)];
+  const set2 = objectSets[Math.floor(Math.random() * objectSets.length)];
+  const object1 = set1.objects[Math.floor(Math.random() * set1.objects.length)];
+  const object2 = set2.objects[Math.floor(Math.random() * set2.objects.length)];
+  gameArea.innerHTML = `
+    <div class="activity-instruction">Which group has MORE?</div>
+    <div class="comparison-container">
+      <div class="comparison-group" onclick="checkComparison('left')">
+        <div class="comparison-objects" id="group1"></div>
+        <div class="number-button">${num1}</div>
+      </div>
+      <div class="vs-symbol">VS</div>
+      <div class="comparison-group" onclick="checkComparison('right')">
+        <div class="comparison-objects" id="group2"></div>
+        <div class="number-button">${num2}</div>
+      </div>
+    </div>
+  `;
+  const group1 = document.getElementById('group1');
+  for (let i = 0; i < num1; i++) {
+    const obj = document.createElement('div');
+    obj.className = 'comparison-object';
+    obj.textContent = object1;
+    group1.appendChild(obj);
+  }
+  const group2 = document.getElementById('group2');
+  for (let i = 0; i < num2; i++) {
+    const obj = document.createElement('div');
+    obj.className = 'comparison-object';
+    obj.textContent = object2;
+    group2.appendChild(obj);
+  }
+  speak(`Which group has more?`);
+}
+
+function checkComparison(chosen) {
+  if (gameState.isCounting) return;
+  gameState.isCounting = true;
+  
+  const isCorrect = (chosen === 'left' && gameState.num1 > gameState.num2) || (chosen === 'right' && gameState.num2 > gameState.num1);
+  if (isCorrect) {
+    const winner = Math.max(gameState.num1, gameState.num2);
+    showResult(winner, `Correct! ${winner} is MORE!`);
+    playSound('celebration');
+    speak(`Yes! ${winner} is more!`, () => gameState.isCounting = false);
+    showProgressBadge('Math Genius! 🧮');
+    createConfetti();
+  } else {
+    speak(`Oops! The other group has more.`, () => {
+        setTimeout(nextGame, 1500);
+    });
+  }
+}
+
+// Confetti celebration
+function createConfetti() {
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57', '#a8e6cf'];
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti-piece';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 5000);
+  }
+}
+
+// UI Management Functions
+function showResult(number, message) {
+  const resultDisplay = document.getElementById('resultDisplay');
+  document.getElementById('bigNumber').textContent = number;
+  document.getElementById('resultMessage').textContent = message;
+  resultDisplay.classList.add('show');
+}
+
+function nextGame() {
+  gameState.currentGame = (gameState.currentGame + 1) % games.length;
+  loadGame();
+}
+
+function repeatGame() {
+  loadGame();
+}
+
+function toggleGrownupZone() {
+  document.getElementById('grownupZone').classList.toggle('active');
+}
+
+function showProgressBadge(text) {
+  const existing = document.querySelector('.progress-badge');
+  if (existing) existing.remove();
+  const badge = document.createElement('div');
+  badge.className = 'progress-badge';
+  badge.textContent = text;
+  document.body.appendChild(badge);
+  setTimeout(() => badge.remove(), 3000);
+}
+
+// =================================================
+// === 10-99 COUNTING GAMES ===
+// =================================================
+
+function loadTensGame() {
+  const gameArea = document.getElementById('gameArea');
+  gameState.targetNumber = Math.floor(Math.random() * 6) + 5; // 5-10 (so 50-100)
+  gameState.currentCount = 0;
+  
+  gameArea.innerHTML = `
+    <div class="activity-instruction">Count by 10s! Click each group of 10.</div>
+    <div class="tens-container" id="tensContainer"></div>
+  `;
+  
+  const container = document.getElementById('tensContainer');
+  
+  // Create groups of 10 dots
+  for (let i = 0; i < gameState.targetNumber; i++) {
+    const tensGroup = document.createElement('div');
+    tensGroup.className = 'tens-group';
+    tensGroup.onclick = () => countTensGroup(tensGroup, (i + 1) * 10);
+    
+    // Create 10 dots in 2x5 grid
+    for (let j = 0; j < 10; j++) {
+      const dot = document.createElement('div');
+      dot.className = 'tens-dot';
+      dot.textContent = '●';
+      tensGroup.appendChild(dot);
+    }
+    
+    // Add the number label
+    const label = document.createElement('div');
+    label.className = 'tens-label';
+    label.textContent = (i + 1) * 10;
+    tensGroup.appendChild(label);
+    
+    container.appendChild(tensGroup);
+  }
+  
+  speak("Count by tens! Click each group: 10, 20, 30...", () => {
+    // Highlight first group
+    const firstGroup = document.querySelector('.tens-group:not(.counted)');
+    if (firstGroup) {
+      firstGroup.classList.add('next-to-click');
+    }
+  });
+}
+
+function countTensGroup(element, number) {
+  if (!element.classList.contains('next-to-click') || gameState.isCounting) return;
+  
+  gameState.isCounting = true;
+  element.classList.remove('next-to-click');
+  
+  gameState.currentCount++;
+  element.classList.add('counted');
+  
+  // Flash the dots in the group
+  const dots = element.querySelectorAll('.tens-dot');
+  dots.forEach((dot, i) => {
+    setTimeout(() => {
+      dot.style.background = 'var(--accent)';
+      dot.style.transform = 'scale(1.2)';
+    }, i * 50);
+  });
+  
+  playSound('number', number, () => {
+    // Find and highlight next group
+    const nextGroup = document.querySelector('.tens-group:not(.counted)');
+    if (nextGroup) {
+      nextGroup.classList.add('next-to-click');
+      gameState.isCounting = false;
+    } else {
+      // All groups counted
+      setTimeout(() => {
+        const finalNumber = gameState.targetNumber * 10;
+        showResult(finalNumber, `Amazing! You counted to ${finalNumber}!`);
+        playSound('celebration');
+        speak(`Fantastic! You counted by tens to ${finalNumber}!`);
+        showProgressBadge('Tens Counter! 🔢');
+        createConfetti();
+      }, 500);
+    }
+  });
+}
+
+function loadTeensGame() {
+  const gameArea = document.getElementById('gameArea');
+  const startTeen = Math.floor(Math.random() * 5) + 11; // 11-15
+  const endTeen = startTeen + Math.floor(Math.random() * 3) + 2; // +2 to +4 numbers
+  const actualEnd = Math.min(endTeen, 19); // Don't go past 19
+  
+  gameState.targetNumber = actualEnd;
+  gameState.currentCount = startTeen - 1; // Start counting from startTeen
+  
+  gameArea.innerHTML = `
+    <div class="activity-instruction">Count the teen numbers! Click each number: ${startTeen}, ${startTeen + 1}, ${startTeen + 2}...</div>
+    <div class="teens-container" id="teensContainer"></div>
+  `;
+  
+  const container = document.getElementById('teensContainer');
+  
+  // Create visual representation for each teen number
+  for (let i = startTeen; i <= actualEnd; i++) {
+    const teenBlock = document.createElement('div');
+    teenBlock.className = 'teen-block';
+    teenBlock.onclick = () => countTeenNumber(teenBlock, i);
+    
+    // Visual: 10 block + ones
+    const tensSection = document.createElement('div');
+    tensSection.className = 'teen-tens';
+    
+    // Create 10 block (2x5 grid)
+    for (let j = 0; j < 10; j++) {
+      const tenDot = document.createElement('div');
+      tenDot.className = 'teen-ten-dot';
+      tenDot.textContent = '●';
+      tensSection.appendChild(tenDot);
+    }
+    
+    const onesSection = document.createElement('div');
+    onesSection.className = 'teen-ones';
+    
+    // Add the extra ones (1-9 for 11-19)
+    const onesCount = i - 10;
+    for (let k = 0; k < onesCount; k++) {
+      const oneDot = document.createElement('div');
+      oneDot.className = 'teen-one-dot';
+      oneDot.textContent = '●';
+      onesSection.appendChild(oneDot);
+    }
+    
+    // Add number label
+    const label = document.createElement('div');
+    label.className = 'teen-label';
+    label.textContent = i;
+    
+    teenBlock.appendChild(tensSection);
+    teenBlock.appendChild(onesSection);
+    teenBlock.appendChild(label);
+    container.appendChild(teenBlock);
+  }
+  
+  speak(`Count the teen numbers! Start with ${startTeen}.`, () => {
+    // Highlight first number
+    const firstBlock = document.querySelector('.teen-block:not(.counted)');
+    if (firstBlock) {
+      firstBlock.classList.add('next-to-click');
+    }
+  });
+}
+
+function countTeenNumber(element, number) {
+  if (!element.classList.contains('next-to-click') || gameState.isCounting) return;
+  
+  gameState.isCounting = true;
+  element.classList.remove('next-to-click');
+  
+  gameState.currentCount = number;
+  element.classList.add('counted');
+  
+  // Animate the tens and ones
+  const tenDots = element.querySelectorAll('.teen-ten-dot');
+  const oneDots = element.querySelectorAll('.teen-one-dot');
+  
+  // Flash tens first
+  tenDots.forEach((dot, i) => {
+    setTimeout(() => {
+      dot.style.background = 'var(--ok)';
+      dot.style.transform = 'scale(1.1)';
+    }, i * 30);
+  });
+  
+  // Then flash ones
+  setTimeout(() => {
+    oneDots.forEach((dot, i) => {
+      setTimeout(() => {
+        dot.style.background = 'var(--accent)';
+        dot.style.transform = 'scale(1.2)';
+      }, i * 50);
+    });
+  }, 300);
+  
+  playSound('number', number, () => {
+    // Find next number
+    const nextBlock = document.querySelector('.teen-block:not(.counted)');
+    if (nextBlock) {
+      nextBlock.classList.add('next-to-click');
+      gameState.isCounting = false;
+    } else {
+      // All teen numbers counted
+      setTimeout(() => {
+        showResult(gameState.targetNumber, `Great! You counted teen numbers to ${gameState.targetNumber}!`);
+        playSound('celebration');
+        speak(`Excellent! Teen numbers are 10 plus some more!`);
+        showProgressBadge('Teen Master! 🔟');
+        createConfetti();
+      }, 500);
+    }
+  });
+}
+
+function loadBigNumbersGame() {
+  const gameArea = document.getElementById('gameArea');
+  const startNum = Math.floor(Math.random() * 30) + 20; // 20-49
+  const endNum = Math.min(startNum + Math.floor(Math.random() * 8) + 5, 99); // +5 to +12 numbers, max 99
+  
+  gameState.targetNumber = endNum;
+  gameState.currentCount = startNum - 1; // Start counting from startNum
+  
+  gameArea.innerHTML = `
+    <div class="activity-instruction">Count the big numbers! ${startNum}, ${startNum + 1}, ${startNum + 2}...</div>
+    <div class="big-numbers-container" id="bigNumbersContainer"></div>
+    <div class="number-line" id="numberLine"></div>
+  `;
+  
+  const container = document.getElementById('bigNumbersContainer');
+  const numberLine = document.getElementById('numberLine');
+  
+  // Create clickable number blocks
+  for (let i = startNum; i <= endNum; i++) {
+    const numberBlock = document.createElement('div');
+    numberBlock.className = 'big-number-block';
+    numberBlock.onclick = () => countBigNumber(numberBlock, i);
+    
+    const tens = Math.floor(i / 10);
+    const ones = i % 10;
+    
+    // Visual representation with tens and ones
+    const tensDisplay = document.createElement('div');
+    tensDisplay.className = 'big-tens-display';
+    
+    // Create tens groups (groups of 10)
+    for (let t = 0; t < tens; t++) {
+      const tensGroup = document.createElement('div');
+      tensGroup.className = 'big-tens-group';
+      tensGroup.textContent = '█'; // Block for 10
+      tensDisplay.appendChild(tensGroup);
+    }
+    
+    const onesDisplay = document.createElement('div');
+    onesDisplay.className = 'big-ones-display';
+    
+    // Create individual ones
+    for (let o = 0; o < ones; o++) {
+      const oneBlock = document.createElement('div');
+      oneBlock.className = 'big-ones-block';
+      oneBlock.textContent = '●';
+      onesDisplay.appendChild(oneBlock);
+    }
+    
+    const numberLabel = document.createElement('div');
+    numberLabel.className = 'big-number-label';
+    numberLabel.textContent = i;
+    
+    const breakdown = document.createElement('div');
+    breakdown.className = 'number-breakdown';
+    breakdown.textContent = `${tens} tens + ${ones} ones`;
+    
+    numberBlock.appendChild(tensDisplay);
+    numberBlock.appendChild(onesDisplay);
+    numberBlock.appendChild(numberLabel);
+    numberBlock.appendChild(breakdown);
+    container.appendChild(numberBlock);
+  }
+  
+  // Create number line for reference
+  for (let i = Math.max(startNum - 2, 10); i <= Math.min(endNum + 2, 99); i++) {
+    const lineNumber = document.createElement('div');
+    lineNumber.className = 'line-number';
+    lineNumber.textContent = i;
+    if (i >= startNum && i <= endNum) {
+      lineNumber.classList.add('target-number');
+    }
+    numberLine.appendChild(lineNumber);
+  }
+  
+  speak(`Count the big numbers! Start with ${startNum}.`, () => {
+    const firstBlock = document.querySelector('.big-number-block:not(.counted)');
+    if (firstBlock) {
+      firstBlock.classList.add('next-to-click');
+    }
+  });
+}
+
+function countBigNumber(element, number) {
+  if (!element.classList.contains('next-to-click') || gameState.isCounting) return;
+  
+  gameState.isCounting = true;
+  element.classList.remove('next-to-click');
+  
+  gameState.currentCount = number;
+  element.classList.add('counted');
+  
+  // Highlight on number line
+  const lineNumbers = document.querySelectorAll('.line-number');
+  lineNumbers.forEach(line => {
+    if (line.textContent == number) {
+      line.classList.add('current-number');
+    }
+  });
+  
+  // Animate tens and ones
+  const tensBlocks = element.querySelectorAll('.big-tens-group');
+  const onesBlocks = element.querySelectorAll('.big-ones-block');
+  
+  // Flash tens
+  tensBlocks.forEach((block, i) => {
+    setTimeout(() => {
+      block.style.color = 'var(--ok)';
+      block.style.transform = 'scale(1.2)';
+    }, i * 50);
+  });
+  
+  // Flash ones
+  setTimeout(() => {
+    onesBlocks.forEach((block, i) => {
+      setTimeout(() => {
+        block.style.color = 'var(--accent)';
+        block.style.transform = 'scale(1.3)';
+      }, i * 50);
+    });
+  }, tensBlocks.length * 50 + 100);
+  
+  playSound('number', number, () => {
+    const nextBlock = document.querySelector('.big-number-block:not(.counted)');
+    if (nextBlock) {
+      nextBlock.classList.add('next-to-click');
+      gameState.isCounting = false;
+    } else {
+      setTimeout(() => {
+        showResult(gameState.targetNumber, `Incredible! You counted to ${gameState.targetNumber}!`);
+        playSound('celebration');
+        speak(`Amazing! You can count really big numbers now!`);
+        showProgressBadge('Big Number Expert! 💯');
+        createConfetti();
+      }, 500);
+    }
+  });
+}
+
+function loadPlaceValueGame() {
+  const gameArea = document.getElementById('gameArea');
+  const targetNumber = Math.floor(Math.random() * 70) + 20; // 20-89
+  const tens = Math.floor(targetNumber / 10);
+  const ones = targetNumber % 10;
+  
+  gameState.targetNumber = targetNumber;
+  gameState.currentTens = tens;
+  gameState.currentOnes = ones;
+  gameState.tensCount = 0;
+  gameState.onesCount = 0;
+  gameState.isCountingTens = true; // Start with tens
+  
+  const questionTypes = [
+    { question: `How many TENS are in ${targetNumber}?`, answer: tens, type: 'tens' },
+    { question: `How many ONES are in ${targetNumber}?`, answer: ones, type: 'ones' },
+    { question: `What number is ${tens} tens and ${ones} ones?`, answer: targetNumber, type: 'build' }
+  ];
+  
+  const currentQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+  gameState.currentQuestionType = currentQuestion.type;
+  gameState.correctAnswer = currentQuestion.answer;
+  
+  gameArea.innerHTML = `
+    <div class="activity-instruction">${currentQuestion.question}</div>
+    <div class="place-value-visual" id="placeValueVisual">
+      <div class="place-value-section">
+        <div class="place-label">TENS</div>
+        <div class="place-display tens-display" id="tensDisplay"></div>
+      </div>
+      <div class="place-value-section">
+        <div class="place-label">ONES</div>
+        <div class="place-display ones-display" id="onesDisplay"></div>
+      </div>
+    </div>
+    <div class="place-value-choices" id="placeValueChoices"></div>
+  `;
+  
+  // Show the visual breakdown
+  const tensDisplay = document.getElementById('tensDisplay');
+  const onesDisplay = document.getElementById('onesDisplay');
+  
+  // Create tens blocks
+  for (let i = 0; i < tens; i++) {
+    const tensBlock = document.createElement('div');
+    tensBlock.className = 'place-tens-block';
+    tensBlock.textContent = '█';
+    tensBlock.style.animationDelay = `${i * 0.1}s`;
+    tensDisplay.appendChild(tensBlock);
+  }
+  
+  // Create ones dots
+  for (let i = 0; i < ones; i++) {
+    const onesBlock = document.createElement('div');
+    onesBlock.className = 'place-ones-block';
+    onesBlock.textContent = '●';
+    onesBlock.style.animationDelay = `${i * 0.1}s`;
+    onesDisplay.appendChild(onesBlock);
+  }
+  
+  // Generate answer choices based on question type
+  const choices = generatePlaceValueChoices(currentQuestion.answer, currentQuestion.type);
+  const choicesContainer = document.getElementById('placeValueChoices');
+  
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'place-value-button';
+    btn.textContent = choice;
+    btn.onclick = () => checkPlaceValueAnswer(choice);
+    choicesContainer.appendChild(btn);
+  });
+  
+  if (currentQuestion.type === 'tens') {
+    speak(`Look at ${targetNumber}. How many groups of ten do you see?`);
+  } else if (currentQuestion.type === 'ones') {
+    speak(`Look at ${targetNumber}. How many single ones are left over?`);
+  } else {
+    speak(`What number do you make with ${tens} tens and ${ones} ones?`);
+  }
+}
+
+function generatePlaceValueChoices(correct, type) {
+  const choices = new Set([correct]);
+  
+  if (type === 'tens' || type === 'ones') {
+    // For tens/ones questions, add nearby numbers
+    while (choices.size < 4) {
+      const random = Math.max(0, correct + Math.floor(Math.random() * 6) - 3);
+      if (random <= 9) choices.add(random);
+    }
+  } else if (type === 'build') {
+    // For building numbers, add similar numbers
+    while (choices.size < 4) {
+      const random = Math.max(10, correct + Math.floor(Math.random() * 20) - 10);
+      if (random <= 99) choices.add(random);
+    }
+  }
+  
+  return Array.from(choices).sort((a, b) => a - b);
+}
+
+function checkPlaceValueAnswer(chosen) {
+  if (gameState.isCounting) return;
+  gameState.isCounting = true;
+  
+  if (chosen === gameState.correctAnswer) {
+    // Correct answer
+    if (gameState.currentQuestionType === 'tens') {
+      // Animate counting tens
+      animatePlaceValueCounting('tens', () => {
+        showResult(gameState.correctAnswer, `Yes! ${gameState.currentTens} tens!`);
+        playSound('celebration');
+        speak(`Perfect! ${gameState.currentTens} groups of ten!`, () => {
+          gameState.isCounting = false;
+          showProgressBadge('Place Value Pro! 🧮');
+          createConfetti();
+        });
+      });
+    } else if (gameState.currentQuestionType === 'ones') {
+      // Animate counting ones
+      animatePlaceValueCounting('ones', () => {
+        showResult(gameState.correctAnswer, `Right! ${gameState.currentOnes} ones!`);
+        playSound('celebration');
+        speak(`Excellent! ${gameState.currentOnes} leftover ones!`, () => {
+          gameState.isCounting = false;
+          showProgressBadge('Place Value Pro! 🧮');
+          createConfetti();
+        });
+      });
+    } else {
+      // Building number
+      showResult(gameState.correctAnswer, `Perfect! ${gameState.currentTens} tens + ${gameState.currentOnes} ones = ${gameState.targetNumber}!`);
+      playSound('celebration');
+      speak(`Amazing! You built the number ${gameState.targetNumber}!`, () => {
+        gameState.isCounting = false;
+        showProgressBadge('Number Builder! 🏗️');
+        createConfetti();
+      });
+    }
+  } else {
+    // Wrong answer - show explanation
+    if (gameState.currentQuestionType === 'tens') {
+      speak(`Not quite. Let's count the tens together!`, () => {
+        animatePlaceValueCounting('tens', () => {
+          showResult(gameState.correctAnswer, `See? ${gameState.currentTens} groups of ten!`);
+          gameState.isCounting = false;
+        });
+      });
+    } else if (gameState.currentQuestionType === 'ones') {
+      speak(`Let me show you. Let's count the ones!`, () => {
+        animatePlaceValueCounting('ones', () => {
+          showResult(gameState.correctAnswer, `Look! ${gameState.currentOnes} single ones!`);
+          gameState.isCounting = false;
+        });
+      });
+    } else {
+      speak(`Not quite. ${gameState.currentTens} tens plus ${gameState.currentOnes} ones makes ${gameState.targetNumber}.`, () => {
+        showResult(gameState.targetNumber, `${gameState.currentTens} tens + ${gameState.currentOnes} ones = ${gameState.targetNumber}`);
+        gameState.isCounting = false;
+      });
+    }
+  }
+}
+
+function animatePlaceValueCounting(type, callback) {
+  const blocks = document.querySelectorAll(type === 'tens' ? '.place-tens-block' : '.place-ones-block');
+  let count = 0;
+  
+  const countNext = () => {
+    if (count < blocks.length) {
+      blocks[count].style.background = type === 'tens' ? 'var(--ok)' : 'var(--accent)';
+      blocks[count].style.transform = 'scale(1.5)';
+      blocks[count].style.boxShadow = `0 0 10px ${type === 'tens' ? 'var(--ok)' : 'var(--accent)'}`;
+      
+      playSound('number', count + 1, () => {
+        count++;
+        setTimeout(countNext, 300);
+      });
+    } else {
+      setTimeout(() => {
+        if (callback) callback();
+      }, 500);
+    }
+  };
+  
+  countNext();
+}
+
+// Audio Toggle
+document.getElementById('audioToggle').addEventListener('click', function() {
+  gameState.audioEnabled = !gameState.audioEnabled;
+  this.textContent = gameState.audioEnabled ? '🔊' : '🔇';
+  this.classList.toggle('muted');
+  if (gameState.audioEnabled) speak('Sound is on!');
+});
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.speechSynthesis) {
+    speechSynthesis.getVoices(); // Pre-load voices
+  }
+  console.log('Virtual Counting App initialized');
+});
+
+// Prevent context menu
+document.addEventListener('contextmenu', function(e) {
+  if (e.target.matches('.counting-object, .number-button, .frame-cell')) {
+    e.preventDefault();
+  }
+});
+
+// Keyboard accessibility
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    if (e.target.matches('.counting-object, .number-button, .frame-cell')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  }
+});
+</script>
+</body>
+</html>

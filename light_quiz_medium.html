@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A Holistic Word Quiz • Light (60 Qs)</title>
+
+<!-- Font: Montserrat -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Tone.js for Sound Effects -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
+<style>
+:root{
+  /* Brand palette (warm cream + orange + espresso) */
+  --bg:#fff8f3;
+  --surface:#ffffff;
+  --surface-soft:#fff3eb;
+  --text:#2a2725;
+  --muted:#6d6660;
+  --line:#eadfd6;
+
+  --header:#1f1b18;
+  --headerText:#f6f3f1;
+
+  --accent:#ef7d55;
+  --accent-tint:#f3b09a;
+  --accent-deep:#d8663f;
+
+  /* Semantics */
+  --correct:#16a34a; --correct-soft:#dcfce7;
+  --wrong:#dc2626; --wrong-soft:#fee2e2;
+
+  /* Matching helper fills */
+  --pair1:#fefce8; --pair2:#f0fdf4; --pair3:#eff6ff; --pair4:#fdf2f8;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%; margin:0}
+body{
+  font-family:'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100vh; display:flex; flex-direction:column;
+  overflow:hidden;
+  --headerCurrentH: 72px;
+  --footerCurrentH: 60px;
+}
+
+/* Common Header/Footer */
+.bd-header{background:#212529; color:#f8f9fa; border-bottom:3px solid var(--accent); height:var(--headerCurrentH); overflow:hidden}
+.bd-header .inner{max-width:1100px; margin:0 auto; padding:.7rem 1rem; display:flex; align-items:center; gap:1rem; height:100%}
+.bd-header .sizer{margin-left:auto; display:none}
+.bd-header.collapsed .sizer{display:flex}
+.bd-toggle{background:transparent; color:#f8f9fa; border:1px solid #495057; padding:.25rem .5rem; border-radius:999px; font-weight:800; cursor:pointer}
+.bd-toggle:hover{background:#343a40}
+.bd-header.collapsed .bd-brand, .bd-header.collapsed .bd-nav, .bd-header.collapsed .bd-search{display:none}
+.bd-brand{font-weight:900; letter-spacing:.3px; color:#fff; text-decoration:none; font-size:1.05rem; white-space:nowrap}
+.bd-nav{margin-left:auto; display:flex; gap:.9rem; flex-wrap:wrap}
+.bd-nav a{color:#ced4da; text-decoration:none; font-weight:700; font-size:.9rem}
+.bd-nav a:hover{color:#fff}
+.bd-search{display:flex; align-items:center; gap:.4rem}
+.bd-search input{background:#343a40; color:#fff; border:1px solid #495057; padding:.45rem .6rem; border-radius:8px; width:170px}
+.bd-search button{background:var(--accent); color:#fff; border:none; padding:.45rem .7rem; border-radius:8px; font-weight:800; cursor:pointer}
+.bd-search button:hover{background:var(--accent-deep)}
+.bd-footer{background:#212529; color:#ced4da; height:var(--footerCurrentH); overflow:hidden; border-top:1px solid #343a40}
+.bd-footer .inner{max-width:1100px; margin:0 auto; padding:.4rem 1rem; display:flex; align-items:center; gap:1rem; height:100%}
+.bd-footer .expander{margin-left:auto; display:none}
+.bd-footer.collapsed .expander{display:block}
+.bd-footer.collapsed .inner > :not(.expander){display:none}
+
+.content{flex:1 1 auto; display:flex; justify-content:center; padding:.5rem; height:calc(100vh - var(--headerCurrentH) - var(--footerCurrentH));}
+.app{
+  width:100%; max-width:860px; height:100%; background:var(--surface);
+  border-radius:14px; box-shadow:0 10px 28px rgba(0,0,0,.08);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+/* App Header */
+.app__header{background:var(--header); color:var(--headerText); padding:.8rem 1rem;}
+.app__title{font-size:1.05rem; font-weight:800; letter-spacing:.3px; margin:0 0 .15rem}
+.app__subtitle{font-size:.8rem; opacity:.9; margin:0 0 .45rem}
+.progress{width:100%; height:6px; background:rgba(255,255,255,.25); border-radius:9999px; overflow:hidden;}
+.progress__bar{height:100%; width:0%; background:var(--accent); border-radius:9999px; transition:width .3s ease;}
+.meta{display:flex; gap:.4rem; margin-top:.45rem; flex-wrap:wrap; font-size:.7rem;}
+.badge{background:rgba(255,255,255,.12); color:#fff; padding:.15rem .5rem; border-radius:999px; font-weight:600;}
+
+/* Main Content */
+.main{ flex:1; overflow:auto; padding:1rem 1rem .6rem; }
+.card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem;}
+.q-head{display:flex; align-items:flex-start; justify-content:space-between; gap:.8rem;}
+.q-index{font-weight:800; color:var(--accent); font-size:.95rem}
+.q-labels{display:flex; align-items:center; gap:.5rem;}
+.q-category{font-size:.7rem; padding:.2rem .5rem; border-radius:999px; background:var(--surface-soft); border:1px solid var(--line); color:var(--muted); font-weight:700; text-transform:capitalize;}
+.q-type{font-size:.72rem; padding:.2rem .5rem; border-radius:999px; background:var(--surface-soft); color:#5a2e1f; font-weight:700}
+.q-text{margin:.6rem 0 .8rem; line-height:1.5; font-weight:600; font-size:1rem}
+
+/* Options (MCQ/TF) */
+.options{display:flex; flex-direction:column; gap:.45rem}
+.option{border:1px solid var(--line); border-radius:10px; padding:.65rem .8rem; cursor:pointer; transition:.2s; background:#fff; position:relative;}
+.option:hover{border-color:var(--accent); background:var(--accent-tint)}
+.option.is-selected{border-color:var(--accent); background:var(--accent-tint)}
+.option.is-correct{border-color:var(--correct); background:var(--correct-soft); color:var(--correct); font-weight:700}
+.option.is-wrong{border-color:var(--wrong); background:var(--wrong-soft); color:var(--wrong); font-weight:700}
+.option[disabled]{opacity:.75; pointer-events:none}
+
+/* FTB Input */
+.ftb input{width:100%; padding:.7rem .8rem; border:1px solid var(--line); border-radius:10px; font-size:.95rem;}
+.ftb input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(239,125,85,.15)}
+
+/* Sequence (Drag & Drop) */
+.seq-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.4rem}
+.seq-item{border:1px solid var(--line); border-radius:10px; background:#fff; padding:.6rem .8rem; display:flex; gap:.6rem; align-items:center; cursor:grab; user-select:none;}
+.seq-item .handle{opacity:.55}
+.seq-item.dragging{opacity:.6; background:var(--accent-tint); border-color:var(--accent)}
+
+/* Match (Tap-to-pair) */
+.match{display:grid; gap:1rem;}
+@media(min-width:760px){ .match{ grid-template-columns:1fr 1fr; } }
+.mcol h4{margin:.1rem 0 .5rem; font-size:.9rem; color:var(--muted)}
+.mitem{border:1px solid var(--line); border-radius:10px; background:#fff; padding:.55rem .7rem; cursor:pointer; transition:.2s; margin-bottom:.4rem;}
+.mitem:hover{border-color:var(--accent); background:var(--accent-tint)}
+.mitem.is-picked{border-color:var(--accent); box-shadow:0 0 0 3px rgba(239,125,85,.18)}
+.mitem.paired-1{background:var(--pair1)}
+.mitem.paired-2{background:var(--pair2)}
+.mitem.paired-3{background:var(--pair3)}
+.mitem.paired-4{background:var(--pair4)}
+.mpair{font-size:.85rem; color:var(--muted); margin-top:.25rem}
+
+/* RTC Context */
+.rtc{border-left:4px solid var(--accent); background:var(--surface-soft); padding:.8rem .8rem; border-radius:8px; margin-bottom:.8rem; line-height:1.45; color:#5a2e1f;}
+
+/* Explanation */
+.expl{margin-top:.8rem; border-left:4px solid; padding:.75rem .8rem; border-radius:8px; line-height:1.55; display:none;}
+.expl--ok{border-color:var(--correct); background:var(--correct-soft); color:var(--correct)}
+.expl--no{border-color:var(--wrong); background:var(--wrong-soft); color:var(--wrong)}
+.expl .model{margin-top:.5rem; font-weight:600}
+
+/* Footer Navigation */
+.nav{border-top:1px solid var(--line); padding:.7rem 1rem; display:flex; justify-content:space-between; align-items:center; gap:.6rem; background:var(--surface);}
+.btn{border:none; border-radius:.65rem; padding:.55rem 1rem; font-weight:800; cursor:pointer; transition:.2s; font-size:.92rem;}
+.btn--pri{background:var(--accent); color:#fff}
+.btn--pri:hover{background:var(--accent-deep)}
+.btn--sec{background:var(--surface-soft); color:var(--muted); border:1px solid var(--line)}
+.btn--sec:hover{background:var(--accent-tint); color:#5a2e1f; border-color:var(--accent-tint)}
+.btn[disabled]{opacity:.6; cursor:not-allowed}
+.score{font-weight:800; color:var(--accent); font-size:.95rem;}
+
+/* Hint Modal */
+.modal-overlay{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity .3s ease;}
+.modal-overlay.visible{opacity:1; pointer-events:auto;}
+.modal-content{background:var(--surface); padding:1.5rem 2rem; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.3); max-width:500px; width:90%; text-align:center;}
+.modal-content h3{margin-top:0; color:var(--accent);}
+.modal-content p{line-height:1.6;}
+.modal-close{margin-top:1rem;}
+
+/* Small screens */
+@media(max-width:480px){
+  .app__title{font-size:.95rem}
+  .app__subtitle{font-size:.72rem}
+  .q-text{font-size:.98rem}
+  .btn{font-size:.9rem}
+}
+
+/* Motion safe */
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important}
+}
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="inner">
+    <a class="bd-brand" href="/">Word Explorer</a>
+    <nav class="bd-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </nav>
+    <form class="bd-search" onsubmit="event.preventDefault();">
+      <input type="search" placeholder="Search..." aria-label="Search" />
+      <button type="submit">Search</button>
+    </form>
+    <div class="sizer"><button id="toggleHeader" class="bd-toggle" title="Collapse header">▲</button></div>
+  </div>
+</header>
+
+<div class="content">
+<div class="app" id="app">
+  <header class="app__header">
+    <h1 class="app__title">A Holistic Word Quiz</h1>
+    <p class="app__subtitle">Exploring the word "Light" in all its forms (60 Questions)</p>
+    <div class="progress"><div class="progress__bar" id="progressBar"></div></div>
+    <div class="meta">
+      <span class="badge" id="badgeIndex">Q 1 / 60</span>
+      <span class="badge" id="badgeType">MCQ</span>
+      <span class="badge" id="badgeMarks">10 Marks</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="card" id="qCard">
+      <!-- Question content will render here -->
+    </div>
+  </main>
+
+  <footer class="nav">
+    <button class="btn btn--sec" id="btnPrev">← Prev</button>
+    <div class="score" id="scoreMini">Score: 0</div>
+    <div>
+      <button class="btn btn--sec" id="btnHint">Hint (-5)</button>
+      <button class="btn btn--sec" id="btnSkip">Skip</button>
+      <button class="btn btn--pri" id="btnSubmit">Submit</button>
+      <button class="btn btn--pri" id="btnNext" style="display:none">Next →</button>
+      <button class="btn btn--pri" id="btnFinish" style="display:none">Finish</button>
+    </div>
+  </footer>
+</div>
+</div>
+
+<footer class="bd-footer" id="bdFooter">
+  <div class="inner">
+    <div>© 2025 Word Explorer</div>
+    <div class="expander"><button id="toggleFooter" class="bd-toggle" title="Expand footer">▼</button></div>
+  </div>
+</footer>
+
+<!-- Hint Modal Structure -->
+<div class="modal-overlay" id="hintModal">
+  <div class="modal-content">
+    <h3>Hint</h3>
+    <p id="hintText"></p>
+    <button class="btn btn--pri modal-close" id="closeHintModal">Got it!</button>
+  </div>
+</div>
+
+<script>
+// Layout controls (unchanged from original)
+document.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('.bd-header');
+  const footer = document.getElementById('bdFooter');
+  const toggleHeaderBtn = document.getElementById('toggleHeader');
+  const toggleFooterBtn = document.getElementById('toggleFooter');
+
+  function collapseHeader(){ document.body.style.setProperty('--headerCurrentH','3vh'); header.classList.add('collapsed'); }
+  function expandHeader(){ document.body.style.setProperty('--headerCurrentH','72px'); header.classList.remove('collapsed'); }
+  function collapseFooter(){ document.body.style.setProperty('--footerCurrentH','3vh'); footer.classList.add('collapsed'); }
+  
+  if(toggleHeaderBtn) toggleHeaderBtn.addEventListener('click', () => header.classList.contains('collapsed') ? expandHeader() : collapseHeader());
+  if(toggleFooterBtn) toggleFooterBtn.addEventListener('click', () => footer.classList.contains('collapsed') ? expandFooter() : collapseFooter());
+
+  const app = document.getElementById('app');
+  if(app) ['click','touchstart','keydown','wheel'].forEach(evt => app.addEventListener(evt, () => { collapseHeader(); collapseFooter(); }, { passive:true, once: true }));
+});
+
+/* ---------- DATA: 60 "Light" questions with hints and categories ---------- */
+const QUIZ = {
+  subject: "Light",
+  chapter: "A Holistic Exploration",
+  total: 60,
+  questions: [
+    { type:"MCQ", category:"Acronym", text:"The acronym LASER stands for 'Light Amplification by Stimulated Emission of...' what?", options:["Radiation", "Resonance", "Rays", "Reflection"], correct:0, hint:"The last word in the acronym refers to the energy that is emitted.", explain:"The answer is **Radiation**. A LASER works by stimulating atoms to emit photons, creating a powerful, focused beam of light." },
+    { type:"TF", category:"Art", text:"In art, the term *chiaroscuro* refers to the use of strong contrasts between light and dark.", correct:true, hint:"The term is Italian. Think about what 'chiaro' (clear) and 'scuro' (obscure) might mean together.", explain:"This statement is true. *Chiaroscuro* is an Italian term that literally means 'light-dark,' used to create dramatic, three-dimensional effects." },
+    { type:"FTB", category:"Animal", text:"An insect famous for its bioluminescence, often seen glowing on summer evenings, is called a ________.", answer:"firefly", answerAlt:["lightning bug"], hint:"This insect is also known as a 'lightning bug'.", explain:"The answer is **firefly** (or lightning bug). Fireflies produce 'cold light' through a chemical reaction to attract mates or prey." },
+    { type:"MATCH", category:"Unit", text:"Match the unit of measurement to what it quantifies.", stems:["Lumen", "Lux", "Candela", "Wavelength"], responses:["Measures the distance between peaks of a light wave, determining its color", "The SI base unit of luminous intensity", "Measures total light output from a source (brightness)", "Measures light intensity on a surface (illuminance)"], correct:[{s:0,r:2},{s:1,r:3},{s:2,r:1},{s:3,r:0}], hint:"Think about total output vs. light falling on a surface. One is the cause, the other is the effect.", explain:"**Lumen (lm):** Total light output. **Lux (lx):** Light on a surface. **Candela (cd):** Intensity in a direction. **Wavelength (nm):** Determines color." },
+    { type:"MCQ", category:"Idiom", text:"If a project manager gives you the 'green light,' what do they mean?", options:["The project is delayed", "You have permission to start", "The project has environmental concerns", "The budget is limited"], correct:1, hint:"This idiom is based on traffic signals.", explain:"The correct answer is **you have permission to start**. The phrase originates from the green signal on a traffic light, which means 'go.'" },
+    { type:"MCQ", category:"Language", text:"Which of the following is the French word for 'light'?", options:["Licht", "Luz", "Lumière", "Luce"], correct:2, hint:"The Lumière brothers were pioneers of cinema.", explain:"The correct answer is **Lumière**. 'Licht' is German, 'Luz' is Spanish, and 'Luce' is Italian." },
+    { type:"FTB", category:"Compound", text:"A tall structure with a powerful lamp, built to guide ships at sea, is called a ________.", answer:"lighthouse", hint:"It's a 'house' for a 'light'.", explain:"The answer is **lighthouse**. It combines 'light' and 'house' to describe its function and structure." },
+    { type:"MCQ", category:"Antonym", text:"Which word is an antonym for 'light' in the context of weight?", options:["Dark", "Dim", "Heavy", "Bright"], correct:2, hint:"What is the opposite of something that is easy to lift?", explain:"The correct antonym for 'light' (not heavy) is **heavy**." },
+    { type:"MCQ", category:"Job", text:"In filmmaking, what is the job title for the head of the electrical and lighting department?", options:["Cinematographer", "Director", "Producer", "Gaffer"], correct:3, hint:"This job title is also a type of tape used on film sets.", explain:"The correct answer is **Gaffer**. The gaffer is responsible for executing the lighting plan for a production." },
+    { type:"TF", category:"Physics", text:"In physics, light is considered to behave only as a wave.", correct:false, hint:"Light has a 'dual' nature.", explain:"This is false. Light exhibits wave-particle duality, meaning it behaves as both a wave and a particle (a photon)." },
+    { type:"MCQ", category:"Rhyme", text:"Which of the following words is a common rhyme for 'light'?", options:["Weight", "Late", "Might", "Lift"], correct:2, hint:"It means 'power' or 'strength'.", explain:"The correct answer is **might**. 'Might' shares the same ending sound as 'light'." },
+    { type:"FTB", category:"Thing", text:"A portable, battery-powered source of light is commonly known as a ________.", answer:"flashlight", answerAlt:["torch"], hint:"In the UK, it's called a 'torch'.", explain:"The answer is **flashlight** (or 'torch' in British English)." },
+    { type:"MCQ", category:"Biology", text:"What is the biological process in which plants use light energy to synthesize foods?", options:["Respiration", "Photosynthesis", "Transpiration", "Metabolism"], correct:1, hint:"It combines 'photo' (light) and 'synthesis' (to make).", explain:"The process is **photosynthesis**. It's the foundation of most food chains on Earth." },
+    { type:"MCQ", category:"Pop Culture", text:"In the 'Star Wars' universe, what is the name of the iconic plasma-bladed weapon used by Jedi and Sith?", options:["Blaster", "Phaser", "Lightsaber", "Light-wand"], correct:2, hint:"It's a sword made of light.", explain:"The iconic weapon is the **lightsaber**." },
+    { type:"MCQ", category:"Grammar", text:"What is the superlative form of the adjective 'light'?", options:["Lighter", "More light", "Lightest", "Most light"], correct:2, hint:"Superlatives often end in '-est'.", explain:"The superlative form is **lightest**." },
+    { type:"RTC", category:"Physics", context:"When a beam of white light passes through a prism, it splits into its constituent colors.", subs:[ {stype:"MCQ", text:"What is this phenomenon called?", options:["Reflection", "Refraction", "Dispersion", "Diffraction"], correct:2}, {stype:"FTB", text:"The band of colors produced is known as a ________.", answer:"spectrum"}, {stype:"MCQ", text:"Which color of light bends the most?", options:["Red", "Yellow", "Green", "Violet"], correct:3} ], hint:"For the first part, think about how the light is 'dispersed'. For the last, think of the order ROYGBIV.", explain:"This phenomenon is **Dispersion**. The band of colors is a **spectrum**. Violet light has the shortest wavelength and bends the most, while red bends the least." },
+    { type:"MCQ", category:"Synonym", text:"Which word is a synonym for 'light' in the context of illumination?", options:["Shadow", "Radiance", "Weightless", "Gloomy"], correct:1, hint:"It starts with 'R' and means a brilliant glow.", explain:"A direct synonym is **radiance**." },
+    { type:"TF", category:"Spelling", text:"A common misspelling of 'light' is 'lihgt'.", correct:true, hint:"Think about common typing errors where adjacent keys are swapped.", explain:"This is true. Transposing the 'g' and 'h' is a frequent typographical error." },
+    { type:"MCQ", category:"Hobby", text:"In photography, what is the term for the main source of light on a subject?", options:["Fill light", "Back light", "Key light", "Ambient light"], correct:2, hint:"It's the most important, or 'key', source.", explain:"The main light source is called the **key light**." },
+    { type:"FTB", category:"Compound", text:"The period of daytime shortly after sunrise or before sunset is known as ________.", answer:"twilight", hint:"It's not full daylight, but not complete darkness either.", explain:"The answer is **twilight**." },
+    { type:"MCQ", category:"Acronym", text:"What does the 'D' in LED stand for?", options:["Diode", "Device", "Display", "Discharge"], correct:0, hint:"It's a type of semiconductor component.", explain:"The 'D' in LED (Light Emitting Diode) stands for **Diode**." },
+    { type:"MCQ", category:"Idiom", text:"What does the idiom 'to make light of something' mean?", options:["To illuminate a topic", "To treat a serious matter as unimportant", "To carry a small load", "To switch on a lamp"], correct:1, hint:"It means to not treat something with the 'heavy' seriousness it deserves.", explain:"To 'make light of something' means **to treat a serious matter as unimportant**." },
+    { type:"SEQ", category:"Physics", text:"Arrange the colors of the visible spectrum in order, from longest wavelength to shortest.", items:["Violet", "Green", "Red", "Orange"], correct:["Red", "Orange", "Green", "Violet"], hint:"Remember the mnemonic ROY G. BIV.", explain:"The correct order from longest to shortest wavelength is Red, Orange, Yellow, Green, Blue, Indigo, Violet (ROYGBIV)." },
+    { type:"MCQ", category:"Language", text:"The Japanese word 'hikari' (光) translates to what in English?", options:["Sun", "Moon", "Star", "Light"], correct:3, hint:"The famous Shinkansen 'Hikari' is named the 'Light' train for its speed.", explain:"'Hikari' (光) is the Japanese word for **light**." },
+    { type:"FTB", category:"Plant", text:"A tall yellow flower that famously turns to face the sun throughout the day is the ________.", answer:"sunflower", hint:"Its name is a compound of what it follows and what it looks like.", explain:"The answer is **sunflower**." },
+    { type:"MCQ", category:"Unit", text:"A 'light-year' is a unit of:", options:["Time", "Brightness", "Distance", "Speed"], correct:2, hint:"Although it has 'year' in the name, it measures something else.", explain:"A light-year is a unit of **distance**." },
+    { type:"MCQ", category:"Antonym", text:"Which of these words is an antonym for 'light' in the context of brightness?", options:["Airy", "Heavy", "Luminous", "Dark"], correct:3, hint:"What is the opposite of a bright room?", explain:"The correct antonym is **dark**." },
+    { type:"MCQ", category:"Grammar", text:"The verb 'to enlighten' means to:", options:["To make something lighter in weight", "To give someone greater knowledge and understanding", "To switch on a lamp", "To set something on fire"], correct:1, hint:"It's about bringing knowledge, like shining a light on a topic.", explain:"To 'enlighten' someone means **to give them greater knowledge**." },
+    { type:"FTB", category:"Thing", text:"A decorative lighting fixture that hangs from the ceiling, often with many branches, is a ________.", answer:"chandelier", hint:"It's a fancy, often crystal, hanging lamp.", explain:"The answer is **chandelier**." },
+    { type:"TF", category:"History", text:"The historical period known as 'The Enlightenment' emphasized emotion and faith over reason.", correct:false, hint:"This period is also called the 'Age of Reason'.", explain:"This is false. The Enlightenment was a philosophical movement that emphasized reason, individualism, and skepticism." },
+    { type:"MATCH", category:"Thing", text:"Match the type of light bulb to its description.", stems:["Incandescent", "LED", "CFL", "Halogen"], responses:["A semiconductor that emits light when current flows through it; very efficient.", "A type of incandescent lamp with a gas that increases brightness and lifespan.", "Generates light by heating a wire filament until it glows.", "A fluorescent lamp that has been compacted to fit in standard fixtures."], correct:[{s:0,r:2},{s:1,r:0},{s:2,r:3},{s:3,r:1}], hint:"Incandescent is the oldest, most traditional type.", explain:"Incandescent bulbs use a heated filament. LEDs are efficient semiconductors. CFLs are compact fluorescent tubes. Halogen is an improved incandescent." },
+    { type:"MCQ", category:"Job", text:"A person responsible for maintaining and operating the light in a lighthouse is called a:", options:["Light Operator", "Lampist", "Lighthouse Keeper", "Beacon Master"], correct:2, hint:"They 'keep' the lighthouse running.", explain:"The correct term is **Lighthouse Keeper**." },
+    { type:"MCQ", category:"Pop Culture", text:"The DC Comics superhero who wields a power ring that creates constructs out of hard light is named:", options:["The Flash", "Green Lantern", "Doctor Light", "Captain Marvel"], correct:1, hint:"His costume is predominantly the color of his name.", explain:"The hero is **Green Lantern**." },
+    { type:"TF", category:"Biology", text:"Circadian rhythms in animals are primarily regulated by sound, not light.", correct:false, hint:"Think about why it gets harder to sleep when the sun comes up.", explain:"This is false. Circadian rhythms (the sleep-wake cycle) are primarily regulated by the light-dark cycle." },
+    { type:"FTB", category:"Idiom", text:"Seeing the 'light at the end of the tunnel' is an idiom that signifies ________.", answer:"hope", answerAlt:["relief", "the end of a difficult period"], hint:"It's a positive feeling about the future after a hard time.", explain:"The answer is **hope** or relief. It means that one can see a sign that a difficult period is nearing its end." },
+    { type:"MCQ", category:"Physics", text:"What is the approximate speed of light in a vacuum?", options:["300,000 kilometers per second", "3,000 kilometers per second", "30,000,000 meters per minute", "300,000 miles per hour"], correct:0, hint:"It's an extremely large number, often denoted by the letter 'c'.", explain:"The speed of light (c) is approximately **300,000 kilometers per second**." },
+    { type:"MCQ", category:"Synonym", text:"Which word is a synonym for 'light' meaning 'not serious'?", options:["Grave", "Solemn", "Frivolous", "Heavy"], correct:2, hint:"The word you're looking for can describe behavior that is carefree and not serious.", explain:"The correct synonym is **frivolous**." },
+    { type:"MCQ", category:"Compound", text:"Which of these is a form of public transportation?", options:["Light-rail", "Light-beam", "Light-foot", "Light-show"], correct:0, hint:"It's a modern type of tram or streetcar system.", explain:"**Light-rail** is a form of urban public transport." },
+    { type:"MCQ", category:"Hobby", text:"In theatre, what is the purpose of a 'spotlight'?", options:["To illuminate the entire stage evenly", "To create a soft, ambient glow", "To project patterns onto the backdrop", "To highlight a single performer or object"], correct:3, hint:"It puts a 'spot' of light on something important.", explain:"A spotlight is used **to highlight a single performer or object**." },
+    { type:"RTC", category:"Idiom", context:"The phrase 'in light of' is used frequently in formal communication.", subs:[ {stype:"MCQ", text:"What does this phrase mean?", options:["Because of new information", "Despite the circumstances", "In the bright sunshine", "With a heavy heart"], correct:0}, {stype:"FTB", text:"A similar phrase meaning 'to clarify' is to 'shed ________ on' a matter.", answer:"light"}, {stype:"TF", text:"If you 'see the light,' it means you have finally understood something.", correct:true} ], hint:"For the first part, it means considering new facts. For the second, what do you 'shed' to make things clearer?", explain:"'In light of' means **because of new information**. The phrase is 'shed **light** on'. To 'see the light' means to finally understand." },
+    { type:"MCQ", category:"Language", text:"The German word 'Licht' is the equivalent of which English word?", options:["Lift", "List", "Light", "Like"], correct:2, hint:"It is pronounced very similarly to the English word.", explain:"'Licht' is the German word for **light**." },
+    { type:"FTB", category:"Animal", text:"A deep-sea fish that uses a bioluminescent lure to attract prey is the ________ fish.", answer:"anglerfish", hint:"It 'angles' for its prey with a glowing rod.", explain:"The answer is **anglerfish**." },
+    { type:"MCQ", category:"Business", text:"In business, an 'asset-light' model refers to a company that:", options:["Sells lighting fixtures", "Has very few physical assets", "Is not very profitable", "Has a simple management structure"], correct:1, hint:"It's about owning less 'heavy' equipment or property.", explain:"An 'asset-light' model means the company **has very few physical assets**." },
+    { type:"MCQ", category:"Grammar", text:"What is the adverb form of 'light'?", options:["Lightful", "Lightness", "Lightly", "Lighting"], correct:2, hint:"Adverbs often end in '-ly'.", explain:"The adverb form is **lightly**." },
+    { type:"MCQ", category:"Tool", text:"What type of light is often used in forensics to find bodily fluids and other evidence?", options:["Infrared light", "Strobe light", "Red light", "Ultraviolet (UV) light"], correct:3, hint:"It's also called 'blacklight'.", explain:"**Ultraviolet (UV) light**, often called a blacklight, is used in forensics." },
+    { type:"SEQ", category:"Physics", text:"Arrange these types of electromagnetic radiation from lowest energy to highest energy.", items:["Visible Light", "X-Rays", "Radio Waves", "Infrared"], correct:["Radio Waves", "Infrared", "Visible Light", "X-Rays"], hint:"Radio waves have very long wavelengths, while X-Rays have very short ones. Energy is inversely proportional to wavelength.", explain:"The correct order of increasing energy is: Radio Waves, Infrared, Visible Light, X-Rays." },
+    { type:"MCQ", category:"Rhyme", text:"Which of these words does NOT rhyme with 'light'?", options:["Bite", "Height", "Weight", "Kite"], correct:2, hint:"One of these words rhymes with 'late'.", explain:"**Weight** does not rhyme with 'light'." },
+    { type:"FTB", category:"Pop Culture", text:"The natural light display seen in the high-latitude regions, like the aurora borealis, is also known as the ________ Lights.", answer:"Northern", hint:"It's named for the hemisphere where it's most commonly seen.", explain:"The aurora borealis is called the **Northern** Lights." },
+    { type:"MCQ", category:"Hobby", text:"What is a 'grow light' used for in the hobby of indoor gardening?", options:["To heat the room", "To provide an artificial light source for photosynthesis", "To repel insects", "To decorate the plant area"], correct:1, hint:"It helps plants 'grow' when there's no sunlight.", explain:"A grow light provides an **artificial light source for photosynthesis**." },
+    { type:"MATCH", category:"Idiom", text:"Match the idiom involving 'light' to its meaning.", stems:["To be light on your feet", "To travel light", "In the cold light of day", "To be light-headed"], responses:["To feel dizzy or faint", "To be agile and move gracefully", "When viewed calmly and rationally, without emotion", "To travel with very little luggage"], correct:[{s:0,r:1},{s:1,r:3},{s:2,r:2},{s:3,r:0}], hint:"'To travel light' means you don't have heavy bags.", explain:"Light on your feet = agile. Travel light = little luggage. Cold light of day = rational view. Light-headed = dizzy." },
+    { type:"MCQ", category:"Physics", text:"The bending of light as it passes from one medium to another (e.g., from air to water) is called:", options:["Reflection", "Refraction", "Diffraction", "Absorption"], correct:1, hint:"It's why a straw in a glass of water looks bent.", explain:"This bending is called **refraction**." },
+    { type:"MCQ", category:"Antonym", text:"Which word is an antonym for 'light' in the context of color?", options:["Bright", "Pale", "Dark", "Vivid"], correct:2, hint:"What's the opposite of 'light blue'?", explain:"The opposite of a light color is a **dark** color." },
+    { type:"TF", category:"Thing", text:"A 'light switch' is a device used to measure the intensity of light.", correct:false, hint:"You use it to turn a lamp on or off.", explain:"This is false. A light switch is used to turn a light on or off. A device that measures light intensity is a light meter." },
+    { type:"FTB", category:"Compound", text:"The light from the sun is called ________.", answer:"sunlight", hint:"It's a simple compound of the source and the emission.", explain:"The answer is **sunlight**." },
+    { type:"MCQ", category:"Biology", text:"The production and emission of light by a living organism is known as:", options:["Photosynthesis", "Bioluminescence", "Fluorescence", "Phosphorescence"], correct:1, hint:"It combines 'bio' (life) with a word for glowing.", explain:"The production of light by living things is called **bioluminescence**." },
+    { type:"RTC", category:"Thing", context:"Modern cars have many different types of external lights for safety and communication.", subs:[ {stype:"MCQ", text:"Which lights are used to see the road ahead at night?", options:["Brake lights", "Turn signals", "Headlights", "Fog lights"], correct:2}, {stype:"FTB", text:"The red lights at the rear that illuminate when the driver slows down are called ________ lights.", answer:"brake"}, {stype:"TF", text:"'Taillights' are the same as 'brake lights'.", correct:false} ], hint:"Taillights are always on with the main lights; the others are for specific actions.", explain:"**Headlights** illuminate the road. The red lights are **brake** lights. Taillights are the standard red lights at the rear that are on whenever the headlights are on; brake lights are brighter and only activate when braking." },
+    { type:"MCQ", category:"Unit", text:"The particle that is the quantum of the electromagnetic field, including light, is called a:", options:["Proton", "Electron", "Neutron", "Photon"], correct:3, hint:"It sounds like 'photo'.", explain:"The quantum particle of light is the **photon**." },
+    { type:"MCQ", category:"Grammar", text:"If a task is described as 'light work,' it means the task is:", options:["Difficult and challenging", "Easy and not strenuous", "Related to electricity", "Done in the morning"], correct:1, hint:"It's the opposite of 'hard work'.", explain:"'Light work' means the task is **easy and not strenuous**." },
+    { type:"FTB", category:"Synonym", text:"A synonym for 'light' that means a faint or gentle light is ________.", answer:"glow", answerAlt:["gleam"], hint:"Think of the light from embers or a candle.", explain:"The answer is **glow** or **gleam**." },
+    { type:"MCQ", category:"Hobby", text:"In astronomy, observing the 'first light' of a new telescope refers to:", options:["The moment it is switched on", "Its first use to capture an astronomical image", "The light from the Big Bang", "A celebratory firework display"], correct:1, hint:"It's a milestone moment for a new observatory.", explain:"'First light' is the term for **the first time a new telescope is used to take an astronomical image**." }
+  ]
+};
+
+/* ---------- STATE ---------- */
+let idx = 0;
+let score = 0;
+const answers = new Array(QUIZ.questions.length).fill(null);
+const hintsUsed = new Array(QUIZ.questions.length).fill(false);
+
+/* ---------- SOUNDS ---------- */
+let soundReady = false;
+const correctSynth = new Tone.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+const wrongSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 1 } }).toDestination();
+
+// Start audio context on first user interaction
+document.body.addEventListener('click', async () => {
+    if (!soundReady) {
+        await Tone.start();
+        soundReady = true;
+    }
+}, { once: true });
+
+
+/* ---------- HELPERS ---------- */
+const el = sel => document.querySelector(sel);
+const qCard = el('#qCard');
+const progressBar = el('#progressBar');
+const badgeIndex = el('#badgeIndex');
+const badgeType = el('#badgeType');
+const badgeMarks = el('#badgeMarks');
+const btnPrev = el('#btnPrev');
+const btnNext = el('#btnNext');
+const btnSubmit = el('#btnSubmit');
+const btnSkip = el('#btnSkip');
+const btnHint = el('#btnHint');
+const btnFinish = el('#btnFinish');
+const scoreMini = el('#scoreMini');
+const hintModal = el('#hintModal');
+const hintText = el('#hintText');
+const closeHintModal = el('#closeHintModal');
+
+
+function updateHeader(){
+  badgeIndex.textContent = `Q ${idx+1} / ${QUIZ.questions.length}`;
+  badgeType.textContent = QUIZ.questions[idx].type;
+  badgeMarks.textContent = `10 Marks`;
+  const pct = ((idx)/QUIZ.questions.length)*100;
+  progressBar.style.width = `${pct}%`;
+}
+function setButtonsState(afterSubmit=false){
+  btnPrev.disabled = idx===0;
+  btnNext.style.display = afterSubmit && idx<QUIZ.questions.length-1 ? 'inline-block':'none';
+  btnSubmit.style.display = afterSubmit ? 'none':'inline-block';
+  btnSkip.style.display = afterSubmit ? 'none':'inline-block';
+  btnHint.style.display = afterSubmit ? 'none' : 'inline-block';
+  btnHint.disabled = hintsUsed[idx];
+  btnFinish.style.display = afterSubmit && idx===QUIZ.questions.length-1 ? 'inline-block':'none';
+}
+
+/* ---------- RENDERERS ---------- */
+function render(){
+  updateHeader();
+  qCard.innerHTML = '';
+  const q = QUIZ.questions[idx];
+
+  // Head
+  const head = document.createElement('div');
+  head.className='q-head';
+  head.innerHTML = `
+    <div class="q-index">Question ${idx+1}</div>
+    <div class="q-labels">
+      <span class="q-category">${q.category}</span>
+      <span class="q-type">${q.type}</span>
+    </div>
+  `;
+  qCard.appendChild(head);
+
+  // Question text / context
+  if(q.type==='RTC' && q.context){
+    const ctx = document.createElement('div');
+    ctx.className='rtc';
+    ctx.innerHTML = q.context;
+    qCard.appendChild(ctx);
+  }
+  const qtext = document.createElement('div');
+  qtext.className='q-text';
+  qtext.innerHTML = q.text || '';
+  qCard.appendChild(qtext);
+
+  // Body per type
+  if(q.type==='MCQ' || q.type==='TF'){
+    const optionsWrap = document.createElement('div');
+    optionsWrap.className='options';
+    const opts = (q.type==='TF') ? ['True','False'] : q.options;
+    opts.forEach((opt,i)=>{
+      const div = document.createElement('div');
+      div.className='option';
+      div.dataset.index=i;
+      div.innerHTML=opt;
+      div.addEventListener('click',()=>selectOption(div,i));
+      optionsWrap.appendChild(div);
+    });
+    qCard.appendChild(optionsWrap);
+    restoreMCQ();
+  }
+  else if(q.type==='FTB'){
+    const wrap = document.createElement('div'); wrap.className='ftb';
+    wrap.innerHTML = `<input id="ftb" placeholder="Type your answer..." autocomplete="off">`;
+    qCard.appendChild(wrap);
+    if(typeof answers[idx]==='string') el('#ftb').value = answers[idx];
+  }
+  else if(q.type==='SEQ'){
+    const list = document.createElement('ul'); list.className='seq-list'; list.id='seqList';
+    const items = answers[idx] && Array.isArray(answers[idx]) ? answers[idx] : shuffle([...q.items]);
+    items.forEach(t=>{
+      const li = document.createElement('li'); li.className='seq-item'; li.draggable=true;
+      li.innerHTML = `<span class="handle">☰</span><span class="txt">${t}</span>`;
+      list.appendChild(li);
+    });
+    addDnD(list);
+    qCard.appendChild(list);
+  }
+  else if(q.type==='MATCH'){
+    const wrap = document.createElement('div'); wrap.className='match';
+    const A = document.createElement('div'); A.className='mcol';
+    A.innerHTML = `<h4>Column A</h4>`;
+    q.stems.forEach((s,i)=>{
+      const d = document.createElement('div'); d.className='mitem'; d.innerHTML=s; d.dataset.side='A'; d.dataset.index=i;
+      d.addEventListener('click',()=>pickMatch(d));
+      A.appendChild(d);
+    });
+    const B = document.createElement('div'); B.className='mcol';
+    B.innerHTML = `<h4>Column B</h4>`;
+    q.responses.forEach((r,i)=>{
+      const d = document.createElement('div'); d.className='mitem'; d.innerHTML=r; d.dataset.side='B'; d.dataset.index=i;
+      d.addEventListener('click',()=>pickMatch(d));
+      B.appendChild(d);
+    });
+    wrap.appendChild(A); wrap.appendChild(B);
+    const pairsInfo = document.createElement('div'); pairsInfo.id='pairsInfo'; pairsInfo.style.marginTop='.3rem';
+    wrap.appendChild(pairsInfo);
+    qCard.appendChild(wrap);
+    restoreMatch();
+  }
+  else if(q.type==='RTC'){
+    q.subs.forEach((sub,si)=>{
+      const box = document.createElement('div'); box.style.margin='0.6rem 0 0';
+      const st = document.createElement('div'); st.className='q-text'; st.style.fontWeight='600';
+      st.innerHTML = (si+1)+'. '+sub.text;
+      box.appendChild(st);
+      if(sub.stype==='MCQ'){
+        const opts = document.createElement('div'); opts.className='options';
+        sub.options.forEach((o,i)=>{
+          const d=document.createElement('div'); d.className='option'; d.dataset.si=si; d.dataset.index=i;
+          d.innerHTML=o;
+          d.addEventListener('click',()=>selectRTCOption(d,si,i));
+          opts.appendChild(d);
+        });
+        box.appendChild(opts);
+      }else if(sub.stype==='FTB'){
+        const wrap = document.createElement('div'); wrap.className='ftb';
+        wrap.innerHTML=`<input data-si="${si}" class="rtc-ftb" placeholder="Type answer...">`;
+        box.appendChild(wrap);
+      }
+      qCard.appendChild(box);
+    });
+    restoreRTC();
+  }
+
+  const expl = document.createElement('div'); expl.className='expl'; expl.id='expl';
+  qCard.appendChild(expl);
+  
+  setButtonsState(false);
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a; }
+
+/* ----- Interactions per type ----- */
+function selectOption(div,i){
+  qCard.querySelectorAll('.option').forEach(o=>o.classList.remove('is-selected'));
+  div.classList.add('is-selected');
+  answers[idx] = i;
+}
+
+function restoreMCQ(){
+  const val = answers[idx];
+  if(val===null || typeof val==='undefined') return;
+  const opt = qCard.querySelector(`.option[data-index="${val}"]`);
+  if(opt) opt.classList.add('is-selected');
+}
+
+function addDnD(list){
+  let dragEl=null;
+  list.querySelectorAll('.seq-item').forEach(li=>{
+    li.addEventListener('dragstart', ()=>{ dragEl=li; li.classList.add('dragging'); });
+    li.addEventListener('dragend', ()=>{ li.classList.remove('dragging'); });
+  });
+  list.addEventListener('dragover', e=>{
+    e.preventDefault();
+    const after = getDragAfterElement(list, e.clientY);
+    if(dragEl) after==null ? list.appendChild(dragEl) : list.insertBefore(dragEl, after);
+  });
+  function getDragAfterElement(container, y){
+    const els=[...container.querySelectorAll('.seq-item:not(.dragging)')];
+    return els.reduce((closest,child)=>{
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height/2;
+      if(offset<0 && offset>closest.offset) return {offset, element:child};
+      else return closest;
+    }, {offset:Number.NEGATIVE_INFINITY}).element;
+  }
+}
+
+let pickedA=null, pickedB=null;
+function pickMatch(node){
+  const side=node.dataset.side;
+  if(side==='A'){ if(pickedA===node){ node.classList.remove('is-picked'); pickedA=null; } else { if(pickedA) pickedA.classList.remove('is-picked'); pickedA=node; node.classList.add('is-picked'); } }
+  if(side==='B'){ if(pickedB===node){ node.classList.remove('is-picked'); pickedB=null; } else { if(pickedB) pickedB.classList.remove('is-picked'); pickedB=node; node.classList.add('is-picked'); } }
+  if(pickedA && pickedB){
+    const colorClass = `paired-${(getPairs().length % 4)+1}`;
+    pickedA.classList.remove('is-picked'); pickedB.classList.remove('is-picked');
+    pickedA.classList.add(colorClass); pickedB.classList.add(colorClass);
+    const pair = {s:parseInt(pickedA.dataset.index), r:parseInt(pickedB.dataset.index), c:colorClass};
+    const current = getPairs(); current.push(pair); setPairs(current);
+    updatePairsInfo();
+    pickedA=null; pickedB=null;
+  }
+}
+function getPairs(){ return (answers[idx] && Array.isArray(answers[idx])) ? answers[idx] : []; }
+function setPairs(p){ answers[idx]=p; }
+function updatePairsInfo(){
+  const q = QUIZ.questions[idx];
+  const div = el('#pairsInfo');
+  const pairs = getPairs();
+  const lines = pairs.map(pr=> `${q.stems[pr.s]} → ${q.responses[pr.r]}`);
+  div.innerHTML = lines.length? `<div class="mpair"><strong>Pairs:</strong><br>${lines.join('<br>')}</div>` : '';
+}
+function restoreMatch(){
+  const pairs = getPairs();
+  if(!pairs.length) return;
+  pairs.forEach(pr=>{
+    const A = qCard.querySelector(`.mitem[data-side="A"][data-index="${pr.s}"]`);
+    const B = qCard.querySelector(`.mitem[data-side="B"][data-index="${pr.r}"]`);
+    if(A && B){ A.classList.add(pr.c); B.classList.add(pr.c); }
+  });
+  updatePairsInfo();
+}
+
+function selectRTCOption(div,si,i){
+  const q = QUIZ.questions[idx];
+  if(!answers[idx]) answers[idx] = {subs: new Array(q.subs.length).fill(null)};
+  qCard.querySelectorAll(`.option[data-si="${si}"]`).forEach(o=>o.classList.remove('is-selected'));
+  div.classList.add('is-selected');
+  answers[idx].subs[si] = i;
+}
+function restoreRTC(){
+  const q = QUIZ.questions[idx];
+  if(!answers[idx] || !answers[idx].subs) return;
+  q.subs.forEach((s,si)=>{
+    const val = answers[idx].subs[si];
+    if(s.stype==='MCQ' && val!==null){
+      const opt = qCard.querySelector(`.option[data-si="${si}"][data-index="${val}"]`);
+      if(opt) opt.classList.add('is-selected');
+    }
+    if(s.stype==='FTB' && typeof val==='string'){
+      const input = qCard.querySelector(`.rtc-ftb[data-si="${si}"]`); if(input) input.value = val;
+    }
+  });
+}
+
+/* ---------- SUBMIT / CHECK ---------- */
+function showExplanation(ok, model=null){
+  const box = el('#expl'); if(!box) return;
+  box.classList.remove('expl--ok','expl--no'); box.style.display='block';
+  const q = QUIZ.questions[idx];
+  box.classList.add(ok?'expl--ok':'expl--no');
+  box.innerHTML = `<div><strong>${ok?'Correct!':'Let’s review:'}</strong> ${q.explain || ''}</div>` + (model?`<div class="model">${model}</div>`:'');
+  setButtonsState(true);
+  // Scroll explanation into view
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function grade(){
+  const q = QUIZ.questions[idx];
+  let ok=false, modelTxt='';
+  let scored = false;
+  if(answers[idx] === '__scored__' || (answers[idx] && answers[idx]._scored)) {
+      scored = true;
+  }
+
+  if(q.type==='MCQ' || q.type==='TF'){
+    const val = answers[idx];
+    if(val===null){ showExplanation(false, 'Please select an option.'); return; }
+    qCard.querySelectorAll('.option').forEach(o=>o.setAttribute('disabled',''));
+    const correctIndex = (q.type==='TF' ? (q.correct?0:1) : q.correct);
+    qCard.querySelectorAll('.option').forEach((o,i)=>{
+      if(i === correctIndex) o.classList.add('is-correct');
+      else if(i===val) o.classList.add('is-wrong');
+    });
+    ok = (q.type==='TF') ? ((val===0)===q.correct) : (val===q.correct);
+    const correctText = q.type==='TF' ? (q.correct ? 'True' : 'False') : (q.options[correctIndex]);
+    modelTxt = `Correct Answer: <strong>${correctText}</strong>`;
+  }
+  else if(q.type==='FTB'){
+    const input = el('#ftb');
+    const val = (input.value||'').trim().toLowerCase();
+    answers[idx]=val;
+    const targets = [q.answer.toLowerCase(), ...(q.answerAlt||[]).map(x=>x.toLowerCase())];
+    ok = targets.includes(val);
+    modelTxt = `Model Answer: <strong>${q.answer}</strong>`;
+    input.setAttribute('disabled','');
+  }
+  else if(q.type==='SEQ'){
+    const order = [...qCard.querySelectorAll('.seq-item .txt')].map(x=>x.textContent);
+    answers[idx]=order;
+    ok = JSON.stringify(order)===JSON.stringify(q.correct);
+    modelTxt = 'Correct order:<br>• ' + q.correct.join('<br>• ');
+    qCard.querySelectorAll('.seq-item').forEach(li=>li.draggable=false);
+  }
+  else if(q.type==='MATCH'){
+    const pairs = getPairs();
+    if(pairs.length !== q.stems.length){ showExplanation(false, "Please pair all items before submitting."); return; }
+    let good=0;
+    pairs.forEach(pr=>{ if(q.correct.some(c=>c.s===pr.s && c.r===pr.r)) good++; });
+    ok = good===q.stems.length;
+    modelTxt = 'Correct pairs:<br>' + q.correct.map(c=>`• ${q.stems[c.s]} → ${q.responses[c.r]}`).join('<br>');
+    qCard.querySelectorAll('.mitem').forEach(m=>m.style.pointerEvents='none');
+  }
+  else if(q.type==='RTC'){
+    const subAns = answers[idx] && answers[idx].subs ? answers[idx].subs : new Array(q.subs.length).fill(null);
+    q.subs.forEach((s,si)=>{
+      if(s.stype==='FTB'){
+        const input = qCard.querySelector(`.rtc-ftb[data-si="${si}"]`);
+        if(input){ subAns[si]=(input.value||'').trim().toLowerCase(); input.setAttribute('disabled',''); }
+      } else if(s.stype==='MCQ'){
+        qCard.querySelectorAll(`.option[data-si="${si}"]`).forEach(o=>o.setAttribute('disabled',''));
+      }
+    });
+    answers[idx] = {subs: subAns};
+    let allOk=true;
+    q.subs.forEach((s,si)=>{
+      if(s.stype==='MCQ'){
+        const sel = subAns[si];
+        qCard.querySelectorAll(`.option[data-si="${si}"]`).forEach((o,i)=>{
+          if(i===s.correct) o.classList.add('is-correct');
+          else if(i===sel) o.classList.add('is-wrong');
+        });
+        if(sel!==s.correct) allOk=false;
+      }else if(s.stype==='FTB'){
+        const val = (subAns[si]||'').toLowerCase();
+        const alts = [ (s.answer||'').toLowerCase(), ...((s.alt||[]).map(x=>x.toLowerCase())) ];
+        if(!alts.includes(val)) allOk=false;
+      }
+    });
+    ok = allOk;
+    modelTxt = 'Review each part using the highlights. Green is correct, red is incorrect.';
+  }
+  
+  // Play sound
+  if (soundReady) {
+    if (ok) {
+        correctSynth.triggerAttackRelease("C5", "8n");
+    } else {
+        wrongSynth.triggerAttackRelease("C3", "8n");
+    }
+  }
+
+  if(ok && !scored){
+    score += 10;
+    if(q.type==='RTC') answers[idx]._scored = true; else answers[idx] = '__scored__';
+  }
+  scoreMini.textContent = `Score: ${score}`;
+  showExplanation(ok, modelTxt);
+}
+
+/* ---------- HINT LOGIC ---------- */
+btnHint.addEventListener('click', () => {
+    if (hintsUsed[idx]) return;
+    
+    // Penalize and update state
+    score -= 5;
+    hintsUsed[idx] = true;
+    btnHint.disabled = true;
+    scoreMini.textContent = `Score: ${score}`;
+
+    // Show hint in modal
+    const q = QUIZ.questions[idx];
+    hintText.textContent = q.hint || "No hint available for this question.";
+    hintModal.classList.add('visible');
+});
+
+closeHintModal.addEventListener('click', () => {
+    hintModal.classList.remove('visible');
+});
+hintModal.addEventListener('click', (e) => {
+    if (e.target === hintModal) {
+        hintModal.classList.remove('visible');
+    }
+});
+
+
+/* ---------- NAV ---------- */
+btnPrev.addEventListener('click', ()=>{ if(idx>0){ idx--; render(); }});
+btnNext.addEventListener('click', ()=>{ if(idx<QUIZ.questions.length-1){ idx++; render(); }});
+btnSubmit.addEventListener('click', grade);
+btnSkip.addEventListener('click', ()=>{ answers[idx]='__skipped__'; showExplanation(false,"Marked as skipped."); });
+btnFinish.addEventListener('click', ()=>{
+  progressBar.style.width='100%';
+  const totalMarks = QUIZ.questions.length * 10;
+  qCard.innerHTML = `
+    <div class="q-text" style="font-size:1.15rem;">🎉 Quiz Complete!</div>
+    <p style="margin:.4rem 0 1rem;color:var(--muted)">You finished all ${QUIZ.questions.length} questions.</p>
+    <div class="expl expl--ok" style="display:block"><strong>Your final score:</strong> ${score} / ${totalMarks}</div>
+  `;
+  btnPrev.disabled=true; btnNext.style.display='none'; btnSubmit.style.display='none'; btnSkip.style.display='none'; btnFinish.style.display='none'; btnHint.style.display='none';
+});
+
+/* ---------- INIT ---------- */
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
