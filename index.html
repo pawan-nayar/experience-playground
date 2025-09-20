@@ -4,26 +4,83 @@
   <meta charset="UTF-8">
   <title>Experience Playground</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 40px; background: #f9f9f9; }
-    h1 { color: #333; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 10px 0; }
-    a { text-decoration: none; color: #0070f3; font-size: 18px; }
-    a:hover { text-decoration: underline; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #f9f9f9, #e6f0ff);
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .card a {
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #0070f3;
+      display: block;
+      margin-top: 10px;
+    }
+    .emoji {
+      font-size: 40px;
+    }
   </style>
 </head>
 <body>
   <h1>🎮 Experience Playground</h1>
-  <p>Explore my interactive experiments:</p>
-  <ul>
-    <li><a href="bodmas_trainer.html">BODMAS Trainer</a></li>
-    <li><a href="bowl_fill_synonymn_antonymn.html">Synonym/Antonym Bowl Fill</a></li>
-    <li><a href="counting_more_less_basic_math_for_age_3_to_.html">Counting Game (Age 3+)</a></li>
-    <li><a href="crakk_misspelling.html">Crakk Misspelling</a></li>
-    <li><a href="emoji_jumble_game.html">Emoji Jumble Game</a></li>
-    <li><a href="light_quiz_medium.html">Light Quiz (Medium)</a></li>
-    <li><a href="math_concept_article_coordinate_geometry.html">Math Concept Article: Geometry</a></li>
-    <li><a href="piano_simulator.html">Piano Simulator</a></li>
-  </ul>
+  <div class="grid">
+    <div class="card">
+      <div class="emoji">🧮</div>
+      <a href="bodmas_trainer.html">BODMAS Trainer</a>
+    </div>
+    <div class="card">
+      <div class="emoji">🥣</div>
+      <a href="bowl_fill_synonymn_antonymn.html">Synonym/Antonym Bowl Fill</a>
+    </div>
+    <div class="card">
+      <div class="emoji">🔢</div>
+      <a href="counting_more_less_basic_math_for_age_3_to_.html">Counting Game (Age 3+)</a>
+    </div>
+    <div class="card">
+      <div class="emoji">✍️</div>
+      <a href="crakk_misspelling.html">Crakk Misspelling</a>
+    </div>
+    <div class="card">
+      <div class="emoji">😀</div>
+      <a href="emoji_jumble_game.html">Emoji Jumble Game</a>
+    </div>
+    <div class="card">
+      <div class="emoji">❓</div>
+      <a href="light_quiz_medium.html">Light Quiz (Medium)</a>
+    </div>
+    <div class="card">
+      <div class="emoji">📐</div>
+      <a href="math_concept_article_coordinate_geometry.html">Geometry Article</a>
+    </div>
+    <div class="card">
+      <div class="emoji">🎹</div>
+      <a href="piano_simulator.html">Piano Simulator</a>
+    </div>
+  </div>
 </body>
 </html>
