@@ -6,25 +6,27 @@ A curated playground of interactive learning and creativity prototypes. This rep
 
 ## 🎮 Featured Prototypes
 
-* **Lightweight Quiz Prototype:** A mobile-first quiz interface with multiple interaction types.<br/>[*Live Demo ➔*](Coming Soon)
+#### 🎮 C. Experience – Games, Interactivity, & Play
 
-* **BODMAS Animated Trainer:** Visual math trainer with bilingual narration and multiple solution paths.<br/>[*Live Demo ➔*](Coming Soon)
+* **Lightweight Quiz Prototype:** A mobile-first quiz interface with multiple interaction types.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/light_quiz_medium.html)
 
-* **Little Math Explorer (Ages 4-7):** Story-driven math learning with animations and guided steps.<br/>[*Live Demo ➔*](Coming Soon)
+* **BODMAS Animated Trainer:** Visual math trainer with bilingual narration and multiple solution paths.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/bodmas_trainer.html)
 
-* **Coordinate Geometry Explainer:** Interactive plotting canvas with glossary and bilingual toggle.<br/>[*Live Demo ➔*](Coming Soon)
+* **Little Math Explorer (Ages 4-7):** Story-driven math learning with animations and guided steps.<br/>\[*Live Demo ➔*]\(Coming Soon)
 
-* **Toddler Counting Simulator (Ages 3-5):** Virtual counting tool with ten-frame and place-value play.<br/>[*Live Demo ➔*](Coming Soon)
+* **Coordinate Geometry Explainer:** Interactive plotting canvas with glossary and bilingual toggle.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/math_concept_article_coordinate_geometry.html)
 
-* **Emoji Jumble Game:** Emoji-based puzzle game blending wordplay and visuals.<br/>[*Live Demo ➔*](Coming Soon)
+* **Toddler Counting Simulator (Ages 3-5):** Virtual counting tool with ten-frame and place-value play.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/counting_more_less_basic_math_for_age_3_to_5.html)
 
-* **Brilliant Bowl (Synonyms & Antonyms):** Immersive “fill & drain” game exploring word meaning.<br/>[*Live Demo ➔*](Coming Soon)
+* **Emoji Jumble Game:** Emoji-based puzzle game blending wordplay and visuals.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/emoji_jumble_game.html)
 
-* **Crakk Misspelling Explorer:** Interactive spelling-error trainer and learning game.<br/>[*Live Demo ➔*](Coming Soon)
+* **Brilliant Bowl (Synonyms & Antonyms):** Immersive “fill & drain” game exploring word meaning.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/bowl_fill_synonymn_antonymn.html)
 
-* **Interactive Piano Simulator:** Playable JS-based piano for music and creativity learning.<br/>[*Live Demo ➔*](Coming Soon)
+* **Crakk Misspelling Explorer:** Interactive spelling-error trainer and learning game.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/crakk_misspelling.html)
 
-* **Dynamic Crossword Engine:** Multi-subject crossword engine with dynamic clue previews.<br/>[*Live Demo ➔*](Coming Soon)
+* **Interactive Piano Simulator:** Playable JS-based piano for music and creativity learning.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/piano_simulator.html)
+
+* **Dynamic Crossword Engine:** Multi-subject crossword engine with dynamic clue previews.<br/>\[*Live Demo ➔*]\(Coming Soon)
 
 ---
 
