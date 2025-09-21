@@ -51,14 +51,4 @@ All demos are currently in **prototype phase**. Live links will be added as proj
 
 ---
 
-## 📫 Contributing
-This repo is experimental and exploratory. If you'd like to collaborate, share feedback, or expand on one of the prototypes, feel free to open an issue or reach out.
-
----
-
-## 📄 License
-MIT License — Free to use, remix, and adapt with attribution.
-
----
-
 *Crafted with ❤️ to make learning playful and meaningful.*
