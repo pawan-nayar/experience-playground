@@ -6,7 +6,7 @@ A curated playground of interactive learning and creativity prototypes. This rep
 
 ## 🎮 Featured Prototypes
 
-#### 🎮 C. Experience – Games, Interactivity, & Play
+#### 🎮 Experience – Games, Interactivity, & Play
 
 * **Lightweight Quiz Prototype:** A mobile-first quiz interface with multiple interaction types.<br/>[*Live Demo ➔*](https://pawan-nayar.github.io/experience-playground/light_quiz_medium.html)
 
@@ -47,7 +47,7 @@ This repo is part of a broader initiative to explore **education through play**,
 ---
 
 ## 📌 Status
-All demos are currently in **prototype phase**. Live links will be added as projects evolve.
+All demos are currently in **prototype phase**. Live links will be added and scale optimized by 1000x in Beyond Dictionary.
 
 ---
 
