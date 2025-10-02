@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polysemous Words</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            padding: 0 15px;
+        }
+
+        .help-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .help-btn:hover {
+            background: #f8fafc;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: 300;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .highlight {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: clamp(12px, 3vw, 14px);
+            color: #64748b;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .tagline {
+            font-size: clamp(11px, 2.5vw, 13px);
+            color: #94a3b8;
+            line-height: 1.3;
+        }
+
+        .quote-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            margin-bottom: 15px;
+            min-height: 320px;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: opacity 1500ms ease;
+            overflow: hidden;
+        }
+
+        .quote-box.fade-out {
+            opacity: 0;
+        }
+
+        .quote-box.fade-in {
+            opacity: 1;
+        }
+
+        .countdown-display {
+            font-size: 70px;
+            font-weight: 300;
+            color: #2563eb;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .countdown-display.show {
+            opacity: 1;
+        }
+
+        .word-title {
+            font-size: 38px;
+            font-weight: 600;
+            color: #1e293b;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            opacity: 0;
+            transition: opacity 1500ms ease;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word-title.show {
+            opacity: 1;
+        }
+
+        .title-emoji {
+            font-size: 44px;
+            opacity: 0;
+            transition: opacity 1500ms ease;
+            margin-bottom: 12px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-emoji.show {
+            opacity: 1;
+        }
+
+        .emoji-bg {
+            position: absolute;
+            font-size: 120px;
+            opacity: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: opacity 0ms linear;
+        }
+
+        .sentence-container {
+            font-size: 32px;
+            font-weight: 300;
+            color: #1e293b;
+            line-height: 1.5;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.5s ease;
+        }
+
+        .char.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .char.key-word {
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .char.key-word-2 {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .char.key-word-3 {
+            color: #9333ea;
+            font-weight: 500;
+        }
+
+        .sentence-container.fading {
+            opacity: 0;
+            transition: opacity 80ms linear;
+        }
+
+        .info-section {
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: all 0.8s ease;
+            min-height: 60px;
+            max-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .info-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .meaning-display {
+            font-size: 17px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .meaning-1 { color: #2563eb; }
+        .meaning-2 { color: #10b981; }
+        .meaning-3 { color: #9333ea; }
+
+        .shift-info {
+            font-size: 12px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .or-text {
+            font-size: 11px;
+            color: #94a3b8;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin: 0 4px;
+        }
+
+        .or-text.show {
+            opacity: 0.6;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .nav-btn {
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .nav-btn:hover {
+            background: #cbd5e1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.98) translateY(0);
+        }
+
+        .nav-btn.pulse-strong {
+            animation: strongPulse 600ms ease-in-out infinite;
+        }
+
+        @keyframes strongPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+            50% { 
+                transform: scale(1.1); 
+                box-shadow: 0 8px 24px rgba(37, 99, 235, 0.6);
+            }
+        }
+
+        .main-btn {
+            background: #2563eb;
+            color: white;
+            font-size: 13px;
+            padding: 10px 24px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .main-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .main-btn:active {
+            transform: scale(0.98) translateY(0);
+        }
+
+        .main-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .main-btn.pulse-soft {
+            animation: softPulse 600ms ease-in-out infinite;
+        }
+
+        @keyframes softPulse {
+            0%, 100% { 
+                opacity: 1; 
+            }
+            50% { 
+                opacity: 0.85; 
+            }
+        }
+
+        .progress {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show {
+            display: flex !important;
+        }
+
+        /* Ensure modal is always centered */
+        .modal-overlay.show .modal-box {
+            position: static !important;
+            margin: 0 !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            margin: 0;
+            transform: none;
+            flex-shrink: 0;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .modal-content {
+            text-align: left;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .modal-content p {
+            margin: 0 0 12px 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: #94a3b8;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        @media (min-width: 768px) {
+            .btn {
+                min-height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="help-btn" onclick="openHelpModal()">?</button>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">The Art of <span class="highlight">Polysemy</span></h1>
+            <p class="subtitle">Watch how one word transforms meaning across contexts</p>
+            <p class="tagline">Same spelling, different worlds</p>
+        </div>
+
+        <div class="quote-box" id="quoteBox">
+            <div class="countdown-display" id="countdownDisplay"></div>
+            <div class="word-title" id="wordTitle"></div>
+            <div class="title-emoji" id="titleEmoji"></div>
+            <div class="emoji-bg" id="emojiBg"></div>
+            <div class="sentence-container" id="sentenceContainer"></div>
+            <div class="info-section" id="infoSection">
+                <div class="meaning-display" id="meaningDisplay"></div>
+                <div class="shift-info" id="shiftInfo"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn nav-btn" id="prevBtn" onclick="previousWord()">← Previous</button>
+            <button class="btn main-btn" id="mainBtn" disabled>Building...</button>
+            <span class="or-text" id="orText">or</span>
+            <button class="btn nav-btn" id="nextBtn" onclick="nextWord()">Next →</button>
+        </div>
+
+        <div class="progress" id="progress">1 of 25</div>
+
+        <div class="footer">
+            Created with love by <a href="#">BeyondDictionary.Com</a>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeHelpModal()">×</button>
+            <div class="modal-header">
+                <h2 class="modal-title">How This Works</h2>
+            </div>
+            <div class="modal-content">
+                <p><strong>Experience polysemy</strong> — the phenomenon where one word carries multiple meanings.</p>
+                <p>You'll see a word used in three different sentences. Watch how the same spelling transforms meaning based on context.</p>
+                <p><strong>Take your time.</strong> This is contemplation, not consumption. Each word reveals itself slowly, inviting reflection.</p>
+                <p>After each word completes, you can replay it, move forward, or go back. If you don't click, the experience will gently continue forward.</p>
+                <p><strong>Enjoy the journey</strong> through language's beautiful complexity.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CHARACTER_SPEED = 80;
+        const SPACE_SPEED = CHARACTER_SPEED * 2.5;
+        const KEY_WORD_PAUSE = 1000;
+        const SENTENCE_PAUSE = CHARACTER_SPEED * 40 * 0.8;
+        const MEANING_PAUSE = CHARACTER_SPEED * 80;
+        const PULSE_DURATION = 3000;
+        const STATIC_WAIT = 3000;
+        const FADE_OUT_DURATION = 1000;
+        const FADE_IN_DURATION = 1000;
+
+        var polysemousWords = [
+            // Original 25 words
+            {word:"head",titleEmoji:"🧠",contexts:[{sentence:"She touched her head",meaning:"Body part",emoji:"👤"},{sentence:"He is the head of the school",meaning:"Leader",emoji:"👔"},{sentence:"We climbed to the head of the table",meaning:"Top of something",emoji:"⬆️"}],shifts:["Physical → Positional","Positional → Spatial"]},{word:"foot",titleEmoji:"🦿",contexts:[{sentence:"She hurt her foot",meaning:"Body part",emoji:"🦶"},{sentence:"The house lies at the foot of the hill",meaning:"Bottom of something",emoji:"🏔️"},{sentence:"The tower is 200 feet tall",meaning:"Unit of measure",emoji:"📏"}],shifts:["Physical → Spatial","Spatial → Measurement"]},{word:"light",titleEmoji:"💫",contexts:[{sentence:"Turn on the light",meaning:"Illumination",emoji:"💡"},{sentence:"This bag is light",meaning:"Not heavy",emoji:"🎈"},{sentence:"The room was full of light",meaning:"Brightness",emoji:"☀️"}],shifts:["Object → Property","Property → Condition"]},{word:"paper",titleEmoji:"📋",contexts:[{sentence:"She wrote on the paper",meaning:"Writing material",emoji:"📄"},{sentence:"I read it in the paper",meaning:"Newspaper",emoji:"📰"},{sentence:"He published a research paper",meaning:"Academic essay",emoji:"📚"}],shifts:["Material → Publication","Publication → Document"]},{word:"book",titleEmoji:"📚",contexts:[{sentence:"I bought a book",meaning:"Set of pages",emoji:"📖"},{sentence:"We booked a taxi",meaning:"To reserve",emoji:"🚕"},{sentence:"Check the account book",meaning:"Record of accounts",emoji:"📊"}],shifts:["Object → Action","Action → Record"]},{word:"right",titleEmoji:"✔️",contexts:[{sentence:"That answer is right",meaning:"Correct",emoji:"✅"},{sentence:"Turn right at the corner",meaning:"Direction",emoji:"➡️"},{sentence:"Everyone has the right to speak",meaning:"Moral entitlement",emoji:"⚖️"}],shifts:["Accuracy → Direction","Direction → Ethics"]},{word:"spring",titleEmoji:"🌺",contexts:[{sentence:"Spring comes after winter",meaning:"Season",emoji:"🌸"},{sentence:"The bed has a metal spring",meaning:"Coil",emoji:"🔩"},{sentence:"The cat can spring high",meaning:"Leap or jump",emoji:"🐱"}],shifts:["Time → Object","Object → Action"]},{word:"bank",titleEmoji:"🏛️",contexts:[{sentence:"I deposited money in the bank",meaning:"Financial institution",emoji:"🏦"},{sentence:"We sat on the river bank",meaning:"Edge of river",emoji:"🌊"},{sentence:"You can bank on her support",meaning:"Rely on",emoji:"🤝"}],shifts:["Institution → Geography","Geography → Trust"]},{word:"point",titleEmoji:"🎯",contexts:[{sentence:"Draw a point on the map",meaning:"Dot",emoji:"📍"},{sentence:"Meet me at this point",meaning:"Location",emoji:"📌"},{sentence:"What's your point?",meaning:"Idea or argument",emoji:"💭"}],shifts:["Visual → Spatial","Spatial → Abstract"]},{word:"mark",titleEmoji:"🏅",contexts:[{sentence:"He got a high mark",meaning:"Grade",emoji:"💯"},{sentence:"There's a mark on your shirt",meaning:"Stain",emoji:"👕"},{sentence:"The cross is a mark of faith",meaning:"Sign or symbol",emoji:"✝️"}],shifts:["Evaluation → Physical","Physical → Symbolic"]},{word:"table",titleEmoji:"🍽️",contexts:[{sentence:"We ate at the table",meaning:"Furniture",emoji:"🪑"},{sentence:"Look at the data table",meaning:"Chart",emoji:"📊"},{sentence:"They tabled the motion",meaning:"To postpone",emoji:"⏸️"}],shifts:["Object → Representation","Representation → Action"]},{word:"fair",titleEmoji:"🎡",contexts:[{sentence:"That was a fair decision",meaning:"Just",emoji:"⚖️"},{sentence:"She has fair skin",meaning:"Light complexion",emoji:"👤"},{sentence:"We went to the book fair",meaning:"Carnival",emoji:"🎪"}],shifts:["Moral → Physical","Physical → Event"]},{word:"well",titleEmoji:"🌟",contexts:[{sentence:"She is well now",meaning:"Healthy",emoji:"😊"},{sentence:"The village has a deep well",meaning:"Water source",emoji:"💧"},{sentence:"Well, let's begin!",meaning:"Exclamation",emoji:"💬"}],shifts:["Health → Structure","Structure → Expression"]},{word:"post",titleEmoji:"📮",contexts:[{sentence:"I received a post",meaning:"Mail",emoji:"📬"},{sentence:"He got a new post abroad",meaning:"Position or job",emoji:"💼"},{sentence:"Tie the rope to the post",meaning:"Vertical pole",emoji:"🪵"}],shifts:["Communication → Career","Career → Object"]},{word:"watch",titleEmoji:"⏰",contexts:[{sentence:"Watch the show carefully",meaning:"To look at",emoji:"👀"},{sentence:"I wear a watch",meaning:"Timepiece",emoji:"⌚"},{sentence:"The soldier had night watch",meaning:"Guard duty",emoji:"💂"}],shifts:["Action → Object","Object → Duty"]},{word:"run",titleEmoji:"🏃",contexts:[{sentence:"She can run quickly",meaning:"To move fast",emoji:"🏃"},{sentence:"I run a business",meaning:"To operate",emoji:"💼"},{sentence:"He had a run of bad luck",meaning:"Sequence",emoji:"🎲"}],shifts:["Physical → Management","Management → Pattern"]},{word:"train",titleEmoji:"🚆",contexts:[{sentence:"The train arrived late",meaning:"Transport",emoji:"🚂"},{sentence:"She trains young athletes",meaning:"To teach",emoji:"🏋️"},{sentence:"A train of thoughts crossed his mind",meaning:"Series",emoji:"💭"}],shifts:["Vehicle → Action","Action → Pattern"]},{word:"arm",titleEmoji:"💪",contexts:[{sentence:"He raised his arm",meaning:"Body part",emoji:"💪"},{sentence:"The country armed itself",meaning:"Weapons",emoji:"⚔️"},{sentence:"The research arm of the company grew",meaning:"Branch",emoji:"🏢"}],shifts:["Physical → Military","Military → Organizational"]},{word:"match",titleEmoji:"🔥",contexts:[{sentence:"They won the match",meaning:"Contest",emoji:"🏆"},{sentence:"Strike a match to light the candle",meaning:"Fire stick",emoji:"🔥"},{sentence:"They are a perfect match",meaning:"Suitable pair",emoji:"💑"}],shifts:["Competition → Object","Object → Compatibility"]},{word:"key",titleEmoji:"🔑",contexts:[{sentence:"That clue is the key to the puzzle",meaning:"Solution",emoji:"🔑"},{sentence:"Press the Enter key",meaning:"Button",emoji:"⌨️"},{sentence:"I lost my house key",meaning:"Lock-opener",emoji:"🏠"}],shifts:["Abstract → Digital","Digital → Physical"]},{word:"glass",titleEmoji:"🥃",contexts:[{sentence:"She filled the glass with water",meaning:"Drinking vessel",emoji:"🥛"},{sentence:"The window is made of glass",meaning:"Material",emoji:"🪟"},{sentence:"I need new glasses",meaning:"Spectacles",emoji:"👓"}],shifts:["Container → Material","Material → Vision aid"]},{word:"ring",titleEmoji:"💍",contexts:[{sentence:"He bought her a gold ring",meaning:"Circular band",emoji:"💍"},{sentence:"I heard the phone ring",meaning:"Bell sound",emoji:"📞"},{sentence:"The police caught a drug ring",meaning:"Criminal group",emoji:"👮"}],shifts:["Object → Sound","Sound → Organization"]},{word:"charge",titleEmoji:"⚡",contexts:[{sentence:"The hotel charges $100 per night",meaning:"Payment",emoji:"💵"},{sentence:"Soldiers charged the enemy",meaning:"Rush forward",emoji:"⚔️"},{sentence:"He faced a serious charge",meaning:"Legal accusation",emoji:"⚖️"}],shifts:["Financial → Military","Military → Legal"]},{word:"board",titleEmoji:"📋",contexts:[{sentence:"The board was nailed to the wall",meaning:"Flat surface",emoji:"🪵"},{sentence:"She joined the school board",meaning:"Committee",emoji:"👥"},{sentence:"We boarded the plane",meaning:"To enter",emoji:"✈️"}],shifts:["Object → Group","Group → Action"]},            {word:"bat",titleEmoji:"🦇",contexts:[{sentence:"He hit the ball with a bat",meaning:"Sports club",emoji:"⚾"},{sentence:"A bat flew out of the cave",meaning:"Flying mammal",emoji:"🦇"},{sentence:"Don't bat an eye at the news",meaning:"To blink",emoji:"👁️"}],shifts:["Object → Animal","Animal → Action"]},{word:"crane",titleEmoji:"🏗️",contexts:[{sentence:"The crane lifted the steel beam",meaning:"Construction machine",emoji:"🏗️"},{sentence:"A crane waded in the marsh",meaning:"Long-necked bird",emoji:"🦩"},{sentence:"She had to crane her neck to see",meaning:"To stretch",emoji:"👀"}],shifts:["Machine → Animal","Animal → Action"]},{word:"scale",titleEmoji:"⚖️",contexts:[{sentence:"Fish have protective scales",meaning:"Skin covering",emoji:"🐟"},{sentence:"Weigh it on the scale",meaning:"Measuring device",emoji:"⚖️"},{sentence:"The map has a scale of 1:1000",meaning:"Proportion",emoji:"🗺️"}],shifts:["Physical → Object","Object → Abstract"]},{word:"crown",titleEmoji:"👑",contexts:[{sentence:"The queen wore a golden crown",meaning:"Royal headpiece",emoji:"👑"},{sentence:"The crown of the tree was thick",meaning:"Top part",emoji:"🌳"},{sentence:"This achievement crowns his career",meaning:"To complete",emoji:"🏆"}],shifts:["Object → Spatial","Spatial → Action"]},{word:"palm",titleEmoji:"🌴",contexts:[{sentence:"She held it in her palm",meaning:"Hand surface",emoji:"✋"},{sentence:"Palm trees swayed in the breeze",meaning:"Tropical tree",emoji:"🌴"},{sentence:"He tried to palm the card",meaning:"To conceal",emoji:"🃏"}],shifts:["Body → Plant","Plant → Action"]},{word:"cricket",titleEmoji:"🦗",contexts:[{sentence:"A cricket chirped in the grass",meaning:"Insect",emoji:"🦗"},{sentence:"They played cricket all day",meaning:"Sport",emoji:"🏏"},{sentence:"That's not cricket behavior",meaning:"Fair play",emoji:"⚖️"}],shifts:["Animal → Game","Game → Ethics"]},{word:"date",titleEmoji:"📅",contexts:[{sentence:"What's the date today?",meaning:"Calendar day",emoji:"📅"},{sentence:"She ate a sweet date",meaning:"Fruit",emoji:"🍇"},{sentence:"They went on a romantic date",meaning:"Social meeting",emoji:"💕"}],shifts:["Time → Food","Food → Social"]},{word:"pound",titleEmoji:"💷",contexts:[{sentence:"The dog weighs 20 pounds",meaning:"Unit of weight",emoji:"⚖️"},{sentence:"The British pound fell",meaning:"Currency",emoji:"💷"},{sentence:"He will pound the nail",meaning:"To hit hard",emoji:"🔨"}],shifts:["Measurement → Money","Money → Action"]},{word:"pitch",titleEmoji:"⚾",contexts:[{sentence:"The pitch was perfect",meaning:"Playing field",emoji:"⚾"},{sentence:"The roof has a steep pitch",meaning:"Slope",emoji:"🏠"},{sentence:"She will pitch her idea",meaning:"To present",emoji:"💡"}],shifts:["Space → Angle","Angle → Communication"]},{word:"rock",titleEmoji:"🪨",contexts:[{sentence:"The rock was heavy",meaning:"Stone",emoji:"🪨"},{sentence:"The boat began to rock",meaning:"To sway",emoji:"🚤"},{sentence:"This music really rocks",meaning:"To be excellent",emoji:"🎵"}],shifts:["Object → Motion","Motion → Quality"]},{word:"saw",titleEmoji:"🔨",contexts:[{sentence:"He used a saw to cut wood",meaning:"Cutting tool",emoji:"🔨"},{sentence:"I saw the movie yesterday",meaning:"Past tense of see",emoji:"👀"},{sentence:"The old saw about patience",meaning:"Saying",emoji:"💭"}],shifts:["Tool → Perception","Perception → Wisdom"]},{word:"seal",titleEmoji:"🦭",contexts:[{sentence:"The seal clapped its flippers",meaning:"Marine animal",emoji:"🦭"},{sentence:"Break the seal on the jar",meaning:"Closure",emoji:"🍯"},{sentence:"The king's seal was official",meaning:"Stamp",emoji:"📜"}],shifts:["Animal → Object","Object → Authority"]},{word:"sink",titleEmoji:"🚰",contexts:[{sentence:"Wash dishes in the sink",meaning:"Basin",emoji:"🚰"},{sentence:"The ship began to sink",meaning:"To go down",emoji:"🚢"},{sentence:"The sun will sink soon",meaning:"To set",emoji:"🌅"}],shifts:["Object → Motion","Motion → Natural"]},{word:"spell",titleEmoji:"✨",contexts:[{sentence:"Cast a magic spell",meaning:"Enchantment",emoji:"✨"},{sentence:"How do you spell that?",meaning:"To write letters",emoji:"✍️"},{sentence:"A spell of bad weather",meaning:"Period",emoji:"⛈️"}],shifts:["Magic → Language","Language → Time"]},{word:"spring",titleEmoji:"🌺",contexts:[{sentence:"Spring comes after winter",meaning:"Season",emoji:"🌸"},{sentence:"The bed has a metal spring",meaning:"Coil",emoji:"🔩"},{sentence:"The cat can spring high",meaning:"Leap or jump",emoji:"🐱"}],shifts:["Time → Object","Object → Action"]},{word:"stamp",titleEmoji:"📮",contexts:[{sentence:"Put a stamp on the letter",meaning:"Postal sticker",emoji:"📮"},{sentence:"Stamp your foot loudly",meaning:"To hit hard",emoji:"👣"},{sentence:"The official stamp was required",meaning:"Mark",emoji:"📜"}],shifts:["Object → Action","Action → Authority"]},{word:"tank",titleEmoji:"🚗",contexts:[{sentence:"The army tank rolled forward",meaning:"Military vehicle",emoji:"🚗"},{sentence:"Fill the fish tank with water",meaning:"Container",emoji:"🐠"},{sentence:"The gas tank is empty",meaning:"Storage unit",emoji:"⛽"}],shifts:["Vehicle → Container","Container → Storage"]},{word:"tie",titleEmoji:"👔",contexts:[{sentence:"Wear a tie to the meeting",meaning:"Neckwear",emoji:"👔"},{sentence:"Tie your shoelaces tight",meaning:"To fasten",emoji:"👟"},{sentence:"The game ended in a tie",meaning:"Equal score",emoji:"⚽"}],shifts:["Clothing → Action","Action → Result"]},{word:"wave",titleEmoji:"🌊",contexts:[{sentence:"The wave crashed on shore",meaning:"Water movement",emoji:"🌊"},{sentence:"Wave goodbye to grandma",meaning:"To gesture",emoji:"👋"},{sentence:"A wave of excitement",meaning:"Surge",emoji:"⚡"}],shifts:["Natural → Gesture","Gesture → Emotion"]},{word:"wind",titleEmoji:"💨",contexts:[{sentence:"The wind blew strongly",meaning:"Air movement",emoji:"💨"},{sentence:"Wind the clock carefully",meaning:"To turn",emoji:"🕐"},{sentence:"The path winds through hills",meaning:"To curve",emoji:"🏔️"}],shifts:["Natural → Mechanical","Mechanical → Spatial"]},{word:"yard",titleEmoji:"🏡",contexts:[{sentence:"Play in the backyard",meaning:"Outdoor area",emoji:"🏡"},{sentence:"The fabric is three yards long",meaning:"Unit of length",emoji:"📏"},{sentence:"The ship's yard was busy",meaning:"Workshop",emoji:"⚓"}],shifts:["Space → Measurement","Measurement → Workplace"]},{word:"bark",titleEmoji:"🐕",contexts:[{sentence:"The dog's bark was loud",meaning:"Dog sound",emoji:"🐕"},{sentence:"The tree's bark was rough",meaning:"Tree covering",emoji:"🌳"},{sentence:"The captain barked orders",meaning:"To shout",emoji:"📢"}],shifts:["Sound → Physical","Physical → Communication"]},{word:"bow",titleEmoji:"🏹",contexts:[{sentence:"Tie a bow in the ribbon",meaning:"Knot",emoji:"🎀"},{sentence:"The bow of the ship",meaning:"Front part",emoji:"🚢"},{sentence:"Bow to the audience",meaning:"To bend",emoji:"🎭"}],shifts:["Object → Spatial","Spatial → Gesture"]},{word:"can",titleEmoji:"🥫",contexts:[{sentence:"Open a can of beans",meaning:"Container",emoji:"🥫"},{sentence:"I can swim well",meaning:"To be able",emoji:"🏊"},{sentence:"The can was empty",meaning:"Metal container",emoji:"🗑️"}],shifts:["Container → Ability","Ability → Object"]},{word:"change",titleEmoji:"💰",contexts:[{sentence:"Keep the change",meaning:"Money back",emoji:"💰"},{sentence:"Change your clothes",meaning:"To alter",emoji:"👕"},{sentence:"The weather will change",meaning:"To become different",emoji:"🌤️"}],shifts:["Money → Action","Action → Natural"]},            {word:"crack",titleEmoji:"💥",contexts:[{sentence:"There's a crack in the wall",meaning:"Break",emoji:"💥"},{sentence:"Crack the eggs open",meaning:"To break",emoji:"🥚"},{sentence:"That's a crack joke",meaning:"Excellent",emoji:"😄"}],shifts:["Physical → Action","Action → Quality"]},
+            // Words 26-50
+            {word:"crane",titleEmoji:"🏗️",contexts:[{sentence:"The crane lifted the steel beam",meaning:"Construction machine",emoji:"🏗️"},{sentence:"A crane waded in the marsh",meaning:"Long-necked bird",emoji:"🦩"},{sentence:"She had to crane her neck to see",meaning:"To stretch",emoji:"👀"}],shifts:["Machine → Animal","Animal → Action"]},
+            {word:"scale",titleEmoji:"⚖️",contexts:[{sentence:"Fish have protective scales",meaning:"Skin covering",emoji:"🐟"},{sentence:"Weigh it on the scale",meaning:"Measuring device",emoji:"⚖️"},{sentence:"The map has a scale of 1:1000",meaning:"Proportion",emoji:"🗺️"}],shifts:["Physical → Object","Object → Abstract"]},
+            {word:"crown",titleEmoji:"👑",contexts:[{sentence:"The queen wore a golden crown",meaning:"Royal headpiece",emoji:"👑"},{sentence:"The crown of the tree was thick",meaning:"Top part",emoji:"🌳"},{sentence:"This achievement crowns his career",meaning:"To complete",emoji:"🏆"}],shifts:["Object → Spatial","Spatial → Action"]},
+            {word:"palm",titleEmoji:"🌴",contexts:[{sentence:"She held it in her palm",meaning:"Hand surface",emoji:"✋"},{sentence:"Palm trees swayed in the breeze",meaning:"Tropical tree",emoji:"🌴"},{sentence:"He tried to palm the card",meaning:"To conceal",emoji:"🃏"}],shifts:["Body → Plant","Plant → Action"]},
+            {word:"cricket",titleEmoji:"🦗",contexts:[{sentence:"A cricket chirped in the grass",meaning:"Insect",emoji:"🦗"},{sentence:"They played cricket all day",meaning:"Sport",emoji:"🏏"},{sentence:"That's not cricket behavior",meaning:"Fair play",emoji:"⚖️"}],shifts:["Animal → Game","Game → Ethics"]},
+            {word:"date",titleEmoji:"📅",contexts:[{sentence:"What's the date today?",meaning:"Calendar day",emoji:"📅"},{sentence:"She ate a sweet date",meaning:"Fruit",emoji:"🍇"},{sentence:"They went on a romantic date",meaning:"Social meeting",emoji:"💕"}],shifts:["Time → Food","Food → Social"]},
+            {word:"pound",titleEmoji:"💷",contexts:[{sentence:"The dog weighs 20 pounds",meaning:"Unit of weight",emoji:"⚖️"},{sentence:"The British pound fell",meaning:"Currency",emoji:"💷"},{sentence:"He will pound the nail",meaning:"To hit hard",emoji:"🔨"}],shifts:["Measurement → Money","Money → Action"]},
+            {word:"pitch",titleEmoji:"⚾",contexts:[{sentence:"The pitch was perfect",meaning:"Playing field",emoji:"⚾"},{sentence:"The roof has a steep pitch",meaning:"Slope",emoji:"🏠"},{sentence:"She will pitch her idea",meaning:"To present",emoji:"💡"}],shifts:["Space → Angle","Angle → Communication"]},
+            {word:"rock",titleEmoji:"🪨",contexts:[{sentence:"The rock was heavy",meaning:"Stone",emoji:"🪨"},{sentence:"The boat began to rock",meaning:"To sway",emoji:"🚤"},{sentence:"This music really rocks",meaning:"To be excellent",emoji:"🎵"}],shifts:["Object → Motion","Motion → Quality"]},
+            {word:"saw",titleEmoji:"🔨",contexts:[{sentence:"He used a saw to cut wood",meaning:"Cutting tool",emoji:"🔨"},{sentence:"I saw the movie yesterday",meaning:"Past tense of see",emoji:"👀"},{sentence:"The old saw about patience",meaning:"Saying",emoji:"💭"}],shifts:["Tool → Perception","Perception → Wisdom"]},
+            {word:"seal",titleEmoji:"🦭",contexts:[{sentence:"The seal clapped its flippers",meaning:"Marine animal",emoji:"🦭"},{sentence:"Break the seal on the jar",meaning:"Closure",emoji:"🍯"},{sentence:"The king's seal was official",meaning:"Stamp",emoji:"📜"}],shifts:["Animal → Object","Object → Authority"]},
+            {word:"sink",titleEmoji:"🚰",contexts:[{sentence:"Wash dishes in the sink",meaning:"Basin",emoji:"🚰"},{sentence:"The ship began to sink",meaning:"To go down",emoji:"🚢"},{sentence:"The sun will sink soon",meaning:"To set",emoji:"🌅"}],shifts:["Object → Motion","Motion → Natural"]},
+            {word:"spell",titleEmoji:"✨",contexts:[{sentence:"Cast a magic spell",meaning:"Enchantment",emoji:"✨"},{sentence:"How do you spell that?",meaning:"To write letters",emoji:"✍️"},{sentence:"A spell of bad weather",meaning:"Period",emoji:"⛈️"}],shifts:["Magic → Language","Language → Time"]},
+            {word:"stamp",titleEmoji:"📮",contexts:[{sentence:"Put a stamp on the letter",meaning:"Postal sticker",emoji:"📮"},{sentence:"Stamp your foot loudly",meaning:"To hit hard",emoji:"👣"},{sentence:"The official stamp was required",meaning:"Mark",emoji:"📜"}],shifts:["Object → Action","Action → Authority"]},
+            {word:"tank",titleEmoji:"🚗",contexts:[{sentence:"The army tank rolled forward",meaning:"Military vehicle",emoji:"🚗"},{sentence:"Fill the fish tank with water",meaning:"Container",emoji:"🐠"},{sentence:"The gas tank is empty",meaning:"Storage unit",emoji:"⛽"}],shifts:["Vehicle → Container","Container → Storage"]},
+            {word:"tie",titleEmoji:"👔",contexts:[{sentence:"Wear a tie to the meeting",meaning:"Neckwear",emoji:"👔"},{sentence:"Tie your shoelaces tight",meaning:"To fasten",emoji:"👟"},{sentence:"The game ended in a tie",meaning:"Equal score",emoji:"⚽"}],shifts:["Clothing → Action","Action → Result"]},
+            {word:"wave",titleEmoji:"🌊",contexts:[{sentence:"The wave crashed on shore",meaning:"Water movement",emoji:"🌊"},{sentence:"Wave goodbye to grandma",meaning:"To gesture",emoji:"👋"},{sentence:"A wave of excitement",meaning:"Surge",emoji:"⚡"}],shifts:["Natural → Gesture","Gesture → Emotion"]},
+            {word:"wind",titleEmoji:"💨",contexts:[{sentence:"The wind blew strongly",meaning:"Air movement",emoji:"💨"},{sentence:"Wind the clock carefully",meaning:"To turn",emoji:"🕐"},{sentence:"The path winds through hills",meaning:"To curve",emoji:"🏔️"}],shifts:["Natural → Mechanical","Mechanical → Spatial"]},
+            {word:"yard",titleEmoji:"🏡",contexts:[{sentence:"Play in the backyard",meaning:"Outdoor area",emoji:"🏡"},{sentence:"The fabric is three yards long",meaning:"Unit of length",emoji:"📏"},{sentence:"The ship's yard was busy",meaning:"Workshop",emoji:"⚓"}],shifts:["Space → Measurement","Measurement → Workplace"]},
+            {word:"bark",titleEmoji:"🐕",contexts:[{sentence:"The dog's bark was loud",meaning:"Dog sound",emoji:"🐕"},{sentence:"The tree's bark was rough",meaning:"Tree covering",emoji:"🌳"},{sentence:"The captain barked orders",meaning:"To shout",emoji:"📢"}],shifts:["Sound → Physical","Physical → Communication"]},
+            {word:"bow",titleEmoji:"🏹",contexts:[{sentence:"Tie a bow in the ribbon",meaning:"Knot",emoji:"🎀"},{sentence:"The bow of the ship",meaning:"Front part",emoji:"🚢"},{sentence:"Bow to the audience",meaning:"To bend",emoji:"🎭"}],shifts:["Object → Spatial","Spatial → Gesture"]},
+            {word:"can",titleEmoji:"🥫",contexts:[{sentence:"Open a can of beans",meaning:"Container",emoji:"🥫"},{sentence:"I can swim well",meaning:"To be able",emoji:"🏊"},{sentence:"The can was empty",meaning:"Metal container",emoji:"🗑️"}],shifts:["Container → Ability","Ability → Object"]},
+            {word:"change",titleEmoji:"💰",contexts:[{sentence:"Keep the change",meaning:"Money back",emoji:"💰"},{sentence:"Change your clothes",meaning:"To alter",emoji:"👕"},{sentence:"The weather will change",meaning:"To become different",emoji:"🌤️"}],shifts:["Money → Action","Action → Natural"]},
+            // Words 51-75
+            {word:"draft",titleEmoji:"📝",contexts:[{sentence:"Write a first draft",meaning:"Rough version",emoji:"📝"},{sentence:"Feel the draft from the window",meaning:"Air current",emoji:"💨"},{sentence:"He was drafted into the army",meaning:"Selected",emoji:"🎖️"}],shifts:["Document → Natural","Natural → Military"]},
+            {word:"file",titleEmoji:"📁",contexts:[{sentence:"Save the file on your computer",meaning:"Digital document",emoji:"💾"},{sentence:"Use a file to smooth the metal",meaning:"Tool",emoji:"🔧"},{sentence:"The soldiers marched in single file",meaning:"Line",emoji:"👥"}],shifts:["Digital → Tool","Tool → Formation"]},
+            {word:"fly",titleEmoji:"🪰",contexts:[{sentence:"A fly landed on the food",meaning:"Insect",emoji:"🪰"},{sentence:"Birds can fly high",meaning:"To move through air",emoji:"🐦"},{sentence:"The flag will fly tomorrow",meaning:"To display",emoji:"🏳️"}],shifts:["Animal → Motion","Motion → Display"]},
+            {word:"ground",titleEmoji:"🌍",contexts:[{sentence:"The ground was wet",meaning:"Earth surface",emoji:"🌍"},{sentence:"Grind the coffee beans",meaning:"To crush",emoji:"☕"},{sentence:"The plane was grounded",meaning:"Prevented from flying",emoji:"✈️"}],shifts:["Surface → Action","Action → Restriction"]},
+            {word:"hand",titleEmoji:"✋",contexts:[{sentence:"She raised her hand",meaning:"Body part",emoji:"✋"},{sentence:"Give me a hand with this",meaning:"Help",emoji:"🤝"},{sentence:"The clock hands point to noon",meaning:"Pointer",emoji:"🕐"}],shifts:["Body → Assistance","Assistance → Object"]},
+            {word:"iron",titleEmoji:"⚙️",contexts:[{sentence:"The iron was hot",meaning:"Metal",emoji:"⚙️"},{sentence:"Iron your shirt",meaning:"To press",emoji:"👔"},{sentence:"She has an iron will",meaning:"Strong",emoji:"💪"}],shifts:["Material → Action","Action → Quality"]},
+            {word:"jam",titleEmoji:"🍇",contexts:[{sentence:"Spread jam on the bread",meaning:"Fruit preserve",emoji:"🍇"},{sentence:"We got stuck in a traffic jam",meaning:"Congestion",emoji:"🚗"},{sentence:"The musicians will jam tonight",meaning:"To play music",emoji:"🎵"}],shifts:["Food → Traffic","Traffic → Music"]},
+            {word:"lead",titleEmoji:"⚡",contexts:[{sentence:"Lead the way",meaning:"To guide",emoji:"👥"},{sentence:"The pencil has a lead tip",meaning:"Graphite",emoji:"✏️"},{sentence:"Lead is a heavy metal",meaning:"Chemical element",emoji:"⚗️"}],shifts:["Action → Material","Material → Science"]},
+            {word:"mine",titleEmoji:"⛏️",contexts:[{sentence:"This book is mine",meaning:"Belongs to me",emoji:"📚"},{sentence:"They work in a coal mine",meaning:"Underground excavation",emoji:"⛏️"},{sentence:"The soldier stepped on a mine",meaning:"Explosive device",emoji:"💥"}],shifts:["Possession → Place","Place → Weapon"]},
+            {word:"nail",titleEmoji:"🔨",contexts:[{sentence:"Hammer the nail into wood",meaning:"Metal fastener",emoji:"🔨"},{sentence:"Trim your fingernails",meaning:"Hard covering",emoji:"💅"},{sentence:"She nailed the performance",meaning:"To succeed",emoji:"🎭"}],shifts:["Object → Body","Body → Achievement"]},
+            {word:"orange",titleEmoji:"🍊",contexts:[{sentence:"Eat an orange",meaning:"Citrus fruit",emoji:"🍊"},{sentence:"The sunset was orange",meaning:"Color",emoji:"🌅"},{sentence:"Orange juice is healthy",meaning:"Beverage",emoji:"🥤"}],shifts:["Fruit → Color","Color → Drink"]},
+            {word:"park",titleEmoji:"🌳",contexts:[{sentence:"Walk in the park",meaning:"Public space",emoji:"🌳"},{sentence:"Park the car here",meaning:"To place vehicle",emoji:"🚗"},{sentence:"The national park is huge",meaning:"Protected area",emoji:"🏞️"}],shifts:["Space → Action","Action → Conservation"]},
+            {word:"plant",titleEmoji:"🌱",contexts:[{sentence:"Water the plant",meaning:"Living organism",emoji:"🌱"},{sentence:"Plant a tree",meaning:"To put in ground",emoji:"🌳"},{sentence:"The factory plant was large",meaning:"Industrial facility",emoji:"🏭"}],shifts:["Organism → Action","Action → Industry"]},
+            {word:"play",titleEmoji:"🎮",contexts:[{sentence:"Children love to play",meaning:"To have fun",emoji:"🎮"},{sentence:"Watch the play tonight",meaning:"Theatrical performance",emoji:"🎭"},{sentence:"Play the piano",meaning:"To make music",emoji:"🎹"}],shifts:["Activity → Entertainment","Entertainment → Music"]},
+            {word:"pool",titleEmoji:"🏊",contexts:[{sentence:"Swim in the pool",meaning:"Water container",emoji:"🏊"},{sentence:"Pool your money together",meaning:"To combine",emoji:"💰"},{sentence:"The pool of candidates was small",meaning:"Group",emoji:"👥"}],shifts:["Container → Action","Action → Collection"]},
+            {word:"race",titleEmoji:"🏃",contexts:[{sentence:"Run in the race",meaning:"Competition",emoji:"🏃"},{sentence:"The human race",meaning:"Species",emoji:"👥"},{sentence:"Race to the finish",meaning:"To compete",emoji:"🏁"}],shifts:["Competition → Biology","Biology → Action"]},
+            {word:"rest",titleEmoji:"😴",contexts:[{sentence:"Take a rest",meaning:"To relax",emoji:"😴"},{sentence:"The rest of the money",meaning:"Remaining part",emoji:"💰"},{sentence:"Rest your head on the pillow",meaning:"To place",emoji:"🛏️"}],shifts:["Activity → Quantity","Quantity → Action"]},
+            {word:"row",titleEmoji:"🚣",contexts:[{sentence:"Row the boat",meaning:"To paddle",emoji:"🚣"},{sentence:"Sit in the front row",meaning:"Line",emoji:"🪑"},{sentence:"They had a big row",meaning:"Argument",emoji:"😠"}],shifts:["Action → Arrangement","Arrangement → Conflict"]},
+            {word:"saw",titleEmoji:"🔨",contexts:[{sentence:"Use a saw to cut wood",meaning:"Cutting tool",emoji:"🔨"},{sentence:"I saw the movie",meaning:"Past tense of see",emoji:"👀"},{sentence:"The old saw about patience",meaning:"Saying",emoji:"💭"}],shifts:["Tool → Perception","Perception → Wisdom"]},
+            {word:"second",titleEmoji:"⏱️",contexts:[{sentence:"Wait a second",meaning:"Unit of time",emoji:"⏱️"},{sentence:"She came in second place",meaning:"Position",emoji:"🥈"},{sentence:"Second the motion",meaning:"To support",emoji:"👍"}],shifts:["Time → Position","Position → Support"]},
+            {word:"shower",titleEmoji:"🚿",contexts:[{sentence:"Take a shower",meaning:"Bath",emoji:"🚿"},{sentence:"A shower of rain",meaning:"Brief fall",emoji:"🌧️"},{sentence:"A shower of gifts",meaning:"Abundance",emoji:"🎁"}],shifts:["Hygiene → Weather","Weather → Abundance"]},
+            {word:"space",titleEmoji:"🚀",contexts:[{sentence:"Travel to space",meaning:"Outer area",emoji:"🚀"},{sentence:"Leave space between words",meaning:"Gap",emoji:"📝"},{sentence:"The space in the room",meaning:"Area",emoji:"🏠"}],shifts:["Cosmic → Typography","Typography → Physical"]},
+            {word:"star",titleEmoji:"⭐",contexts:[{sentence:"Look at the stars",meaning:"Celestial body",emoji:"⭐"},{sentence:"She's a movie star",meaning:"Famous person",emoji:"🎬"},{sentence:"Star in the show",meaning:"To perform",emoji:"🎭"}],shifts:["Astronomy → Fame","Fame → Performance"]},
+            {word:"step",titleEmoji:"👣",contexts:[{sentence:"Take a step forward",meaning:"Foot movement",emoji:"👣"},{sentence:"Follow each step",meaning:"Instruction",emoji:"📋"},{sentence:"Step on the brake",meaning:"To press",emoji:"🚗"}],shifts:["Movement → Instruction","Instruction → Action"]}
+        ];
+
+        var currentIndex = 0;
+        var isAnimating = false;
+        var currentWord = polysemousWords[currentIndex];
+        var pulseTimer = null;
+        var waitTimer = null;
+        var autoAdvanceTimer = null;
+
+        // Cancellation tokens to prevent overlapping animations
+        var currentSequenceToken = 0; // Increments each time a new word sequence starts
+        var currentSentenceToken = 0; // Increments each time a new sentence reveal starts
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = (currentIndex + 1) + ' of ' + polysemousWords.length;
+        }
+
+        function clearAllTimers() {
+            if (pulseTimer) clearInterval(pulseTimer);
+            if (waitTimer) clearTimeout(waitTimer);
+            if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+            pulseTimer = null;
+            waitTimer = null;
+            autoAdvanceTimer = null;
+            document.getElementById('nextBtn').classList.remove('pulse-strong');
+            document.getElementById('mainBtn').classList.remove('pulse-soft');
+            document.getElementById('orText').classList.remove('show');
+        }
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function showCountdown() {
+            var countdownEl = document.getElementById('countdownDisplay');
+            countdownEl.classList.add('show');
+            
+            for (var i = 3; i >= 1; i--) {
+                countdownEl.textContent = i;
+                await wait(700);
+            }
+            
+            countdownEl.classList.remove('show');
+            await wait(200);
+            countdownEl.textContent = '';
+        }
+
+        async function showWordTitle() {
+            var titleEl = document.getElementById('wordTitle');
+            var titleEmojiEl = document.getElementById('titleEmoji');
+            
+            // Show title first
+            titleEl.textContent = currentWord.word.toUpperCase();
+            titleEl.classList.add('show');
+            
+            await wait(1100);
+            
+            // Show emoji
+            titleEmojiEl.textContent = currentWord.titleEmoji;
+            titleEmojiEl.classList.add('show');
+            
+            await wait(1000);
+        }
+
+        // Basic normalization to match simple inflections (plural, past, ing)
+        function normalizeForMatch(word) {
+            var w = word.toLowerCase().replace(/[.,!?]/g, '');
+            // Irregulars that appear in our dataset domain
+            var irregular = { feet: 'foot', children: 'child', men: 'man', women: 'woman', mice: 'mouse', geese: 'goose' };
+            if (irregular[w]) return irregular[w];
+            if (w.endsWith("'s") || w.endsWith("’s")) w = w.slice(0, -2);
+            // Verb forms
+            if (w.endsWith('ing') && w.length > 4) return w.slice(0, -3);
+            if (w.endsWith('ed') && w.length > 3) return w.slice(0, -2);
+            // Plurals
+            if (w.endsWith('es') && w.length > 3) {
+                // glasses -> glass, charges -> charge (approximate)
+                if (/(ch|sh|x|s|z|o)es$/.test(w)) return w.slice(0, -2);
+                return w.slice(0, -1);
+            }
+            if (w.endsWith('s') && w.length > 2) return w.slice(0, -1);
+            return w;
+        }
+
+        function findWordPositionInSentence(sentence, targetWord) {
+            var lowerSentence = sentence.toLowerCase();
+            var lowerTarget = targetWord.toLowerCase();
+            var targetNorm = normalizeForMatch(lowerTarget);
+            var words = lowerSentence.split(' ');
+            
+            var charPosition = 0;
+            for (var i = 0; i < words.length; i++) {
+                var raw = words[i];
+                var cleanWord = raw.replace(/[.,!?]/g, '');
+                var norm = normalizeForMatch(cleanWord);
+                if (cleanWord === lowerTarget || norm === targetNorm) {
+                    return { wordIndex: i, startChar: charPosition, endChar: charPosition + raw.length };
+                }
+                charPosition += raw.length + 1;
+            }
+            return { wordIndex: -1, startChar: -1, endChar: -1 };
+        }
+
+        function calculateSentenceRevealTime(sentence, keyWordStart, keyWordEnd) {
+            var totalTime = 0;
+            for (var i = 0; i < sentence.length; i++) {
+                if (sentence[i] === ' ') {
+                    totalTime += SPACE_SPEED;
+                } else {
+                    totalTime += CHARACTER_SPEED;
+                }
+                if (i === keyWordEnd - 1) {
+                    totalTime += KEY_WORD_PAUSE;
+                }
+            }
+            return totalTime;
+        }
+
+        function startEmojiTransition(emoji, duration) {
+            var emojiEl = document.getElementById('emojiBg');
+            emojiEl.textContent = emoji;
+            emojiEl.style.transition = 'opacity ' + duration + 'ms linear';
+            emojiEl.style.opacity = '0.12';
+        }
+
+        async function revealSentence(sentence, targetWord, meaningIndex) {
+            console.log(`Revealing sentence: "${sentence}" for word: "${targetWord}"`);
+            var container = document.getElementById('sentenceContainer');
+            
+            // CRITICAL: Clear container completely before adding new content
+            container.innerHTML = '';
+            
+            // Capture token to cancel on navigation/next sequence
+            const sentenceToken = ++currentSentenceToken;
+
+            var wordPos = findWordPositionInSentence(sentence, targetWord);
+            console.log('Word position found:', wordPos);
+            var className = meaningIndex === 0 ? 'key-word' : (meaningIndex === 1 ? 'key-word-2' : 'key-word-3');
+            
+            var totalRevealTime = calculateSentenceRevealTime(sentence, wordPos.startChar, wordPos.endChar);
+            startEmojiTransition(currentWord.contexts[meaningIndex].emoji, totalRevealTime);
+            
+            var charIndex = 0;
+            for (var i = 0; i < sentence.length; i++) {
+                // Check if animation should stop (user clicked next/prev)
+                if (!isAnimating || sentenceToken !== currentSentenceToken) {
+                    console.log('Animation stopped, breaking out of revealSentence');
+                    return;
+                }
+                
+                var char = sentence[i];
+                var span = document.createElement('span');
+                span.className = 'char';
+                
+                if (charIndex >= wordPos.startChar && charIndex < wordPos.endChar) {
+                    span.classList.add(className);
+                }
+                
+                span.textContent = char;
+                container.appendChild(span);
+                
+                var delay = (char === ' ') ? SPACE_SPEED : CHARACTER_SPEED;
+                await wait(delay);
+                span.classList.add('show');
+                
+                if (charIndex === wordPos.endChar - 1) {
+                    await wait(KEY_WORD_PAUSE);
+                }
+                
+                charIndex++;
+            }
+        }
+
+        function showMeaning(meaning, meaningIndex) {
+            var meaningClass = 'meaning-' + (meaningIndex + 1);
+            document.getElementById('meaningDisplay').innerHTML = 
+                '<span class="' + meaningClass + '">' + meaning + '</span>';
+            document.getElementById('infoSection').classList.add('show');
+        }
+
+        function showShift(shift) {
+            document.getElementById('shiftInfo').textContent = shift;
+        }
+
+        async function fadeOutSentence() {
+            var container = document.getElementById('sentenceContainer');
+            container.classList.add('fading');
+            await wait(CHARACTER_SPEED);
+            // Ensure container maintains its space during transition
+            container.style.minHeight = container.offsetHeight + 'px';
+        }
+
+        function startPulsePattern() {
+            var mainBtn = document.getElementById('mainBtn');
+            var nextBtn = document.getElementById('nextBtn');
+            var orText = document.getElementById('orText');
+            
+            mainBtn.classList.add('pulse-soft');
+            
+            waitTimer = setTimeout(function() {
+                mainBtn.classList.remove('pulse-soft');
+                orText.classList.add('show');
+                nextBtn.classList.add('pulse-strong');
+                
+                autoAdvanceTimer = setTimeout(function() {
+                    autoAdvance();
+                }, STATIC_WAIT);
+            }, PULSE_DURATION);
+        }
+
+        async function transitionToWord(newIndex) {
+            console.log('=== TRANSITION START ===');
+            console.log('From word:', currentWord ? currentWord.word : 'undefined', 'To index:', newIndex);
+            
+            // STEP 1: STOP animation immediately
+            clearAllTimers();
+            isAnimating = false;
+            // Invalidate any ongoing sequences/sentences
+            currentSequenceToken++;
+            currentSentenceToken++;
+            
+            // STEP 2: Update word data
+            currentIndex = newIndex;
+            currentWord = polysemousWords[currentIndex];
+            console.log('New word:', currentWord.word);
+            
+            // STEP 3: Get all DOM elements
+            var quoteBox = document.getElementById('quoteBox');
+            var emojiEl = document.getElementById('emojiBg');
+            var titleEmojiEl = document.getElementById('titleEmoji');
+            var titleEl = document.getElementById('wordTitle');
+            var sentenceContainer = document.getElementById('sentenceContainer');
+            var infoSection = document.getElementById('infoSection');
+            var mainBtn = document.getElementById('mainBtn');
+            
+            // STEP 4: DIM and CLEAR everything
+            quoteBox.classList.add('fade-out');
+            emojiEl.style.transition = 'opacity ' + FADE_OUT_DURATION + 'ms ease';
+            emojiEl.style.opacity = '0';
+            
+            await wait(FADE_OUT_DURATION);
+            
+            // STEP 5: CLEAR the display array completely
+            sentenceContainer.innerHTML = '';
+            sentenceContainer.classList.remove('fading');
+            sentenceContainer.style.minHeight = '';
+            infoSection.classList.remove('show');
+            titleEl.classList.remove('show');
+            titleEl.textContent = '';
+            titleEmojiEl.classList.remove('show');
+            titleEmojiEl.textContent = '';
+            emojiEl.style.opacity = '0';
+            emojiEl.style.transition = 'opacity 0ms linear';
+            emojiEl.textContent = '';
+            
+            // STEP 6: Update progress
+            updateProgress();
+            
+            // STEP 7: Fade in container
+            quoteBox.classList.remove('fade-out');
+            quoteBox.classList.add('fade-in');
+            await wait(300);
+            
+            // STEP 8: Start proper sequence
+            await runWordSequence();
+        }
+
+        async function autoAdvance() {
+            var nextIndex = (currentIndex + 1) % polysemousWords.length;
+            await transitionToWord(nextIndex);
+        }
+
+        // UNIFIED SEQUENCE: Title → Emoji → Emoji disappears → Sentence 1+emoji → Sentence 2+emoji → Sentence 3+emoji → Highlight controls
+        async function runWordSequence() {
+            console.log('=== SEQUENCE START for word:', currentWord.word, '===');
+            isAnimating = true;
+            const sequenceToken = ++currentSequenceToken; // bump token for this run
+            
+            var titleEl = document.getElementById('wordTitle');
+            var titleEmojiEl = document.getElementById('titleEmoji');
+            var mainBtn = document.getElementById('mainBtn');
+            
+            // SEQUENCE STEP 1: Show Title
+            console.log('STEP 1: Showing title');
+            titleEl.textContent = currentWord.word.toUpperCase();
+            titleEl.classList.add('show');
+            mainBtn.disabled = true;
+            mainBtn.textContent = 'Reflecting...';
+            await wait(1000);
+            
+            // SEQUENCE STEP 2: Show Emoji
+            console.log('STEP 2: Showing title emoji');
+            titleEmojiEl.textContent = currentWord.titleEmoji;
+            titleEmojiEl.classList.add('show');
+            await wait(1000);
+            
+            // SEQUENCE STEP 3: Emoji disappears (background emoji cleared)
+            console.log('STEP 3: Clearing background emoji');
+            var emojiEl = document.getElementById('emojiBg');
+            emojiEl.style.opacity = '0';
+            
+            // SEQUENCE STEPS 4-6: Show each sentence with its emoji
+            for (var i = 0; i < currentWord.contexts.length; i++) {
+                if (!isAnimating || sequenceToken !== currentSequenceToken) {
+                    console.log('Sequence interrupted at context', i);
+                    break;
+                }
+                
+                var context = currentWord.contexts[i];
+                console.log(`STEP ${4 + i}: Showing sentence ${i + 1}:`, context.sentence);
+                
+                // Clear previous sentence if needed
+                if (i > 0) {
+                    await fadeOutSentence();
+                    var sentenceContainer = document.getElementById('sentenceContainer');
+                    sentenceContainer.innerHTML = '';
+                    sentenceContainer.classList.remove('fading');
+                    sentenceContainer.style.minHeight = '';
+                    document.getElementById('infoSection').classList.remove('show');
+                }
+                
+                // Reveal sentence with emoji
+                await revealSentence(context.sentence, currentWord.word, i);
+                
+                if (!isAnimating || sequenceToken !== currentSequenceToken) break;
+                
+                await wait(SENTENCE_PAUSE);
+                
+                // Show meaning and shift
+                showMeaning(context.meaning, i);
+                if (i > 0) {
+                    showShift(currentWord.shifts[i - 1]);
+                }
+                
+                mainBtn.textContent = 'Meaning ' + (i + 1);
+                await wait(MEANING_PAUSE);
+            }
+
+            // SEQUENCE STEP 7: Highlight control buttons
+            if (isAnimating && sequenceToken === currentSequenceToken) {
+                console.log('STEP 7: Highlighting controls');
+            mainBtn.textContent = 'Play Again';
+            mainBtn.disabled = false;
+            isAnimating = false;
+            
+            startPulsePattern();
+            }
+            
+            console.log('=== SEQUENCE END ===');
+        }
+
+        async function startAnimation() {
+            // Deprecated - use runWordSequence instead
+            await runWordSequence();
+        }
+
+        async function nextWord() {
+            // Allow navigation during animation - stop current animation and move to next
+            var nextIndex = (currentIndex + 1) % polysemousWords.length;
+            await transitionToWord(nextIndex);
+        }
+
+        async function previousWord() {
+            // Allow navigation during animation - stop current animation and move to previous
+            var prevIndex = (currentIndex - 1 + polysemousWords.length) % polysemousWords.length;
+            await transitionToWord(prevIndex);
+        }
+
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) closeHelpModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('helpModal').classList.contains('show')) {
+                closeHelpModal();
+            }
+        });
+
+        document.getElementById('mainBtn').addEventListener('click', async function() {
+            if (this.textContent === 'Play Again') {
+                clearAllTimers();
+                isAnimating = false;
+                currentSequenceToken++;
+                currentSentenceToken++;
+                
+                // Clear display
+                document.getElementById('sentenceContainer').innerHTML = '';
+                document.getElementById('infoSection').classList.remove('show');
+                document.getElementById('wordTitle').classList.remove('show');
+                document.getElementById('titleEmoji').classList.remove('show');
+                
+                await wait(70);
+                
+                // Run the unified sequence
+                await runWordSequence();
+            }
+        });
+
+        // Validate all word data
+        function validateWordData() {
+            console.log('Validating word data...');
+            for (let i = 0; i < polysemousWords.length; i++) {
+                const word = polysemousWords[i];
+                console.log(`Word ${i + 1}: ${word.word}`);
+                
+                if (!word.word || !word.titleEmoji) {
+                    console.error(`Missing word or titleEmoji for index ${i}`);
+                }
+                
+                if (!word.contexts || word.contexts.length !== 3) {
+                    console.error(`Invalid contexts for word ${word.word}: expected 3, got ${word.contexts ? word.contexts.length : 0}`);
+                } else {
+                    word.contexts.forEach((context, j) => {
+                        if (!context.sentence || !context.meaning || !context.emoji) {
+                            console.error(`Missing data in context ${j + 1} for word ${word.word}:`, context);
+                        }
+                    });
+                }
+                
+                if (!word.shifts || word.shifts.length !== 2) {
+                    console.error(`Invalid shifts for word ${word.word}: expected 2, got ${word.shifts ? word.shifts.length : 0}`);
+                }
+            }
+            console.log('Validation complete.');
+        }
+        
+        validateWordData();
+        updateProgress();
+        
+        (async function() {
+            await showCountdown();
+            // Run the unified sequence (which includes showing title and emoji)
+            await runWordSequence();
+        })();
+    </script>
+</body>
+</html>
