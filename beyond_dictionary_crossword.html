@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)file:///C:/Go2Words/Research%20work/HTML%20Games/Temp/Crossword%20Claude%202.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond Dictionary - Crossword Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+            height: 3rem;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-weight: 700;
+            color: #4c51bf;
+        }
+
+        .theme {
+            font-weight: 600;
+            color: #6b46c1;
+        }
+
+        .progress {
+            background: #4c51bf;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem;
+            gap: 0.5rem;
+            min-height: 0;
+            align-items: center;
+        }
+
+        .grid-container {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.3rem;
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        .cell {
+            position: relative;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+            width: 40px;
+            height: 40px;
+        }
+
+        .cell:hover {
+            background: #f9fafb;
+        }
+
+        .cell.selected {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+
+        .cell.correct {
+            background: #d1fae5 !important;
+            border-color: #10b981;
+            animation: celebrate 0.5s ease-out;
+        }
+
+        .cell.incorrect {
+            background: #fee2e2 !important;
+            border-color: #ef4444;
+            animation: shake 0.5s ease-out;
+        }
+
+        .cell-empty {
+            background: transparent;
+            width: 40px;
+            height: 40px;
+        }
+
+        .number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #374151;
+            line-height: 1;
+            z-index: 1;
+        }
+
+        .input {
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            width: 100%;
+            height: 100%;
+            outline: none;
+            text-transform: uppercase;
+            padding: 0;
+        }
+
+        .clues {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 0.75rem;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .clues-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .clue-section h3 {
+            color: #4c51bf;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .clue {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        .clue.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+        }
+
+        .clue-num {
+            font-weight: 700;
+            color: #4c51bf;
+            min-width: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .clue-text {
+            color: #374151;
+            font-size: 0.8rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            height: 3.5rem;
+            flex-shrink: 0;
+        }
+
+        .score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .btn.hint {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fbbf24;
+        }
+
+        .btn.hint:hover:not(:disabled) {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .btn.submit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn.next {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .btn.audio {
+            background: #e0e7ff;
+            color: #4c51bf;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Confetti Animation */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fbbf24;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        .confetti:nth-child(odd) { background: #ef4444; }
+        .confetti:nth-child(3n) { background: #10b981; }
+        .confetti:nth-child(4n) { background: #3b82f6; }
+        .confetti:nth-child(5n) { background: #8b5cf6; }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        @keyframes scoreBoost {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .score.boost {
+            animation: scoreBoost 0.6s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                height: 2.5rem;
+                padding: 0.3rem 0.8rem;
+                font-size: 0.8rem;
+                flex-shrink: 0;
+            }
+
+            .controls {
+                height: 3rem;
+                padding: 0.5rem 0.8rem;
+                flex-shrink: 0;
+            }
+
+            .main {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 0.5rem;
+                gap: 0.5rem;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .grid-container {
+                flex: 0 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                max-height: 50vh;
+                min-height: 280px;
+            }
+
+            .clues {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                width: 100%;
+                padding: 0.75rem;
+            }
+            
+            .clues-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+            
+            .clue-section h3 {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .clue {
+                font-size: 0.8rem;
+                padding: 0.3rem;
+                margin-bottom: 0.3rem;
+                line-height: 1.3;
+            }
+            
+            .clue-num, .clue-text {
+                font-size: 0.8rem;
+            }
+            
+            .cell, .cell-empty {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .input {
+                font-size: 1.1rem;
+            }
+            
+            .number {
+                font-size: 0.6rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .score {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .main {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                gap: 2rem;
+            }
+
+            .grid-container {
+                flex: 1;
+                max-width: 600px;
+                min-height: 70vh;
+            }
+
+            .clues {
+                flex: 1;
+                max-width: 500px;
+                max-height: 70vh;
+                padding: 1.5rem;
+            }
+
+            .clue-section h3 {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
+            .clue {
+                font-size: 1rem;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .clue-num, .clue-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="brand">Beyond Dictionary</div>
+            <div class="theme" id="theme">Word Power: Mental Power</div>
+            <div class="progress" id="progress">Round 1/10</div>
+        </header>
+
+        <main class="main">
+            <div class="grid-container">
+                <div class="grid" id="crossword-grid" style="grid-template-columns: repeat(7, 40px); grid-template-rows: repeat(6, 40px);"><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell"><span class="number">5</span><input class="input" type="text" maxlength="1" data-pos="0-6"></div><div class="cell"><span class="number">1</span><input class="input" type="text" maxlength="1" data-pos="1-0"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="1-1"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="1-2"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="1-3"></div><div class="cell"><span class="number">2</span><input class="input" type="text" maxlength="1" data-pos="1-4"></div><div class="cell-empty"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="1-6"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="2-4"></div><div class="cell-empty"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="2-6"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell"><span class="number">3</span><input class="input" type="text" maxlength="1" data-pos="3-2"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="3-3"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="3-4"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="3-5"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="3-6"></div><div class="cell-empty"></div><div class="cell"><span class="number">4</span><input class="input" type="text" maxlength="1" data-pos="4-1"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="4-2"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="4-3"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="4-4"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="4-5"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell-empty"></div><div class="cell"><input class="input" type="text" maxlength="1" data-pos="5-4"></div><div class="cell-empty"></div><div class="cell-empty"></div></div>
+            </div>
+
+            <div class="clues">
+                <div class="clues-grid">
+                    <div class="clue-section">
+                        <h3>Across</h3>
+                        <div id="across-clues"><div class="clue">
+                    <span class="clue-num">1.</span>
+                    <span class="clue-text">Concentrate attention (5)</span>
+                </div><div class="clue">
+                    <span class="clue-num">3.</span>
+                    <span class="clue-text">Conscious and informed (5)</span>
+                </div><div class="clue">
+                    <span class="clue-num">4.</span>
+                    <span class="clue-text">Quick and intelligent (5)</span>
+                </div></div>
+                    </div>
+                    
+                    <div class="clue-section">
+                        <h3>Down</h3>
+                        <div id="down-clues"><div class="clue">
+                    <span class="clue-num">2.</span>
+                    <span class="clue-text">Showing intelligence (5)</span>
+                </div><div class="clue">
+                    <span class="clue-num">5.</span>
+                    <span class="clue-text">Having knowledge and experience (4)</span>
+                </div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="controls">
+            <div class="score" id="score-container">
+                <span>⭐</span>
+                <span id="score-display">100</span>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn hint" id="hint-btn" onclick="giveHint()">
+                    💡 Hint (-10)
+                </button>
+                
+                <button class="btn audio" onclick="playAudio()">
+                    🔊
+                </button>
+                
+                <button class="btn submit" id="submit-btn" onclick="submitAnswers()">
+                    📤 Submit
+                </button>
+                
+                <button class="btn next" id="next-btn" onclick="nextRound()" style="display: none;">
+                    ➡️ Next Round
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Confetti Container -->
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        // STEP 1: Define word sets for 10 rounds
+        const roundData = {
+            1: {
+                theme: "Inner Strength",
+                words: ["ELATED", "VIVID", "JARGON", "GRIT", "NOBLE", "BRISK"],
+                clues: [
+                    "Extremely happy or joyful",
+                    "Strikingly bright or clear", 
+                    "Specialized language of a group",
+                    "Courage and resolve",
+                    "Having high moral qualities",
+                    "Energetic or fast-paced"
+                ]
+            },
+            2: {
+                theme: "Mental Power", 
+                words: ["FOCUS", "SMART", "AWARE", "SHARP", "WISE", "KEEN"],
+                clues: [
+                    "Concentrate attention",
+                    "Showing intelligence",
+                    "Conscious and informed", 
+                    "Quick and intelligent",
+                    "Having knowledge and experience",
+                    "Having sharp insight"
+                ]
+            },
+            3: {
+                theme: "Life Force",
+                words: ["ENERGY", "SPARK", "BLAZE", "ZEAL", "FIRE", "VITAL"],
+                clues: [
+                    "Power and vitality",
+                    "Small fiery particle", 
+                    "Burn fiery bright",
+                    "Passionate enthusiasm",
+                    "Burning passion",
+                    "Essential for life"
+                ]
+            },
+            4: {
+                theme: "Achievement",
+                words: ["TRIUMPH", "SUCCESS", "EXCEL", "THRIVE", "REACH", "CLIMB"],
+                clues: [
+                    "Great victory or accomplishment",
+                    "Favorable outcome",
+                    "Be exceptionally good at",
+                    "Flourish and prosper",
+                    "Arrive at a destination",
+                    "Ascend step by step"
+                ]
+            },
+            5: {
+                theme: "Innovation",
+                words: ["CREATE", "INVENT", "DESIGN", "BUILD", "CRAFT", "FORGE"],
+                clues: [
+                    "Bring something into existence",
+                    "Devise something new",
+                    "Plan and create skillfully",
+                    "Construct something",
+                    "Make with skill and care",
+                    "Shape through hard work"
+                ]
+            },
+            6: {
+                theme: "Leadership",
+                words: ["GUIDE", "LEAD", "DIRECT", "INSPIRE", "MENTOR", "COACH"],
+                clues: [
+                    "Show the way forward",
+                    "Be in charge or command",
+                    "Give clear instructions",
+                    "Fill with enthusiasm",
+                    "Wise and trusted advisor",
+                    "Train and develop skills"
+                ]
+            },
+            7: {
+                theme: "Resilience",
+                words: ["BOUNCE", "ADAPT", "ENDURE", "PERSIST", "RECOVER", "STEADY"],
+                clues: [
+                    "Spring back quickly",
+                    "Adjust to new conditions",
+                    "Continue despite hardship",
+                    "Keep going steadily",
+                    "Return to normal state",
+                    "Firm and stable"
+                ]
+            },
+            8: {
+                theme: "Communication",
+                words: ["SPEAK", "LISTEN", "SHARE", "CONNECT", "EXPRESS", "RELATE"],
+                clues: [
+                    "Use voice to communicate",
+                    "Pay attention to sounds",
+                    "Give part of something",
+                    "Join or link together",
+                    "Convey thoughts clearly",
+                    "Show connection with"
+                ]
+            },
+            9: {
+                theme: "Growth",
+                words: ["LEARN", "EVOLVE", "EXPAND", "DEVELOP", "PROGRESS", "ADVANCE"],
+                clues: [
+                    "Gain knowledge or skill",
+                    "Change gradually over time",
+                    "Increase in size or scope",
+                    "Grow and improve",
+                    "Move forward steadily",
+                    "Move to higher level"
+                ]
+            },
+            10: {
+                theme: "Mastery",
+                words: ["MASTER", "EXPERT", "SKILLED", "GIFTED", "TALENT", "GENIUS"],
+                clues: [
+                    "Achieve complete control",
+                    "Person with deep knowledge",
+                    "Having developed ability",
+                    "Naturally talented",
+                    "Natural aptitude",
+                    "Exceptional intellectual ability"
+                ]
+            }
+        };
+
+        // Game state with random round sequence
+        let gameState = {
+            score: 100,
+            round: 1,
+            maxRounds: 10,
+            roundSequence: [],
+            selectedCell: { row: 0, col: 0 },
+            answers: {},
+            isSubmitted: false,
+            currentData: null,
+            speechQueue: [],
+            isSpeaking: false,
+            firstHint: true,
+            hintsDisabled: false
+        };
+
+        // Generate random round sequence with true randomization
+        function generateRandomSequence() {
+            const rounds = Array.from({length: 10}, (_, i) => i + 1);
+            
+            // Use current timestamp as seed for better randomization
+            const seed = Date.now() + Math.random() * 1000000;
+            
+            // Fisher-Yates shuffle with enhanced randomization
+            for (let i = rounds.length - 1; i > 0; i--) {
+                const j = Math.floor((Math.sin(seed + i) * 10000 % 1) * (i + 1));
+                [rounds[i], rounds[j]] = [rounds[j], rounds[i]];
+            }
+            
+            // Additional randomization pass
+            for (let i = 0; i < rounds.length; i++) {
+                const randomIndex = Math.floor(Math.random() * rounds.length);
+                [rounds[i], rounds[randomIndex]] = [rounds[randomIndex], rounds[i]];
+            }
+            
+            return rounds;
+        }
+
+        // STEP 2: Find intersections between words
+        function findIntersections(word1, word2) {
+            const intersections = [];
+            for (let i = 0; i < word1.length; i++) {
+                for (let j = 0; j < word2.length; j++) {
+                    if (word1[i] === word2[j]) {
+                        intersections.push({
+                            letter: word1[i],
+                            word1Index: i,
+                            word2Index: j,
+                            score: (i > 0 && i < word1.length-1 ? 5 : 0) + (j > 0 && j < word2.length-1 ? 5 : 0)
+                        });
+                    }
+                }
+            }
+            return intersections.sort((a, b) => b.score - a.score);
+        }
+
+        // STEP 3: Build crossword grid
+        function buildCrossword(roundNum) {
+            const data = roundData[roundNum];
+            const words = data.words;
+            const clues = data.clues;
+            
+            // Start with longest word horizontal
+            const sortedWords = words.map((word, idx) => ({word, clue: clues[idx], index: idx}))
+                                    .sort((a, b) => b.word.length - a.word.length);
+            
+            const placements = [];
+            const grid = new Map();
+            
+            // Place first word horizontally at origin
+            const first = sortedWords[0];
+            placements.push({
+                word: first.word,
+                clue: first.clue,
+                direction: 'across',
+                row: 0,
+                col: 0,
+                number: 1
+            });
+            
+            // Add first word to grid
+            for (let i = 0; i < first.word.length; i++) {
+                grid.set(`0,${i}`, first.word[i]);
+            }
+            
+            let nextNumber = 2;
+            
+            // Place remaining words
+            for (let w = 1; w < sortedWords.length; w++) {
+                const currentWord = sortedWords[w];
+                let placed = false;
+                
+                // Try to intersect with each placed word
+                for (const existing of placements) {
+                    if (placed) break;
+                    
+                    const intersections = findIntersections(currentWord.word, existing.word);
+                    
+                    for (const intersection of intersections) {
+                        // Determine direction (prefer vertical for shorter words)
+                        const newDirection = existing.direction === 'across' ? 'down' : 'across';
+                        
+                        let newRow, newCol;
+                        if (newDirection === 'across') {
+                            newRow = existing.row + intersection.word2Index;
+                            newCol = existing.col - intersection.word1Index;
+                        } else {
+                            newRow = existing.row - intersection.word1Index;
+                            newCol = existing.col + intersection.word2Index;
+                        }
+                        
+                        // Check if placement is valid
+                        let valid = true;
+                        for (let i = 0; i < currentWord.word.length; i++) {
+                            const r = newDirection === 'across' ? newRow : newRow + i;
+                            const c = newDirection === 'across' ? newCol + i : newCol;
+                            const key = `${r},${c}`;
+                            
+                            if (grid.has(key) && grid.get(key) !== currentWord.word[i]) {
+                                valid = false;
+                                break;
+                            }
+                        }
+                        
+                        if (valid) {
+                            placements.push({
+                                word: currentWord.word,
+                                clue: currentWord.clue,
+                                direction: newDirection,
+                                row: newRow,
+                                col: newCol,
+                                number: nextNumber++
+                            });
+                            
+                            // Add to grid
+                            for (let i = 0; i < currentWord.word.length; i++) {
+                                const r = newDirection === 'across' ? newRow : newRow + i;
+                                const c = newDirection === 'across' ? newCol + i : newCol;
+                                grid.set(`${r},${c}`, currentWord.word[i]);
+                            }
+                            
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Create final grid array
+            const minRow = Math.min(...Array.from(grid.keys()).map(k => parseInt(k.split(',')[0])));
+            const maxRow = Math.max(...Array.from(grid.keys()).map(k => parseInt(k.split(',')[0])));
+            const minCol = Math.min(...Array.from(grid.keys()).map(k => parseInt(k.split(',')[1])));
+            const maxCol = Math.max(...Array.from(grid.keys()).map(k => parseInt(k.split(',')[1])));
+            
+            const rows = maxRow - minRow + 1;
+            const cols = maxCol - minCol + 1;
+            const finalGrid = Array(rows).fill(null).map(() => Array(cols).fill(null));
+            
+            // Adjust placements and fill grid
+            placements.forEach(p => {
+                p.row -= minRow;
+                p.col -= minCol;
+            });
+            
+            grid.forEach((letter, key) => {
+                const [r, c] = key.split(',').map(Number);
+                const newR = r - minRow;
+                const newC = c - minCol;
+                finalGrid[newR][newC] = { letter };
+            });
+            
+            // Add numbers
+            placements.forEach(p => {
+                if (finalGrid[p.row] && finalGrid[p.row][p.col]) {
+                    finalGrid[p.row][p.col].number = p.number;
+                }
+            });
+            
+            return { grid: finalGrid, words: placements };
+        }
+
+        // Initialize game
+        function initGame() {
+            // Generate random sequence first
+            gameState.roundSequence = generateRandomSequence();
+            
+            // Get the actual round number from the sequence
+            const currentRoundData = gameState.roundSequence[gameState.round - 1];
+            
+            // Build crossword data
+            gameState.currentData = buildCrossword(currentRoundData);
+            
+            // Only render after data is ready
+            if (gameState.currentData && gameState.currentData.grid && gameState.currentData.words) {
+                renderGame();
+            } else {
+                console.error('Failed to initialize game data');
+            }
+        }
+
+        // Render complete game
+        function renderGame() {
+            // Safety check before rendering anything
+            if (!gameState.currentData || !gameState.currentData.grid || !gameState.currentData.words) {
+                console.warn('Cannot render game - data not ready');
+                return;
+            }
+            
+            renderGrid();
+            renderClues();
+            updateDisplay();
+        }
+
+        // Render grid
+        function renderGrid() {
+            const gridEl = document.getElementById('crossword-grid');
+            
+            // Safety check
+            if (!gameState.currentData || !gameState.currentData.grid) {
+                console.log('Grid data not ready yet');
+                return;
+            }
+            
+            const { grid } = gameState.currentData;
+            
+            const isDesktop = window.innerWidth >= 769;
+            const cellSize = isDesktop ? '40px' : '36px';
+            
+            gridEl.style.gridTemplateColumns = `repeat(${grid[0].length}, ${cellSize})`;
+            gridEl.style.gridTemplateRows = `repeat(${grid.length}, ${cellSize})`;
+            gridEl.innerHTML = '';
+
+            grid.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    const cellDiv = document.createElement('div');
+                    
+                    if (cell === null) {
+                        cellDiv.className = 'cell-empty';
+                    } else {
+                        cellDiv.className = 'cell';
+                        if (gameState.selectedCell.row === rowIndex && gameState.selectedCell.col === colIndex) {
+                            cellDiv.classList.add('selected');
+                        }
+                        
+                        cellDiv.onclick = () => selectCell(rowIndex, colIndex);
+                        
+                        if (cell.number) {
+                            const numberSpan = document.createElement('span');
+                            numberSpan.className = 'number';
+                            numberSpan.textContent = cell.number;
+                            cellDiv.appendChild(numberSpan);
+                        }
+                        
+                        const input = document.createElement('input');
+                        input.className = 'input';
+                        input.type = 'text';
+                        input.maxLength = '1';
+                        input.value = gameState.answers[`${rowIndex}-${colIndex}`] || '';
+                        input.disabled = gameState.isSubmitted;
+                        input.setAttribute('data-pos', `${rowIndex}-${colIndex}`);
+                        input.addEventListener('input', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInput(rowIndex, colIndex, e.target.value);
+                        });
+                        input.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            selectCell(rowIndex, colIndex);
+                        });
+                        cellDiv.appendChild(input);
+                    }
+                    
+                    gridEl.appendChild(cellDiv);
+                });
+            });
+        }
+
+        // Render clues
+        function renderClues() {
+            const acrossEl = document.getElementById('across-clues');
+            const downEl = document.getElementById('down-clues');
+            
+            // Safety check
+            if (!gameState.currentData || !gameState.currentData.words) {
+                console.log('Clues data not ready yet');
+                return;
+            }
+            
+            const { words } = gameState.currentData;
+            
+            const acrossWords = words.filter(w => w.direction === 'across');
+            const downWords = words.filter(w => w.direction === 'down');
+            
+            acrossEl.innerHTML = acrossWords.map(word => 
+                `<div class="clue">
+                    <span class="clue-num">${word.number}.</span>
+                    <span class="clue-text">${word.clue} (${word.word.length})</span>
+                </div>`
+            ).join('');
+            
+            downEl.innerHTML = downWords.map(word => 
+                `<div class="clue">
+                    <span class="clue-num">${word.number}.</span>
+                    <span class="clue-text">${word.clue} (${word.word.length})</span>
+                </div>`
+            ).join('');
+        }
+
+        // Update display
+        function updateDisplay() {
+            const currentRoundData = gameState.roundSequence[gameState.round - 1];
+            document.getElementById('theme').textContent = `Word Power: ${roundData[currentRoundData].theme}`;
+            document.getElementById('progress').textContent = `Round ${gameState.round}/${gameState.maxRounds}`;
+            document.getElementById('score-display').textContent = gameState.score;
+        }
+
+        // Select cell
+        function selectCell(row, col) {
+            gameState.selectedCell = { row, col };
+            renderGrid();
+            
+            // Check if this is the first cell of a word and speak the clue
+            const word = findWordAtPosition(row, col);
+            if (word) {
+                const isFirstCell = (word.direction === 'across' && word.col === col) || 
+                                  (word.direction === 'down' && word.row === row);
+                
+                if (isFirstCell) {
+                    const message = `Find ${word.word.length} letter word for ${word.clue}`;
+                    speak(message, 100, true); // Disable all buttons during speech
+                }
+            }
+            
+            // Focus the input in selected cell
+            setTimeout(() => {
+                const input = document.querySelector(`input[data-pos="${row}-${col}"]`);
+                if (input && !input.disabled) {
+                    input.focus();
+                    input.select();
+                }
+            }, 10);
+        }
+
+        // Handle input
+        function handleInput(row, col, value) {
+            if (value.length > 1) return;
+            
+            const key = `${row}-${col}`;
+            gameState.answers[key] = value.toUpperCase();
+            
+            // Update the input field immediately
+            const input = event.target;
+            input.value = value.toUpperCase();
+            
+            if (value) {
+                // Auto-advance to next empty cell in word
+                const word = findWordAtPosition(row, col);
+                if (word) {
+                    const nextCell = getNextEmptyCell(word, row, col);
+                    if (nextCell) {
+                        gameState.selectedCell = nextCell;
+                        // Focus on next input
+                        setTimeout(() => {
+                            const nextInput = document.querySelector(`input[data-pos="${nextCell.row}-${nextCell.col}"]`);
+                            if (nextInput) {
+                                nextInput.focus();
+                                nextInput.select();
+                            }
+                        }, 10);
+                    }
+                }
+            }
+            
+            renderGrid();
+        }
+
+        // Find word at position
+        function findWordAtPosition(row, col) {
+            if (!gameState.currentData || !gameState.currentData.words) {
+                return null;
+            }
+            
+            return gameState.currentData.words.find(word => {
+                for (let i = 0; i < word.word.length; i++) {
+                    const r = word.direction === 'across' ? word.row : word.row + i;
+                    const c = word.direction === 'across' ? word.col + i : word.col;
+                    if (r === row && c === col) return true;
+                }
+                return false;
+            });
+        }
+
+        // Get next empty cell in word
+        function getNextEmptyCell(word, currentRow, currentCol) {
+            for (let i = 0; i < word.word.length; i++) {
+                const r = word.direction === 'across' ? word.row : word.row + i;
+                const c = word.direction === 'across' ? word.col + i : word.col;
+                if ((r !== currentRow || c !== currentCol) && !gameState.answers[`${r}-${c}`]) {
+                    return { row: r, col: c };
+                }
+            }
+            return null;
+        }
+
+        // Enhanced speech synthesis with queue management
+        function speak(text, delay = 0, disableAllButtons = false) {
+            if ('speechSynthesis' in window) {
+                gameState.speechQueue.push({ text, delay, disableAllButtons });
+                processSpeeches();
+            }
+        }
+
+        function processSpeeches() {
+            if (gameState.isSpeaking || gameState.speechQueue.length === 0) return;
+            
+            gameState.isSpeaking = true;
+            const { text, delay, disableAllButtons } = gameState.speechQueue.shift();
+            
+            if (disableAllButtons) {
+                gameState.hintsDisabled = true;
+                const hintBtn = document.getElementById('hint-btn');
+                const submitBtn = document.getElementById('submit-btn');
+                const nextBtn = document.getElementById('next-btn');
+                const audioBtn = document.getElementById('audio');
+                
+                if (hintBtn) hintBtn.disabled = true;
+                if (submitBtn) submitBtn.disabled = true;
+                if (nextBtn) nextBtn.disabled = true;
+                if (audioBtn) audioBtn.disabled = true;
+            }
+            
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0; // 120 words per minute is roughly rate 1.0
+                utterance.pitch = 1.1;
+                
+                utterance.onend = () => {
+                    gameState.isSpeaking = false;
+                    if (disableAllButtons) {
+                        gameState.hintsDisabled = false;
+                        const hintBtn = document.getElementById('hint-btn');
+                        const submitBtn = document.getElementById('submit-btn');
+                        const nextBtn = document.getElementById('next-btn');
+                        const audioBtn = document.getElementById('audio');
+                        
+                        if (hintBtn) hintBtn.disabled = false;
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (nextBtn) nextBtn.disabled = false;
+                        if (audioBtn) audioBtn.disabled = false;
+                    }
+                    processSpeeches();
+                };
+                
+                speechSynthesis.speak(utterance);
+            }, delay);
+        }
+
+        // Confetti animation
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#fbbf24', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Give hint with synchronized voice and text
+        function giveHint() {
+            if (gameState.hintsDisabled) return; // Prevent hints during speech
+            
+            const { row, col } = gameState.selectedCell;
+            const cell = gameState.currentData.grid[row]?.[col];
+            
+            if (!cell) {
+                speak("Please select a cell first");
+                return;
+            }
+            
+            const word = findWordAtPosition(row, col);
+            if (!word) return;
+            
+            // Find first empty cell in word
+            for (let i = 0; i < word.word.length; i++) {
+                const r = word.direction === 'across' ? word.row : word.row + i;
+                const c = word.direction === 'across' ? word.col + i : word.col;
+                const cellKey = `${r}-${c}`;
+                
+                if (!gameState.answers[cellKey]) {
+                    // Fill in the answer first
+                    gameState.answers[cellKey] = word.word[i];
+                    gameState.score = Math.max(0, gameState.score - 10);
+                    
+                    // Update display immediately
+                    updateDisplay();
+                    renderGrid();
+                    
+                    // Different voice message based on whether it's first hint or not
+                    const message = gameState.firstHint ? 
+                        `The letter is ${word.word[i]}` : 
+                        word.word[i];
+                    
+                    gameState.firstHint = false;
+                    speak(message, 100);
+                    return;
+                }
+            }
+        }
+
+        // Submit answers with celebration
+        function submitAnswers() {
+            const { words } = gameState.currentData;
+            let bonus = 0;
+            let correctWords = 0;
+            
+            words.forEach(word => {
+                let wordCorrect = true;
+                
+                for (let i = 0; i < word.word.length; i++) {
+                    const r = word.direction === 'across' ? word.row : word.row + i;
+                    const c = word.direction === 'across' ? word.col + i : word.col;
+                    const cellKey = `${r}-${c}`;
+                    const userAnswer = gameState.answers[cellKey] || '';
+                    
+                    // Fill in correct answer
+                    gameState.answers[cellKey] = word.word[i];
+                    
+                    if (userAnswer !== word.word[i]) {
+                        wordCorrect = false;
+                    }
+                }
+                
+                if (wordCorrect) {
+                    correctWords++;
+                    bonus += word.word.length >= 5 ? 70 : 50;
+                }
+            });
+            
+            gameState.score += bonus;
+            gameState.isSubmitted = true;
+            
+            // Celebrate with confetti if score earned
+            if (bonus > 0) {
+                createConfetti();
+                // Animate score boost
+                const scoreContainer = document.getElementById('score-container');
+                scoreContainer.classList.add('boost');
+                setTimeout(() => scoreContainer.classList.remove('boost'), 600);
+            }
+            
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'flex';
+            
+            renderGrid();
+            updateDisplay();
+            
+            const message = bonus > 0 ? 
+                `Fantastic! You got ${correctWords} words correct and earned ${bonus} points!` : 
+                "Good effort! Keep practicing to improve your score!";
+            
+            speak(message, 500);
+        }
+
+        // Next round
+        function nextRound() {
+            if (gameState.round < gameState.maxRounds) {
+                gameState.round++;
+                gameState.answers = {};
+                gameState.isSubmitted = false;
+                gameState.selectedCell = { row: 0, col: 0 };
+                gameState.firstHint = true; // Reset for new round
+                
+                document.getElementById('submit-btn').style.display = 'flex';
+                document.getElementById('next-btn').style.display = 'none';
+                
+                const currentRoundData = gameState.roundSequence[gameState.round - 1];
+                gameState.currentData = buildCrossword(currentRoundData);
+                renderGame();
+                
+                speak(`Starting round ${gameState.round}! Theme: ${roundData[currentRoundData].theme}`, 300, true);
+            } else {
+                // Final celebration
+                createConfetti();
+                const scoreContainer = document.getElementById('score-container');
+                scoreContainer.classList.add('boost');
+                setTimeout(() => scoreContainer.classList.remove('boost'), 600);
+                
+                speak(`Outstanding! You've completed all ${gameState.maxRounds} rounds! Your final score is ${gameState.score} points! You've truly mastered word power!`, 500, true);
+            }
+        }
+
+        // Play audio with context-aware responses
+        function playAudio() {
+            // Check if game is just starting (no answers filled)
+            const hasAnswers = Object.keys(gameState.answers).some(key => gameState.answers[key]);
+            
+            if (!hasAnswers) {
+                // Game intro for empty state
+                if (gameState.round === 1) {
+                    speak("Welcome to Beyond Dictionary! Fill in the crossword using the clues. Click on cells to start playing!", 0, true);
+                } else {
+                    // Empty round but not first
+                    const currentRoundData = gameState.roundSequence[gameState.round - 1];
+                    speak(`Ready for round ${gameState.round}? Theme is ${roundData[currentRoundData].theme}. Click on cells to begin!`, 0, true);
+                }
+            } else {
+                // Encouragement during gameplay
+                const encouragements = [
+                    "You're doing fantastic! Keep it up!",
+                    "Great job! Your vocabulary is growing!",
+                    "Excellent work! You're getting stronger with words!",
+                    "Keep going! You're building real word power!",
+                    "Amazing progress! Your mind is sharp!"
+                ];
+                const message = encouragements[Math.floor(Math.random() * encouragements.length)];
+                speak(message, 0, true);
+            }
+        }
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+        window.addEventListener('resize', renderGrid);
+    </script>
+
+</body></html>
