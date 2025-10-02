@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part of Speech Coder</title>
+    
+    <!-- Font: Montserrat for Quiz, System UI for Game -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
+    <style>
+        :root {
+            --cube-size: 350px;
+            --tile-gap: 8px;
+            --border-radius: 10px;
+            --transition-speed: 0.5s;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+            /* Palette (Unified for Game and Quiz) */
+            --bg-main: #f8f9fa; /* Very Light Gray */
+            --bg-panel: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --accent-color: #007bff; /* Professional Blue */
+            --accent-hover: #0056b3;
+            --win-color: #28a745;
+            --border-color: #dee2e6;
+            --wrong-color: #dc3545;
+
+            /* Tile/Category Colors */
+            --noun-bg: #007bff;
+            --verb-bg: #dc3545;
+            --adjective-bg: #28a745;
+            --adverb-bg: #6f42c1;
+            --conjunction-bg: #fd7e14; /* Conjunction/Determiner */
+            --preposition-bg: #6c757d;
+            --tile-text-color: #ffffff;
+            
+            /* Quiz/Welcome Specific Palette */
+            --quiz-accent: #ef7d55;
+            --quiz-accent-deep: #d8663f;
+            --quiz-correct-soft: #dcfce7;
+            --quiz-wrong-soft: #fee2e2;
+            --quiz-header-bg: #1f1b18;
+            --quiz-header-text: #f6f3f1;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* View Switching Logic */
+        #app-container[data-view="welcome"] .game-view,
+        #app-container[data-view="welcome"] .quiz-view,
+        #app-container[data-view="welcome"] .summary-view { display: none; }
+        
+        #app-container[data-view="game"] .welcome-view,
+        #app-container[data-view="game"] .quiz-view,
+        #app-container[data-view="game"] .summary-view { display: none; }
+        
+        #app-container[data-view="quiz"] .welcome-view,
+        #app-container[data-view="quiz"] .game-view,
+        #app-container[data-view="quiz"] .summary-view { display: none; }
+
+        #app-container[data-view="summary"] .welcome-view,
+        #app-container[data-view="summary"] .game-view,
+        #app-container[data-view="summary"] .quiz-view { display: none; }
+
+
+        .welcome-view, .game-view, .quiz-view, .summary-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .game-view {
+            overflow: hidden; /* Prevents double scrollbars on the game screen only */
+        }
+
+        /* --- 1. CUBE GAME STYLES --- */
+        .header {
+            flex-shrink: 0;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            height: 60px;
+            justify-content: space-between;
+        }
+        .header h1 { margin: 0; font-size: clamp(1.1rem, 2vh, 1.3rem); font-weight: 600; }
+        .header-stats { display: flex; align-items: center; gap: 1.5rem; }
+        .timer-display, .score-display { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); font-family: 'Montserrat', sans-serif; }
+        
+        .info-button { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); width: 30px; height: 30px; border-radius: 50%; font-size: 1.1rem; font-style: italic; font-family: serif; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; touch-action: manipulation; }
+        .info-button:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .game-wrapper { flex-grow: 1; display: grid; grid-template-columns: 2fr 1fr; align-items: flex-start; padding: 2vw; gap: 2vw; overflow: hidden; width: 100%; box-sizing: border-box; }
+        .cube-area { display: flex; align-items: center; justify-content: center; perspective: 2000px; padding-top: 2rem; cursor: grab; flex-grow: 1; }
+        .cube-area:active { cursor: grabbing; }
+        
+        #cube { width: var(--cube-size); height: var(--cube-size); position: relative; transform-style: preserve-3d; transition: transform 0s; /* Remove transition for smooth drag */ }
+        .face { position: absolute; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: var(--tile-gap); padding: var(--tile-gap); box-sizing: border-box; backface-visibility: hidden; }
+        .front  { transform: rotateY(  0deg) translateZ(calc(var(--cube-size) / 2)); }
+        .back   { transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2)); }
+        .right  { transform: rotateY( 90deg) translateZ(calc(var(--cube-size) / 2)); }
+        .left   { transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2)); }
+        .top    { transform: rotateX( 90deg) translateZ(calc(var(--cube-size) / 2)); }
+        .bottom { transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2)); }
+        
+        .tile { display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.3s; cursor: pointer; user-select: none; box-sizing: border-box; border: 3px solid transparent; color: var(--tile-text-color); position: relative; overflow: hidden; touch-action: manipulation; }
+        .tile.selected { border-color: #000; transform: scale(1.05); box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+        .tile span { display: block; font-size: calc(var(--cube-size) * 0.05); font-weight: 500; padding: 2px; max-width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tile.pos-noun { background-color: var(--noun-bg); }
+        .tile.pos-verb { background-color: var(--verb-bg); }
+        .tile.pos-adjective { background-color: var(--adjective-bg); }
+        .tile.pos-adverb { background-color: var(--adverb-bg); }
+        .tile.pos-conjunction { background-color: var(--conjunction-bg); }
+        .tile.pos-preposition { background-color: var(--preposition-bg); }
+        
+        .control-group h3 { margin: 0 0 15px 0; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); }
+        .button-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .control-btn { background-color: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); height: 50px; border-radius: var(--border-radius); font-size: 1.5rem; cursor: pointer; transition: all 0.2s; touch-action: manipulation; display:flex; align-items:center; justify-content:center; }
+        .control-btn:hover { background-color: var(--text-secondary); border-color: var(--text-secondary); color: white; }
+        .control-btn svg { width: 24px; height: 24px; }
+
+        .zoom-controls { display: flex; align-items: center; gap: 10px; }
+        #zoom-slider { width: 100%; cursor: pointer; }
+
+        /* Modal, Confetti & Countdown Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 10, 20, 0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 10px; box-sizing: border-box; backdrop-filter: blur(4px); transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
+        .modal-overlay.active { display: flex; opacity: 1; pointer-events: auto; }
+        .modal-content { background-color: var(--bg-panel); padding: 30px 40px; border-radius: var(--border-radius); text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modal-fade-in 0.5s ease-out; position: relative; max-width: 600px; width: 95%; border-top: 5px solid var(--accent-color); }
+        .modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2rem; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; }
+        .modal-close-btn:hover { color: var(--text-primary); }
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; top: -20px; animation: fall 4s linear; }
+        .countdown-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 3000; color: white; font-size: 8rem; font-weight: 800; font-family: 'Montserrat', sans-serif; text-shadow: 0 0 20px black; }
+
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        @keyframes modal-fade-in { from { opacity: 0; transform: scale(0.9) translateY(-20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* --- 2. WELCOME, SUMMARY & QUIZ STYLES --- */
+        .welcome-view, .quiz-view, .summary-view { font-family: 'Montserrat', sans-serif; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box; height: 100%; }
+        .welcome-app, .quiz-app, .summary-app { width: 100%; max-width: 860px; height: 100%; max-height: 900px; background: var(--bg-panel); border-radius: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+        .app__header { background: var(--quiz-header-bg); color: var(--quiz-header-text); padding: .8rem 1rem; flex-shrink: 0; }
+        .app__title { font-size: 1.05rem; font-weight: 800; letter-spacing: .3px; margin: 0 0 .15rem; }
+        .app__subtitle { font-size: .8rem; opacity: .9; margin: 0 0 .45rem; }
+        .app-main, .quiz-main, .summary-main { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        .quiz-main { padding: 1rem; }
+        .quiz-nav { border-top: 1px solid var(--border-color); padding: .7rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 1rem; }
+        
+        .app-main h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--text-primary); }
+        .app-main ul { padding-left: 20px; margin-top: 10px; line-height: 1.7; }
+        .app-main li { margin-bottom: 15px; }
+
+        .action-container { padding: 1rem 0; text-align: center; }
+        .byline { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1.5rem; }
+        
+        .summary-main .final-score {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--quiz-accent);
+            text-align: center;
+            margin: 0 0 1.5rem 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .summary-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .summary-table { border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; }
+        .summary-table h4 { margin: 0; padding: .6rem; text-transform: uppercase; font-size: .9rem; text-align: center; color: var(--tile-text-color); }
+        .summary-table.pos-noun h4 { background-color: var(--noun-bg); }
+        .summary-table.pos-verb h4 { background-color: var(--verb-bg); }
+        .summary-table.pos-adjective h4 { background-color: var(--adjective-bg); }
+        .summary-table.pos-adverb h4 { background-color: var(--adverb-bg); }
+        .summary-table.pos-conjunction h4 { background-color: var(--conjunction-bg); }
+        .summary-table.pos-preposition h4 { background-color: var(--preposition-bg); }
+        .summary-table ul { list-style: none; padding: 0 .8rem .8rem; margin: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; text-align: center; }
+        .summary-table li { font-size: .9rem; background: var(--bg-main); padding: .2rem; border-radius: 4px; }
+
+
+        .progress { width: 100%; height: 6px; background: rgba(255, 255, 255, .25); border-radius: 9999px; overflow: hidden; }
+        .progress__bar { height: 100%; width: 0%; background: var(--quiz-accent); border-radius: 9999px; transition: width .3s ease; }
+        .meta { display: flex; gap: .4rem; margin-top: .45rem; flex-wrap: wrap; font-size: .7rem; }
+        .badge { background: rgba(255, 255, 255, .12); color: #fff; padding: .15rem .5rem; border-radius: 9999px; font-weight: 600; }
+        .card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; }
+        .q-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+        .q-index { font-weight: 800; color: var(--quiz-accent); font-size: .95rem; }
+        .q-labels { display: flex; align-items: center; gap: .5rem; }
+        .q-category { font-size: .7rem; padding: .2rem .5rem; border-radius: 9999px; background: #f1f3f5; border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 700; text-transform: capitalize; }
+        .q-text { margin: .6rem 0 .8rem; line-height: 1.5; font-weight: 600; font-size: 1rem; }
+        .options { display: flex; flex-direction: column; gap: .45rem; }
+        .option { border: 1px solid var(--border-color); border-radius: 10px; padding: .65rem .8rem; cursor: pointer; transition: .2s; background: #fff; position: relative; }
+        .option:hover { border-color: var(--quiz-accent); background-color: #fff7f5; }
+        .option.is-selected { border-color: var(--quiz-accent); background-color: #fff7f5; }
+        .option.is-correct { border-color: var(--win-color); background: var(--quiz-correct-soft); color: var(--win-color); font-weight: 700; }
+        .option.is-wrong { border-color: var(--wrong-color); background: var(--quiz-wrong-soft); color: var(--wrong-color); font-weight: 700; }
+        .option[disabled] { opacity: .75; pointer-events: none; }
+        .ftb input { width: 100%; padding: .7rem .8rem; border: 1px solid var(--border-color); border-radius: 10px; font-size: .95rem; box-sizing: border-box; }
+        .ftb input:focus { outline: none; border-color: var(--quiz-accent); box-shadow: 0 0 0 3px rgba(239, 125, 85, .15); }
+        .expl { margin-top: .8rem; border-left: 4px solid; padding: .75rem .8rem; border-radius: 8px; line-height: 1.55; display: none; text-align: left; }
+        .expl--ok { border-color: var(--win-color); background: var(--quiz-correct-soft); color: var(--win-color); }
+        .expl--no { border-color: var(--wrong-color); background: var(--quiz-wrong-soft); color: var(--wrong-color); }
+        .expl .model { margin-top: .5rem; font-weight: 600; }
+        .btn { border: none; border-radius: .65rem; padding: .55rem 1rem; font-weight: 800; cursor: pointer; transition: .2s; font-size: .92rem; }
+        .btn--pri { background: var(--quiz-accent); color: #fff; }
+        .btn--pri:hover { background: var(--quiz-accent-deep); }
+        .btn--sec { background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .btn--sec:hover { background-color: #fff7f5; color: var(--quiz-accent-deep); border-color: var(--quiz-accent); }
+        .btn[disabled] { opacity: .6; cursor: not-allowed; }
+        .score { font-weight: 800; color: var(--quiz-accent); font-size: .95rem; }
+
+        /* --- 3. RESPONSIVE & MOBILE-SPECIFIC STYLES --- */
+
+        /* DESKTOP STYLES (default) */
+        .controls-area {
+            background-color: var(--bg-panel); padding: 25px; border-radius: var(--border-radius);
+            box-shadow: var(--shadow); border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; gap: 20px;
+            width: 100%; max-width: 300px; justify-self: start;
+        }
+
+        /* MOBILE STYLES */
+        @media (max-width: 900px) {
+            :root { --cube-size: min(250px, 65vh); }
+            
+            .game-view { display: flex; flex-direction: column; }
+            
+            .game-wrapper {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Pushes cube up, controls down */
+                align-items: center;
+                flex-grow: 1;
+                padding: 15px 15px 5px 15px; /* Less padding at bottom */
+                gap: 15px;
+            }
+            .controls-area {
+                order: 3;
+                flex-shrink: 0;
+                width: 100%;
+                max-width: 420px;
+                height: auto;
+                background: transparent; /* Make background transparent */
+                border: none; /* Remove border */
+                box-shadow: none;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+                gap: 8px;
+            }
+            
+            .controls-row-1 {
+                display: flex;
+                width: 100%;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .controls-area > .control-group {
+               flex-grow: 1;
+            }
+            .controls-area > .control-group:first-of-type {
+                max-width: 100px;
+            }
+
+            .control-group h3 { display: none; }
+            
+            .button-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+            }
+
+            .zoom-controls {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .control-btn { 
+                height: 40px; 
+                width: 40px;
+                font-size: 1.1rem;
+                flex-shrink: 0;
+            }
+
+            .button-grid .control-btn {
+                width: 100%;
+            }
+
+            .zoom-controls .control-btn {
+                font-size: 1.4rem;
+            }
+            
+            #new-puzzle-btn { 
+                width: 100%; 
+                height: 45px;
+                display: none; /* Initially hidden */
+            }
+            
+            .header { padding: 0 15px; }
+        }
+        @media (max-width: 480px) {
+            :root { --cube-size: min(220px, 60vh); }
+            .game-wrapper { padding: 10px 10px 5px 10px; gap: 10px; }
+            .modal-content { padding: 20px; }
+            .welcome-app, .quiz-app, .summary-app { border-radius: 0; height: 100%; max-height: 100%;}
+            .app-main { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container" data-view="welcome">
+    <!-- VIEW 0: The Welcome Screen -->
+    <div class="welcome-view">
+        <div class="welcome-app">
+            <header class="app__header">
+                <h1 class="app__title">Part of Speech Coder</h1>
+                <p class="app__subtitle">Your journey to mastering English grammar starts now.</p>
+            </header>
+            <main class="app-main">
+                <h3>Part 1: The Cube Challenge</h3>
+                <ul>
+                    <li><strong>The Objective:</strong> Your goal is to solve the puzzle by making each of the cube's six faces a single, solid color.</li>
+                    <li><strong>Colors are Categories:</strong> Each color represents a specific Part of Speech (Nouns, Verbs, Adjectives, etc.).</li>
+                    <li><strong>How to Play:</strong> Use your mouse or finger to drag and rotate the cube. Click one tile to select it, then another to swap their positions.</li>
+                </ul>
+                <h3>Scoring System</h3>
+                 <ul>
+                    <li><strong>Solve a Face:</strong> +45 points.</li>
+                    <li><strong>Upright Bonus:</strong> If a face's text is upright when solved, you get a 3x bonus for 135 points!</li>
+                    <li><strong>Quiz Questions:</strong> +10 points for correct MCQ/TF answers, and +20 for correct Fill-in-the-Blanks.</li>
+                </ul>
+                <h3>Part 2: Milestone Quizzes</h3>
+                <p>Each time you successfully solve a face, the game will pause and you'll take a **short, 3-question quiz** on the words you just sorted. This reinforces your learning as you play!</p>
+               
+                <div class="action-container">
+                    <button class="btn btn--pri" id="lets-play-btn" style="font-size: 1.1rem; padding: .8rem 2rem;">Let's Play!</button>
+                    <p class="byline">&copy; Beyond Dictionary, 2025</p>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- VIEW 1: The Cube Game -->
+    <div class="game-view">
+        <header class="header">
+            <div class="header-left">
+                <h1>Part of Speech Coder</h1>
+            </div>
+            <div class="header-stats">
+                <div id="score-display" class="score-display">0</div>
+                <div id="timer" class="timer-display">00:00</div>
+                 <button class="info-button" id="info-btn" title="Game Rules">i</button>
+            </div>
+        </header>
+        <div class="game-wrapper">
+            <div class="cube-area"><div id="cube"></div></div>
+            <section class="controls-area">
+                <div class="controls-row-1">
+                    <div class="control-group">
+                        <h3>Rotate Cube</h3>
+                        <div class="button-grid">
+                            <button class="control-btn" id="arrow-up" title="Rotate Up">↑</button>
+                            <button class="control-btn" id="arrow-down" title="Rotate Down">↓</button>
+                            <button class="control-btn" id="arrow-left" title="Rotate Left">←</button>
+                            <button class="control-btn" id="arrow-right" title="Rotate Right">→</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <h3>Zoom (50% - 125%)</h3>
+                        <div class="zoom-controls">
+                            <button class="control-btn" id="zoom-out-btn" title="Zoom Out">-</button>
+                            <input type="range" id="zoom-slider" min="0.5" max="1.25" step="0.05" value="1" title="Zoom">
+                            <button class="control-btn" id="zoom-in-btn" title="Zoom In">+</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn--sec" id="new-puzzle-btn" title="New Game / Reshuffle" style="font-weight: 600; display:flex; align-items:center; justify-content:center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    New Game
+                </button>
+            </section>
+        </div>
+    </div>
+
+    <!-- VIEW 2: The Quiz -->
+    <div class="quiz-view">
+        <div class="quiz-app" id="quizApp">
+            <header class="app__header" id="quizHeader">
+                <h1 class="app__title" id="quizTitle">Knowledge Check!</h1>
+                <p class="app__subtitle" id="quizSubtitle">Answer 3 questions to continue.</p>
+                <div class="progress"><div class="progress__bar" id="quizProgressBar"></div></div>
+                <div class="meta">
+                    <span class="badge" id="badgeIndex">Q 1 / 3</span>
+                    <span class="badge" id="badgeType">MCQ</span>
+                </div>
+            </header>
+            <main class="quiz-main"><div class="card" id="qCard"></div></main>
+            <footer class="quiz-nav">
+                <button class="btn btn--sec" id="btnPrev" disabled>← Prev</button>
+                <div class="score" id="scoreMini">Score: 0</div>
+                <div>
+                    <button class="btn btn--sec" id="btnHint">Hint</button>
+                    <button class="btn btn--pri" id="btnSubmit">Submit</button>
+                    <button class="btn btn--pri" id="btnNext" style="display:none">Next →</button>
+                    <button class="btn btn--pri" id="btnFinish" style="display:none">Finish Quiz</button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- VIEW 3: The Summary Screen -->
+    <div class="summary-view">
+        <div class="summary-app">
+            <header class="app__header">
+                <h1 class="app__title">Mission Complete!</h1>
+                <p class="app__subtitle">You've solved the cube. Here are the words you mastered.</p>
+            </header>
+            <main class="summary-main" id="summary-main">
+                 <div id="final-score" class="final-score">Final Score: 0</div>
+                 <div id="summary-tables-container"></div>
+                 <div class="action-container">
+                     <button class="btn btn--pri" id="master-quiz-btn">Master Quiz (All Words)</button>
+                     <button class="btn btn--sec" id="play-again-summary-btn">Play Again</button>
+                     <p class="byline">&copy; Beyond Dictionary, 2025</p>
+                 </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- All Modals & Overlays -->
+<div class="confetti-container" id="confetti-container"></div>
+<div class="countdown-overlay" id="countdown-overlay"></div>
+
+<div class="modal-overlay" id="milestone-modal">
+    <div class="modal-content">
+         <h2 id="milestone-title" style="color: var(--win-color);">Milestone Reached!</h2>
+         <p id="milestone-text">You've solved the NOUN face.</p>
+         <p id="milestone-score-text">You earned <strong>45 points</strong>!</p>
+         <p>Answer 3 questions to earn more points and unlock the cube.</p>
+         <button class="btn btn--pri" id="start-milestone-quiz">Start Quiz</button>
+   </div>
+</div>
+
+<div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+        <button class="modal-close-btn" data-target="rules-modal">&times;</button>
+        <h2 style="color: var(--accent-color);">How to Play & Score</h2>
+        <div class="app-main" style="padding: 0; text-align: left;">
+             <h3>The Cube Challenge</h3>
+            <ul>
+                <li><strong>Objective:</strong> Make each of the cube's six faces a single, solid color.</li>
+                <li><strong>How to Play:</strong> Use your mouse or finger to drag and rotate the cube. Click one tile to select it, then another to swap their positions.</li>
+            </ul>
+             <h3>Scoring System</h3>
+             <ul>
+                <li><strong>Solve a Face:</strong> +45 points.</li>
+                <li><strong>Upright Bonus:</strong> If a face's text is upright when solved, you get a 3x bonus for 135 points!</li>
+                <li><strong>Quiz Questions:</strong> +10 points for correct MCQ/TF answers, and +20 for correct Fill-in-the-Blanks.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="hint-modal">
+    <div class="modal-content">
+        <button class="modal-close-btn" data-target="hint-modal">&times;</button>
+        <h3>Hint</h3>
+        <p id="hint-text"></p>
+        <button class="btn btn--pri" id="close-hint-modal">Got it!</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ---------- 1. DATA & CONSTANTS ---------- */
+    
+    const WORD_DATA = {
+        "noun": {
+            "area": [{ "type": "MCQ", "text": "In 'This area is safe,' the word 'area' names a...?", "options": ["Person", "Place", "Thing", "Idea"], "correct": 1, "hint": "It refers to a location.", "explain": "'Area' is a noun that names a place." }],
+            "army": [{ "type": "MCQ", "text": "Which sentence uses 'army' correctly as a noun?", "options": ["He will army the troops.", "The army marched on.", "She felt very army today."], "correct": 1, "hint": "A noun can be the subject of a sentence.", "explain": "An army is a large group of soldiers, which is a noun." }],
+            "aunt": [{ "type": "FTB", "text": "My mother's sister is my ________.", "answer": "aunt", "hint": "This is a family relationship.", "explain": "An 'aunt' is a noun naming a person." }],
+            "awe": [{ "type": "TF", "text": "True or False: 'Awe' is a feeling of respect mixed with fear or wonder.", "correct": true, "hint": "You might feel this watching a meteor shower.", "explain": "'Awe' is a noun representing a powerful feeling or idea." }],
+            "age": [{ "type": "FTB", "text": "What is your ________?", "answer": "age", "hint": "This asks for a number of years.", "explain": "'Age' is a noun representing a concept of time." }],
+            "art": [{ "type": "MCQ", "text": "Sculpture and painting are forms of...?", "options": ["science", "art", "sport"], "correct": 1, "hint": "This word relates to creativity.", "explain": "'Art' is a noun naming a category of creative works." }],
+            "air": [{ "type": "TF", "text": "True or False: 'Air' as a noun is the same as 'to air' a room.", "correct": false, "hint": "One is a substance, one is an action.", "explain": "The noun 'air' is what we breathe; the verb 'to air' means to ventilate." }],
+            "ace": [{ "type": "MCQ", "text": "In cards, the highest ranking card is often the...?", "options": ["king", "queen", "ace"], "correct": 2, "hint": "It can also mean an expert.", "explain": "'Ace' is a noun naming a specific thing." }],
+            "act": [{ "type": "FTB", "text": "A play is divided into a number of ________.", "answer": "acts", "hint": "Plural of act.", "explain": "An 'act' is a noun for a main division of a play or performance." }],
+            "nation": [{ "type": "MCQ", "text": "A large body of people united by common culture is a...?", "options": ["City", "Nation", "Team"], "correct": 1, "hint": "It is often associated with a country.", "explain": "'Nation' is a noun referring to a community of people." }],
+            "person": [{ "type": "FTB", "text": "An individual human being is a ________.", "answer": "person", "hint": "It can be a man, woman, or child.", "explain": "'Person' is a noun for an individual human." }]
+        },
+        "verb": {
+            "add": [{ "type": "MCQ", "text": "Which sentence uses 'add' as an action?", "options": ["This is a good add.", "Please add the numbers.", "The add was on TV."], "correct": 1, "hint": "Look for the sentence that is asking someone to do something.", "explain": "'To add' is a verb meaning to join something to another." }],
+            "aid": [{ "type": "FTB", "text": "To help someone is to ________ them.", "answer": "aid", "hint": "This word means 'help' or 'assist'.", "explain": "'To aid' is a verb meaning to provide assistance." }],
+            "aim": [{ "type": "MCQ", "text": "The archer will ________ for the bullseye.", "options": ["aim", "aims", "aimed"], "correct": 0, "hint": "What is the archer about to do?", "explain": "'Aim' is the base form of the verb, used for future actions." }],
+            "arm": [{ "type": "TF", "text": "True or False: 'To arm' means to take weapons away.", "correct": false, "hint": "Think about arming the guards.", "explain": "'To arm' is a verb meaning to supply with weapons." }],
+            "ask": [{ "type": "FTB", "text": "If you don't know the answer, you should ________ a question.", "answer": "ask", "hint": "What action do you take to get information?", "explain": "'Ask' is a verb meaning to say something in order to get an answer." }],
+            "ache": [{ "type": "MCQ", "text": "After the long run, my muscles began to ________.", "options": ["aching", "ache", "ached"], "correct": 1, "hint": "This describes the start of a feeling.", "explain": "'Ache' is a verb meaning to suffer a continuous dull pain." }],
+            "become": [{ "type": "MCQ", "text": "A caterpillar will ________ a butterfly.", "options": ["stay", "become", "eat"], "correct": 1, "hint": "To grow into something.", "explain": "'Become' is a verb meaning to begin to be." }],
+            "leave": [{ "type": "FTB", "text": "It's time to ________ for school.", "answer": "leave", "hint": "To go away from.", "explain": "'Leave' is a verb meaning to depart." }],
+            "put": [{ "type": "TF", "text": "True or False: To 'put' something down means to pick it up.", "correct": false, "hint": "The opposite action.", "explain": "'Put' is a verb meaning to place in a particular position." }]
+        },
+        "adjective": {
+            "able": [{ "type": "MCQ", "text": "The word 'able' in 'She is an able student' describes the...?", "options": ["student", "is", "an"], "correct": 0, "hint": "Adjectives describe nouns.", "explain": "'Able' is an adjective describing the noun 'student'." }],
+            "acid": [{ "type": "TF", "text": "True or False: An adjective like 'acid' can describe a taste.", "correct": true, "hint": "Think of lemons.", "explain": "'Acid' is an adjective used to describe a sharp, sour taste." }],
+            "adept": [{ "type": "FTB", "text": "He is very ________ at playing the piano.", "answer": "adept", "hint": "This word means 'skilled'.", "explain": "'Adept' is an adjective that describes someone as skilled or proficient." }],
+            "adult": [{ "type": "MCQ", "text": "Which word does 'adult' describe in 'This is an adult decision'?", "options": ["This", "is", "decision"], "correct": 2, "hint": "What kind of decision is it?", "explain": "'Adult' is an adjective modifying the noun 'decision'." }],
+            "aged": [{ "type": "FTB", "text": "The cheese was ________ for twelve months.", "answer": "aged", "hint": "This describes a process of maturing over time.", "explain": "'Aged' is an adjective describing something that has grown older." }],
+            "agile": [{ "type": "MCQ", "text": "The cat was very ________ and quick.", "options": ["agile", "agility", "agilely"], "correct": 0, "hint": "We need a word that describes the cat.", "explain": "'Agile' is an adjective meaning able to move quickly and easily." }],
+            "alert": [{ "type": "TF", "text": "True or False: 'Alert' can be used to describe a watchful guard.", "correct": true, "hint": "A guard needs to be awake and watchful.", "explain": "'Alert' is an adjective meaning quick to notice any unusual circumstances." }],
+            "alive": [{ "type": "FTB", "text": "Is the plant dead or ________?", "answer": "alive", "hint": "What is the opposite of dead?", "explain": "'Alive' is an adjective meaning living." }],
+            "angry": [{ "type": "MCQ", "text": "The ________ dog barked loudly. Which word fits?", "options": ["angrily", "anger", "angry"], "correct": 2, "hint": "The word needs to describe the dog.", "explain": "'Angry' is an adjective used to describe the noun 'dog'." }]
+        },
+        "adverb": {
+            "ably": [{ "type": "MCQ", "text": "In 'She completed the task ably,' the word 'ably' describes...?", "options": ["she", "task", "completed"], "correct": 2, "hint": "Adverbs often describe how an action is done.", "explain": "'Ably' is an adverb modifying the verb 'completed'." }],
+            "abroad": [{ "type": "FTB", "text": "Many students choose to study ________ for a semester.", "answer": "abroad", "hint": "This word means 'in a foreign country'.", "explain": "'Abroad' is an adverb that tells where the action takes place." }],
+            "ago": [{ "type": "TF", "text": "True or False: The adverb 'ago' refers to a time in the future.", "correct": false, "hint": "Think of the phrase 'long, long ago'.", "explain": "'Ago' is an adverb referring to a time in the past." }],
+            "ahead": [{ "type": "MCQ", "text": "The runner was far ________ of the pack.", "options": ["ahead", "aheads", "aheadly"], "correct": 0, "hint": "This word describes a position in front of others.", "explain": "'Ahead' is an adverb describing location or position." }],
+            "alike": [{ "type": "FTB", "text": "The two sisters look very ________.", "answer": "alike", "hint": "This word means 'similar'.", "explain": "'Alike' can be an adverb or adjective; here it describes how they look." }],
+            "almost": [{ "type": "MCQ", "text": "The word 'almost' in 'We are almost there' tells us...?", "options": ["how", "when", "to what extent"], "correct": 2, "hint": "It modifies how close 'there' is.", "explain": "'Almost' is an adverb of degree, telling us the extent." }],
+            "aloft": [{ "type": "TF", "text": "True or False: If a flag is flying 'aloft,' it is on the ground.", "correct": false, "hint": "'Aloft' means up in the air.", "explain": "'Aloft' is an adverb meaning high up or in the air." }],
+            "alone": [{ "type": "FTB", "text": "He wanted to be ________ with his thoughts.", "answer": "alone", "hint": "Without anyone else.", "explain": "'Alone' is an adverb describing the state of being by oneself." }],
+            "fully": [{ "type": "MCQ", "text": "I ________ agree with your point.", "options": ["partly", "fully", "never"], "correct": 1, "hint": "Completely or entirely.", "explain": "'Fully' is an adverb meaning completely." }]
+        },
+        "conjunction": {
+            "and": [{ "type": "MCQ", "text": "Which function does 'and' serve in 'sun and moon'?", "options": ["Separating", "Describing", "Connecting"], "correct": 2, "hint": "It joins two words together.", "explain": "'And' is a conjunction used to connect words, phrases, or clauses." }],
+            "as": [{ "type": "FTB", "text": "He is not as tall ________ his brother.", "answer": "as", "hint": "This is used for comparisons.", "explain": "'As' is a conjunction used in comparisons." }],
+            "all": [{ "type": "MCQ", "text": "In 'All the birds flew away,' 'all' acts as a...?", "options": ["Verb", "Determiner", "Adverb"], "correct": 1, "hint": "It specifies a quantity of 'birds'.", "explain": "'All' is a determiner (grouped with conjunctions) that specifies quantity." }],
+            "after": [{ "type": "TF", "text": "True or False: The word 'after' can link two events in time.", "correct": true, "hint": "'We will eat after we wash our hands.'", "explain": "'After' is a conjunction that connects clauses based on time." }],
+            "any": [{ "type": "MCQ", "text": "Do you have ________ questions?", "options": ["any", "some", "a"], "correct": 0, "hint": "This word is often used in questions.", "explain": "'Any' is a determiner used to refer to one or some of a thing, no matter how much or many." }],
+            "but": [{ "type": "MCQ", "text": "The conjunction 'but' is used to show...?", "options": ["agreement", "contrast", "reason"], "correct": 1, "hint": "'It is sunny but cold.'", "explain": "'But' is a conjunction used to introduce a contrasting idea." }],
+            "both": [{ "type": "FTB", "text": "You can have ________ the apple and the orange.", "answer": "both", "hint": "This word includes two things.", "explain": "'Both' is a determiner that refers to two things together." }],
+            "because": [{ "type": "MCQ", "text": "Which word explains the reason for something?", "options": ["Because", "Although", "And"], "correct": 0, "hint": "I am tired ___ I did not sleep well.", "explain": "'Because' is a conjunction used to show cause and effect." }],
+            "while": [{ "type": "FTB", "text": "I read a book ________ I waited for the bus.", "answer": "while", "hint": "During the time that.", "explain": "'While' is a conjunction that connects two actions happening at the same time." }]
+        },
+        "preposition": {
+            "about": [{ "type": "MCQ", "text": "The book is ________ a young wizard. What word fits?", "options": ["for", "about", "with"], "correct": 1, "hint": "This preposition means 'on the subject of'.", "explain": "'About' is a preposition that can mean 'concerning a topic'." }],
+            "above": [{ "type": "TF", "text": "True or False: 'Above' indicates a position lower than something else.", "correct": false, "hint": "The sky is above the ground.", "explain": "'Above' is a preposition indicating a higher position." }],
+            "across": [{ "type": "FTB", "text": "The chicken ran ________ the road.", "answer": "across", "hint": "From one side to the other.", "explain": "'Across' is a preposition that indicates movement from one side to the other." }],
+            "against": [{ "type": "MCQ", "text": "He leaned ________ the wall.", "options": ["into", "against", "over"], "correct": 1, "hint": "This shows physical support or opposition.", "explain": "'Against' is a preposition indicating contact or opposition." }],
+            "along": [{ "type": "TF", "text": "True or False: 'Walking along the path' means you are walking away from it.", "correct": false, "hint": "It implies following the line of the path.", "explain": "'Along' is a preposition indicating movement in a line next to something." }],
+            "amid": [{ "type": "FTB", "text": "He found his keys ________ the mess on his desk.", "answer": "amid", "hint": "This word means 'in the middle of' or 'surrounded by'.", "explain": "'Amid' is a preposition used to say something is in the middle of a situation or group of things." }],
+            "among": [{ "type": "MCQ", "text": "A secret was shared ________ the three friends.", "options": ["between", "among", "with"], "correct": 1, "hint": "Use 'among' for groups of three or more.", "explain": "'Among' is a preposition used when talking about a group of people or things." }],
+            "around": [{ "type": "FTB", "text": "The Earth travels ________ the Sun.", "answer": "around", "hint": "This shows a circular path.", "explain": "'Around' is a preposition indicating movement in a circle or surrounding something." }],
+            "of": [{ "type": "MCQ", "text": "A cup ________ tea.", "options": ["of", "for", "with"], "correct": 0, "hint": "Expressing the relationship between a part and a whole.", "explain": "'Of' is a preposition showing possession or relation." }]
+        }
+    };
+    
+    const FACE_NAMES = ['front', 'back', 'left', 'right', 'top', 'bottom'];
+    
+    /* ---------- 2. STATE MANAGEMENT ---------- */
+    let cubeState = {}, rotateX = -15, rotateY = -25, cubeScale = 1, selectedTile = null, isGameActive = false, isFirstGame = true, totalScore = 0;
+    let timer = { startTime: 0, elapsedTime: 0, interval: null };
+    let quizIdx = 0, quizAnswers = [], quizHintsUsed = [], activeQuiz = [];
+    const solvedFaces = new Set();
+    let currentGameWords = {};
+    let isDragging = false, previousMousePosition = { x: 0, y: 0 };
+    
+    /* ---------- 3. DOM ELEMENTS ---------- */
+    const appContainer = document.getElementById('app-container');
+    const cube = document.getElementById('cube');
+    const cubeArea = document.querySelector('.cube-area');
+    const timerDisplay = document.getElementById('timer');
+    const scoreDisplay = document.getElementById('score-display');
+    const milestoneModal = document.getElementById('milestone-modal');
+    const rulesModal = document.getElementById('rules-modal');
+    const hintModal = document.getElementById('hint-modal');
+    const infoBtn = document.getElementById('info-btn');
+    const confettiContainer = document.getElementById('confetti-container');
+    const countdownOverlay = document.getElementById('countdown-overlay');
+    const qCard = document.getElementById('qCard');
+    const quizProgressBar = document.getElementById('quizProgressBar');
+    const badgeIndex = document.getElementById('badgeIndex');
+    const badgeType = document.getElementById('badgeType');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnHint = document.getElementById('btnHint');
+    const btnFinish = document.getElementById('btnFinish');
+    const scoreMini = document.getElementById('scoreMini');
+    const hintText = document.getElementById('hint-text');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomSlider = document.getElementById('zoom-slider');
+    const newPuzzleBtn = document.getElementById('new-puzzle-btn');
+    const finalScoreDisplay = document.getElementById('final-score');
+    
+    /* ---------- 4. CUBE GAME LOGIC ---------- */
+    
+    function updateCubeTransform() {
+        cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${cubeScale})`;
+    }
+
+    function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function createPuzzle() {
+        const allWords = [];
+        currentGameWords = {}; // Reset for the new game
+
+        for (const pos in WORD_DATA) {
+            const allWordsForPos = Object.keys(WORD_DATA[pos]);
+            const selectedWords = isFirstGame 
+                ? allWordsForPos.slice(0, 9) 
+                : shuffleArray(allWordsForPos).slice(0, 9);
+            
+            currentGameWords[pos] = selectedWords;
+            
+            selectedWords.forEach(word => {
+                allWords.push({ word: word, pos: pos });
+            });
+        }
+        
+        const finalScrambledWords = shuffleArray(allWords);
+        FACE_NAMES.forEach((faceName, faceIndex) => { 
+            cubeState[faceName] = finalScrambledWords.slice(faceIndex * 9, (faceIndex + 1) * 9); 
+        });
+    }
+    
+    function playSound(note, duration) {
+        if (Tone.context.state !== 'running') {
+            Tone.context.resume();
+        }
+        // Create a new synth each time to avoid state conflicts
+        const synth = new Tone.Synth().toDestination();
+        synth.triggerAttackRelease(note, duration, Tone.now());
+    }
+    
+    function updateScoreDisplays() {
+        scoreDisplay.textContent = totalScore;
+        scoreMini.textContent = `Score: ${totalScore}`;
+        finalScoreDisplay.textContent = `Final Score: ${totalScore}`;
+    }
+
+    function handleTileClick(tileElement, faceName, tileIndex) {
+        if (!isGameActive) return;
+
+        if (!selectedTile) {
+            selectedTile = { domElement: tileElement, faceName, tileIndex };
+            tileElement.classList.add('selected');
+            playSound('C4', '8n');
+        } else {
+            if (selectedTile.domElement === tileElement) {
+                selectedTile.domElement.classList.remove('selected');
+                selectedTile = null;
+                return;
+            }
+            
+            playSound('E4', '8n');
+            const { faceName: prevFace, tileIndex: prevIndex } = selectedTile;
+            [cubeState[prevFace][prevIndex], cubeState[faceName][tileIndex]] = [cubeState[faceName][tileIndex], cubeState[prevFace][prevIndex]];
+            
+            selectedTile.domElement.classList.remove('selected');
+            selectedTile = null;
+            renderCube();
+            
+            setTimeout(checkMilestones, 100);
+        }
+    }
+    
+    function isAngleInRange(angle, target, tolerance = 20) {
+        const normalizedAngle = (angle % 360 + 360) % 360;
+        const normalizedTarget = (target % 360 + 360) % 360;
+        let diff = Math.abs(normalizedAngle - normalizedTarget);
+        if (diff > 180) diff = 360 - diff;
+        return diff <= tolerance;
+    }
+
+    function isFaceUpright(faceName, rx, ry) {
+        // More intuitive upright check based on which axis matters for text orientation
+        switch(faceName) {
+            case 'front': 
+            case 'back':
+            case 'right':
+            case 'left':
+                return isAngleInRange(rx, 0); // For side faces, text is upright if not tilted up/down
+            case 'top':
+                 // For top/bottom, text is upright if not rotated sideways
+                return isAngleInRange(ry, 0) || isAngleInRange(ry, 180) || isAngleInRange(ry, -180);
+            case 'bottom':
+                return isAngleInRange(ry, 0) || isAngleInRange(ry, 180) || isAngleInRange(ry, -180);
+            default: 
+                return false;
+        }
+    }
+
+    function checkMilestones() {
+        FACE_NAMES.forEach(faceName => {
+            if (solvedFaces.has(faceName)) return;
+
+            const face = cubeState[faceName];
+            if (!face || face.length === 0) return;
+            
+            const firstPos = face[0].pos;
+            const isFaceSolved = face.every(tile => tile.pos === firstPos);
+
+            if (isFaceSolved) {
+                solvedFaces.add(faceName);
+                pauseGame();
+                playSound('G5', '4n');
+                
+                const upright = isFaceUpright(faceName, rotateX, rotateY);
+                const points = upright ? 135 : 45;
+                totalScore += points;
+                updateScoreDisplays();
+                
+                const wordsOnFace = [...new Set(face.map(tile => tile.word))];
+                prepareQuiz(wordsOnFace, 3);
+                
+                document.getElementById('milestone-title').innerText = `Milestone Reached!`;
+                document.getElementById('milestone-text').innerText = `You've solved the ${firstPos.toUpperCase()} face.`;
+                document.getElementById('milestone-score-text').innerHTML = `You earned <strong>${points} points</strong>${upright ? ' (3x Upright Bonus!)' : ''}!`;
+                milestoneModal.classList.add('active');
+            }
+        });
+    }
+
+    function checkForTotalWin() {
+        return solvedFaces.size === 6;
+    }
+    
+    function triggerVictorySequence() {
+        isGameActive = false;
+        stopTimer();
+        fireConfetti();
+        renderSummaryScreen();
+        appContainer.dataset.view = 'summary';
+        newPuzzleBtn.style.display = 'flex'; // Show New Game button
+    }
+
+    function fireConfetti() {
+        confettiContainer.innerHTML = '';
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confettiContainer.appendChild(confetti);
+        }
+        setTimeout(() => confettiContainer.innerHTML = '', 4000);
+    }
+
+    function startGameFlow() {
+        newPuzzleBtn.style.display = 'none'; // Hide button at start of game
+        appContainer.dataset.view = 'game';
+        let count = 3;
+        countdownOverlay.style.display = 'flex';
+        countdownOverlay.textContent = count;
+        playSound('C5', '8n');
+        
+        const countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                countdownOverlay.textContent = count;
+                playSound('C5', '8n');
+            } else {
+                clearInterval(countdownInterval);
+                countdownOverlay.style.display = 'none';
+                newGame();
+            }
+        }, 1000);
+    }
+
+    function newGame() {
+        solvedFaces.clear();
+        if (selectedTile) selectedTile.domElement.classList.remove('selected');
+        selectedTile = null;
+        totalScore = 0;
+        updateScoreDisplays();
+        
+        createPuzzle();
+        renderCube();
+        startTimer();
+        isGameActive = true;
+    }
+    
+    function renderCube() {
+        const oldSelectedInfo = selectedTile ? { face: selectedTile.faceName, index: selectedTile.tileIndex } : null;
+        cube.innerHTML = '';
+        FACE_NAMES.forEach(faceName => {
+            const faceDiv = document.createElement('div');
+            faceDiv.className = `face ${faceName}`;
+            if (cubeState[faceName]) { 
+                cubeState[faceName].forEach((tileData, index) => {
+                    const tileDiv = document.createElement('div');
+                    tileDiv.className = `tile pos-${tileData.pos}`;
+                    const textSpan = document.createElement('span');
+                    textSpan.innerText = tileData.word;
+                    tileDiv.appendChild(textSpan);
+                    tileDiv.addEventListener('click', () => handleTileClick(tileDiv, faceName, index));
+                    if(oldSelectedInfo && oldSelectedInfo.face === faceName && oldSelectedInfo.index === index) {
+                        tileDiv.classList.add('selected');
+                        selectedTile.domElement = tileDiv;
+                    }
+                    faceDiv.appendChild(tileDiv);
+                });
+            }
+            cube.appendChild(faceDiv);
+        });
+    }
+
+    function pauseGame() {
+        isGameActive = false;
+        stopTimer();
+        document.querySelector('.game-wrapper').style.pointerEvents = 'none';
+    }
+
+    function resumeGame() {
+        startTimer(true); // resume
+        isGameActive = true;
+        document.querySelector('.game-wrapper').style.pointerEvents = 'auto';
+    }
+
+    /* ---------- 5. TIMER LOGIC ---------- */
+    function startTimer(isResume = false) {
+        if (timer.interval) clearInterval(timer.interval);
+        if (!isResume) {
+            timer.startTime = Date.now();
+            timer.elapsedTime = 0;
+        } else {
+            timer.startTime = Date.now() - timer.elapsedTime;
+        }
+        
+        timer.interval = setInterval(() => {
+            timer.elapsedTime = Date.now() - timer.startTime;
+            const minutes = Math.floor(timer.elapsedTime / 60000);
+            const seconds = Math.floor((timer.elapsedTime % 60000) / 1000);
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+    
+    function stopTimer() {
+        clearInterval(timer.interval);
+    }
+
+    /* ---------- 6. QUIZ LOGIC & GENERATION ---------- */
+
+    function prepareQuiz(words, questionCount) {
+        activeQuiz = [];
+        const shuffledWords = shuffleArray(words);
+        for (let i = 0; i < Math.min(questionCount, shuffledWords.length); i++) {
+            const word = shuffledWords[i];
+            const pos = Object.keys(WORD_DATA).find(p => WORD_DATA[p][word]);
+            if (pos && WORD_DATA[pos][word]) {
+                const questionPool = WORD_DATA[pos][word];
+                const question = { ...questionPool[0], word: word, pos: pos };
+                activeQuiz.push(question);
+            }
+        }
+        quizIdx = 0;
+        quizAnswers = new Array(activeQuiz.length).fill(null);
+        quizHintsUsed = new Array(activeQuiz.length).fill(false);
+    }
+
+    function renderQuestion() {
+        if (quizIdx < 0 || quizIdx >= activeQuiz.length) return;
+        
+        const q = activeQuiz[quizIdx];
+        let optionsHTML = '';
+
+        if (q.type === 'MCQ') {
+            optionsHTML = `<div class="options">${q.options.map((opt, i) => `<div class="option" data-idx="${i}">${opt}</div>`).join('')}</div>`;
+        } else if (q.type === 'TF') {
+            optionsHTML = `<div class="options"><div class="option" data-idx="true">True</div><div class="option" data-idx="false">False</div></div>`;
+        } else if (q.type === 'FTB') {
+            optionsHTML = `<div class="ftb"><input type="text" placeholder="Type your answer..."></div>`;
+        }
+
+        qCard.innerHTML = `
+            <div class="q-head">
+                <div class="q-index">Q ${quizIdx + 1}</div>
+                <div class="q-labels"><span class="q-category">${q.pos}</span></div>
+            </div>
+            <p class="q-text">${q.text.replace('________', `<strong>________</strong>`)}</p>
+            ${optionsHTML}
+            <div class="expl" id="explainer"></div>
+        `;
+        
+        // Update header
+        quizProgressBar.style.width = `${((quizIdx + 1) / activeQuiz.length) * 100}%`;
+        badgeIndex.textContent = `Q ${quizIdx + 1} / ${activeQuiz.length}`;
+        badgeType.textContent = q.type;
+
+        if (quizAnswers[quizIdx] !== null) {
+            showAnswerFeedback(false); // don't award points again
+        } else {
+            resetButtonsForNewQuestion();
+        }
+        
+        updateNavButtons();
+    }
+    
+    function updateNavButtons() {
+        btnPrev.disabled = quizIdx === 0;
+        btnNext.style.display = quizAnswers[quizIdx] !== null ? 'inline-block' : 'none';
+        btnSubmit.style.display = quizAnswers[quizIdx] === null ? 'inline-block' : 'none';
+        btnFinish.style.display = (quizIdx === activeQuiz.length - 1 && quizAnswers[quizIdx] !== null) ? 'inline-block' : 'none';
+        if (btnFinish.style.display === 'inline-block') btnNext.style.display = 'none';
+    }
+
+    function resetButtonsForNewQuestion() {
+        btnSubmit.disabled = true;
+        btnHint.disabled = false;
+        btnNext.style.display = 'none';
+        btnSubmit.style.display = 'inline-block';
+        btnFinish.style.display = 'none';
+    }
+
+    function showAnswerFeedback(awardPoints = true) {
+        const q = activeQuiz[quizIdx];
+        const userAnswer = quizAnswers[quizIdx];
+        let isCorrect;
+
+        if (q.type === 'MCQ') {
+            isCorrect = userAnswer === q.correct;
+            document.querySelectorAll('.option').forEach(opt => {
+                const optIdx = parseInt(opt.dataset.idx);
+                if (optIdx === q.correct) opt.classList.add('is-correct');
+                else if (optIdx === userAnswer) opt.classList.add('is-wrong');
+                opt.setAttribute('disabled', 'true');
+            });
+        } else if (q.type === 'TF') {
+            isCorrect = (userAnswer === 'true') === q.correct;
+             document.querySelectorAll('.option').forEach(opt => {
+                if (String(opt.dataset.idx) === String(q.correct)) opt.classList.add('is-correct');
+                else if (String(opt.dataset.idx) === userAnswer) opt.classList.add('is-wrong');
+                opt.setAttribute('disabled', 'true');
+            });
+        } else if (q.type === 'FTB') {
+            isCorrect = userAnswer.toLowerCase().trim() === q.answer.toLowerCase().trim();
+            const input = qCard.querySelector('input');
+            input.value = userAnswer;
+            input.disabled = true;
+        }
+        
+        if(isCorrect && awardPoints) {
+            const points = q.type === 'FTB' ? 20 : 10;
+            totalScore += points;
+            updateScoreDisplays();
+        }
+
+        const explainer = document.getElementById('explainer');
+        explainer.style.display = 'block';
+        explainer.classList.toggle('expl--ok', isCorrect);
+        explainer.classList.toggle('expl--no', !isCorrect);
+        explainer.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Not quite...'}</strong> ${q.explain}`;
+        
+        btnSubmit.style.display = 'none';
+        btnNext.style.display = (quizIdx < activeQuiz.length - 1) ? 'inline-block' : 'none';
+        btnFinish.style.display = (quizIdx === activeQuiz.length - 1) ? 'inline-block' : 'none';
+        btnHint.disabled = true;
+    }
+    
+    function finishQuiz() {
+        if (!checkForTotalWin()) {
+            appContainer.dataset.view = 'game';
+            resumeGame();
+        } else {
+            triggerVictorySequence();
+        }
+    }
+    
+    /* ---------- 7. SUMMARY SCREEN ---------- */
+    
+    function renderSummaryScreen() {
+        const container = document.getElementById('summary-tables-container');
+        container.innerHTML = '';
+        
+        let summaryHTML = '<div class="summary-tables">';
+        for (const pos in currentGameWords) {
+            summaryHTML += `
+                <div class="summary-table pos-${pos}">
+                    <h4>${pos}s</h4>
+                    <ul>${currentGameWords[pos].map(w => `<li>${w}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+        summaryHTML += '</div>';
+        container.innerHTML = summaryHTML;
+        updateScoreDisplays();
+    }
+
+    /* ---------- 8. EVENT LISTENERS & INITIALIZATION ---------- */
+    
+    // -- App Navigation & Game Start --
+    document.getElementById('lets-play-btn').addEventListener('click', startGameFlow);
+    
+    document.getElementById('play-again-summary-btn').addEventListener('click', () => {
+        isFirstGame = false;
+        startGameFlow();
+    });
+    
+    document.getElementById('master-quiz-btn').addEventListener('click', () => {
+        const allWords = Object.values(currentGameWords).flat();
+        prepareQuiz(allWords, allWords.length);
+        document.getElementById('quizTitle').textContent = 'Mastery Quiz';
+        document.getElementById('quizSubtitle').textContent = `Test your knowledge on all ${allWords.length} words.`;
+        appContainer.dataset.view = 'quiz';
+        renderQuestion();
+    });
+    
+    // -- Cube Drag Controls --
+    cubeArea.addEventListener('mousedown', e => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+        cube.style.transition = 'transform 0s'; // Make drag immediate
+    });
+
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        rotateY += deltaX * 0.5;
+        rotateX -= deltaY * 0.5;
+
+        updateCubeTransform();
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', () => {
+        if(isDragging) {
+            isDragging = false;
+            cube.style.transition = 'transform var(--transition-speed) ease-out'; // Restore transition
+        }
+    });
+
+    // -- Cube Touch Controls --
+     cubeArea.addEventListener('touchstart', e => {
+        isDragging = true;
+        const touch = e.touches[0];
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+        cube.style.transition = 'transform 0s';
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - previousMousePosition.x;
+        const deltaY = touch.clientY - previousMousePosition.y;
+
+        rotateY += deltaX * 0.5;
+        rotateX -= deltaY * 0.5;
+
+        updateCubeTransform();
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+         if(isDragging) {
+            isDragging = false;
+            cube.style.transition = 'transform var(--transition-speed) ease-out';
+        }
+    });
+
+
+    // -- Cube Button Controls --
+    const arrows = { 'arrow-up': [-90, 0], 'arrow-down': [90, 0], 'arrow-left': [0, -90], 'arrow-right': [0, 90] };
+    Object.keys(arrows).forEach(id => {
+        document.getElementById(id).addEventListener('click', () => {
+            cube.style.transition = 'transform var(--transition-speed) ease-out';
+            rotateX += arrows[id][0];
+            rotateY += arrows[id][1];
+            updateCubeTransform();
+        });
+    });
+
+    zoomInBtn.addEventListener('click', () => {
+        cubeScale = Math.min(1.25, cubeScale + 0.1);
+        zoomSlider.value = cubeScale;
+        updateCubeTransform();
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+        cubeScale = Math.max(0.5, cubeScale - 0.1);
+        zoomSlider.value = cubeScale;
+        updateCubeTransform();
+    });
+
+    zoomSlider.addEventListener('input', () => {
+        cubeScale = parseFloat(zoomSlider.value);
+        updateCubeTransform();
+    });
+    
+    newPuzzleBtn.addEventListener('click', () => {
+        isFirstGame = false;
+        startGameFlow();
+    });
+
+    // -- Modals --
+    infoBtn.addEventListener('click', () => rulesModal.classList.add('active'));
+    
+    document.querySelectorAll('.modal-close-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById(btn.dataset.target).classList.remove('active');
+        });
+    });
+    
+    document.getElementById('start-milestone-quiz').addEventListener('click', () => {
+        milestoneModal.classList.remove('active');
+        appContainer.dataset.view = 'quiz';
+        renderQuestion();
+    });
+
+    // -- Quiz Logic --
+    qCard.addEventListener('click', e => {
+        if (e.target.classList.contains('option') && !e.target.hasAttribute('disabled')) {
+            qCard.querySelectorAll('.option').forEach(opt => opt.classList.remove('is-selected'));
+            e.target.classList.add('is-selected');
+            btnSubmit.disabled = false;
+        }
+    });
+
+    qCard.addEventListener('input', e => {
+        if (e.target.matches('.ftb input')) {
+            btnSubmit.disabled = e.target.value.trim() === '';
+        }
+    });
+    
+    btnSubmit.addEventListener('click', () => {
+        const q = activeQuiz[quizIdx];
+        let userAnswer = null;
+
+        if (q.type === 'MCQ' || q.type === 'TF') {
+            const selected = qCard.querySelector('.option.is-selected');
+            if(selected) userAnswer = q.type === 'MCQ' ? parseInt(selected.dataset.idx) : selected.dataset.idx;
+        } else if (q.type === 'FTB') {
+            userAnswer = qCard.querySelector('input').value;
+        }
+        
+        if(userAnswer !== null) {
+            quizAnswers[quizIdx] = userAnswer;
+            showAnswerFeedback();
+            playSound('A4', '8n');
+        }
+    });
+
+    btnNext.addEventListener('click', () => {
+        if (quizIdx < activeQuiz.length - 1) {
+            quizIdx++;
+            renderQuestion();
+        }
+    });
+
+    btnPrev.addEventListener('click', () => {
+        if (quizIdx > 0) {
+            quizIdx--;
+            renderQuestion();
+        }
+    });
+    
+    btnFinish.addEventListener('click', finishQuiz);
+    
+    btnHint.addEventListener('click', () => {
+        const q = activeQuiz[quizIdx];
+        hintText.textContent = q.hint;
+        hintModal.classList.add('active');
+        quizHintsUsed[quizIdx] = true;
+    });
+    
+    document.getElementById('close-hint-modal').addEventListener('click', () => hintModal.classList.remove('active'));
+
+    // -- Initialize --
+    updateCubeTransform();
+    renderCube();
+    updateScoreDisplays();
+});
+</script>
+</body>
+</html>
+
