@@ -645,8 +645,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Tone.context.state !== 'running') {
             Tone.context.resume();
         }
-        // Create a new synth each time to avoid state conflicts
-        const synth = new Tone.Synth().toDestination();
+        // Create a softer, happier synth with gentle settings
+        const synth = new Tone.Synth({
+            oscillator: {
+                type: 'sine' // Softer than default sawtooth
+            },
+            envelope: {
+                attack: 0.1,  // Gentle attack
+                decay: 0.2,  // Quick decay
+                sustain: 0.3, // Lower sustain for softer sound
+                release: 0.4  // Gentle release
+            },
+            volume: -12 // Much quieter (default is 0)
+        }).toDestination();
+        
+        // Add a subtle reverb for warmth
+        const reverb = new Tone.Reverb({
+            decay: 0.5,
+            wet: 0.2
+        }).toDestination();
+        
+        synth.connect(reverb);
         synth.triggerAttackRelease(note, duration, Tone.now());
     }
     
@@ -662,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!selectedTile) {
             selectedTile = { domElement: tileElement, faceName, tileIndex };
             tileElement.classList.add('selected');
-            playSound('C4', '8n');
+            playSound('C5', '16n'); // Higher, shorter note
         } else {
             if (selectedTile.domElement === tileElement) {
                 selectedTile.domElement.classList.remove('selected');
@@ -670,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            playSound('E4', '8n');
+            playSound('E5', '16n'); // Higher, shorter note
             const { faceName: prevFace, tileIndex: prevIndex } = selectedTile;
             [cubeState[prevFace][prevIndex], cubeState[faceName][tileIndex]] = [cubeState[faceName][tileIndex], cubeState[prevFace][prevIndex]];
             
@@ -721,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isFaceSolved) {
                 solvedFaces.add(faceName);
                 pauseGame();
-                playSound('G5', '4n');
+                playSound('G6', '8n'); // Higher, shorter success sound
                 
                 const upright = isFaceUpright(faceName, rotateX, rotateY);
                 const points = upright ? 135 : 45;
@@ -771,13 +790,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let count = 3;
         countdownOverlay.style.display = 'flex';
         countdownOverlay.textContent = count;
-        playSound('C5', '8n');
+        playSound('C6', '16n'); // Higher, shorter countdown
         
         const countdownInterval = setInterval(() => {
             count--;
             if (count > 0) {
                 countdownOverlay.textContent = count;
-                playSound('C5', '8n');
+                playSound('C6', '16n'); // Higher, shorter countdown
             } else {
                 clearInterval(countdownInterval);
                 countdownOverlay.style.display = 'none';
@@ -1156,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(userAnswer !== null) {
             quizAnswers[quizIdx] = userAnswer;
             showAnswerFeedback();
-            playSound('A4', '8n');
+            playSound('A5', '16n'); // Higher, shorter quiz sound
         }
     });
 
