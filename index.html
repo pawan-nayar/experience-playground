@@ -1,86 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <title>Experience Playground</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #f9f9f9, #e6f0ff);
-      padding: 40px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 30px;
-      color: #333;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .card {
-      background: white;
-      border-radius: 15px;
-      padding: 25px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-    .card a {
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: bold;
-      color: #0070f3;
-      display: block;
-      margin-top: 10px;
-    }
-    .emoji {
-      font-size: 40px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience-Playground | Interactive Prototypes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-link:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+    </style>
 </head>
 <body>
-  <h1>🎮 Experience Playground</h1>
-  <div class="grid">
-    <div class="card">
-      <div class="emoji">🧮</div>
-      <a href="bodmas_trainer.html">BODMAS Trainer</a>
-    </div>
-    <div class="card">
-      <div class="emoji">🥣</div>
-      <a href="bowl_fill_synonymn_antonymn.html">Synonym/Antonym Bowl Fill</a>
-    </div>
-    <div class="card">
-      <div class="emoji">🔢</div>
-      <a href="counting_more_less_basic_math_for_age_3_to_.html">Counting Game (Age 3+)</a>
-    </div>
-    <div class="card">
-      <div class="emoji">✍️</div>
-      <a href="crakk_misspelling.html">Crakk Misspelling</a>
-    </div>
-    <div class="card">
-      <div class="emoji">😀</div>
-      <a href="emoji_jumble_game.html">Emoji Jumble Game</a>
-    </div>
-    <div class="card">
-      <div class="emoji">❓</div>
-      <a href="light_quiz_medium.html">Light Quiz (Medium)</a>
-    </div>
-    <div class="card">
-      <div class="emoji">📐</div>
-      <a href="math_concept_article_coordinate_geometry.html">Geometry Article</a>
-    </div>
-    <div class="card">
-      <div class="emoji">🎹</div>
-      <a href="piano_simulator.html">Piano Simulator</a>
-    </div>
-  </div>
+
+    <!-- Header / Hero Section -->
+    <header class="hero-gradient text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight">🎮 Experience-Playground</h1>
+            <p class="mt-3 max-w-3xl mx-auto text-sm text-slate-300">A curated playground of interactive learning and creativity prototypes, demonstrating how GenAI can transform abstract concepts into living engagement.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+
+        <!-- Math & Logic Builders Section -->
+        <section id="math-logic" class="mb-10">
+            <h2 class="text-xl font-bold pb-2 mb-5 text-slate-900">🧮 Math & Logic Builders</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/light_quiz_medium.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Lightweight Quiz Prototype</h3></div>
+                            <p class="text-sm text-slate-600">A mobile-first quiz engine showcasing flexible formats and adaptive questioning.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/bodmas_trainer.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">BODMAS Animated Trainer</h3></div>
+                            <p class="text-sm text-slate-600">Turns order of operations into visual, bilingual play.</p>
+                        </div>
+                         <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                     <a href="https://pawan-nayar.github.io/experience-playground/common_math_operations_for_6_to_8_year_old_addition_subtraction_division_multiplication_and_knowledge_calculator.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 0v6m0-6L5 21"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Little Math Explorer (6-8)</h3></div>
+                            <p class="text-sm text-slate-600">A hands-on calculator for joyful experimentation with numbers.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/math_concept_article_coordinate_geometry.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Coordinate Geometry Explainer</h3></div>
+                            <p class="text-sm text-slate-600">Abstract plotting becomes tangible and interactive.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/counting_more_less_basic_math_for_age_3_to_5.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Toddler Counting Simulator (3-5)</h3></div>
+                            <p class="text-sm text-slate-600">A playful environment to grasp quantity through ten-frames.</p>
+                        </div>
+                         <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                     <a href="https://pawan-nayar.github.io/experience-playground/calculator_physics__newton_laws_free_body_calculator.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Newton’s Laws Calculator</h3></div>
+                            <p class="text-sm text-slate-600">Brings physics to life with interactive forces and vectors.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+            </div>
+        </section>
+
+        <!-- Language & Word Explorers Section -->
+        <section id="language-word" class="mb-10">
+            <h2 class="text-xl font-bold pb-2 mb-5 text-slate-900">📝 Language & Word Explorers</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/bowl_fill_synonymn_antonymn.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Brilliant Bowl (Synonyms)</h3></div>
+                            <p class="text-sm text-slate-600">Words flow in and out of a bowl, making nuance visible.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/crakk_misspelling.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Crakk Misspelling Explorer</h3></div>
+                            <p class="text-sm text-slate-600">Learners play with errors, discovering resilience in spelling.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/polysemous_words.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Polysemous Words Explorer</h3></div>
+                            <p class="text-sm text-slate-600">A reflective journey into words with multiple meanings.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/part_of_speech_cube_game_interactive_teacher.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Part-of-Speech Cube Game</h3></div>
+                            <p class="text-sm text-slate-600">A rotating 3D cube turns grammar into touch and motion.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/synonym_finder_game.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Synonym Finder Game</h3></div>
+                            <p class="text-sm text-slate-600">A drag-and-drop challenge to build language agility.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+            </div>
+        </section>
+        
+        <!-- Design & Creative Play Section -->
+        <section id="design-creative" class="mb-10">
+            <h2 class="text-xl font-bold pb-2 mb-5 text-slate-900">🎨 Design & Creative Play</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/emoji_jumble_game.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Emoji Jumble Game</h3></div>
+                            <p class="text-sm text-slate-600">Emojis become puzzles, blending pop culture and language.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/designer_foreground_background_ui_color_trainer.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Foreground/Background UI Trainer</h3></div>
+                            <p class="text-sm text-slate-600">A simple lesson in design to train contrast and clarity.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+            </div>
+        </section>
+        
+         <!-- Music & Puzzle Engines -->
+        <section id="music-puzzle" class="mb-10">
+            <h2 class="text-xl font-bold pb-2 mb-5 text-slate-900">🎼 Music & Puzzle Engines</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/piano_simulator.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12-3"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Interactive Piano Simulator</h3></div>
+                            <p class="text-sm text-slate-600">A virtual keyboard for play, learning, and improvisation.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+                 <article class="h-full">
+                    <a href="https://pawan-nayar.github.io/experience-playground/beyond_dictionary_crossword.html" target="_blank" rel="noopener noreferrer" class="card-link bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="p-3 flex-grow">
+                            <div class="flex items-center space-x-3 mb-2"><div class="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></div><h3 class="text-base font-semibold text-slate-900">Dynamic Crossword Engine</h3></div>
+                            <p class="text-sm text-slate-600">Crosswords as evolving knowledge webs with dynamic clues.</p>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-50 border-t"><span class="text-sm font-medium text-orange-600">Launch Demo →</span></div>
+                    </a>
+                </article>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm">
+            <p class="font-semibold text-white">Copyright Notice / Usage Policy</p>
+            <p class="mt-2 max-w-2xl mx-auto text-xs">This repository is for viewing and inspiration purposes only. You are not permitted to fork, copy, duplicate, download, reproduce, or redistribute any part of this repository.</p>
+            <p class="mt-4 text-xs">&copy; All rights are reserved by the author.</p>
+        </div>
+    </footer>
+
 </body>
 </html>
+
