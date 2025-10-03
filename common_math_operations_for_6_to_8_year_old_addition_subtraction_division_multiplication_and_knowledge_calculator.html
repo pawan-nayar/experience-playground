@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Math Fun for Young Minds (5-8 Age)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <!-- KaTeX for beautiful math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIROPtCIDJtxpGoiCoYEVxIVbntBH31NQ/L2uqxgMLnHmbQ" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzYCcm2IawAzXpKaMNgen/pfyपकנLNws5c" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --text: #212529; --bg: #f8f9fa; --muted: #f8f9fa; --border: #e9ecef;
+      --accent: #fd7e14; --accent-2: #e87312; --blue: #0d6efd;
+      --ok: #16a34a; --ok-soft: #dcfce7; --bad: #dc2626; --bad-soft: #fee2e2;
+      --highlight-color: #fd7e14;
+      --font-mono: 'Roboto Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+    .main-wrapper {
+      max-width: 800px; margin: auto; background: #fff;
+      border-radius: 16px; margin: 16px 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+      position: relative; overflow: hidden;
+    }
+    .container { padding: 16px; }
+    
+    header { padding: 15px 20px; background: var(--muted); border-bottom: 1px solid var(--border); }
+    .breadcrumbs { font-size: 0.9rem; color: #6c757d; }
+    .breadcrumbs a { color: var(--accent-2); text-decoration: none; }
+    footer { padding: 20px; text-align: center; font-size: 0.9rem; color: #6c757d; background: var(--muted); border-top: 1px solid var(--border); margin-top: 16px; }
+
+    /* Top-level tabs */
+    .top-tabs { display: flex; justify-content: center; gap: 8px; margin: 8px 0 14px; }
+    .top-tab { background: #fff; border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+    .top-tab.active { background: var(--accent); color: #fff; border-color: var(--accent-2); }
+    .top-pane { display: none; }
+    .top-pane.active { display: block; }
+
+    h1 { font-size: clamp(1.6rem, 3vw, 2rem); text-align: left; margin-bottom: 6px; color: var(--text); line-height: 1.2; }
+    h2 { font-size: clamp(1.25rem, 3vw, 1.5rem); margin-top: 16px; margin-bottom: 8px; border-bottom: 2px solid var(--border); padding-bottom: 4px;}
+    p.intro { font-size: 1rem; line-height: 1.5; color: #495057; margin-bottom: 14px; }
+    
+    .tabs { display: flex; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); margin-bottom: 12px; justify-content: center; }
+    .tab-button { background: none; border: none; padding: 10px 15px; font-size: 1rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; }
+    .tab-button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .content-section { display: none; animation: fadeIn 0.5s; }
+    .content-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1, transform: translateY(0); } }
+
+    /* --- New Example Links --- */
+    .example-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      padding-bottom: 12px;
+      justify-content: center;
+    }
+    .example-link {
+      background-color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1.1rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .example-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-color: var(--accent);
+    }
+
+    /* --- Practice Simulator --- */
+    .practice-simulator { padding: 16px; background: linear-gradient(145deg, #fdfdfe, #f5f6f7); border: 1px solid var(--border); border-radius: 16px; margin-top: 20px; }
+    .simulator-controls { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .simulator-controls input {
+        width: 100%; padding: 12px; font-size: 1.4rem; text-align: center;
+        border: 2px solid var(--border); border-radius: 10px; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .simulator-controls input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(253, 126, 20, 0.2); }
+    .operator-buttons { display: flex; justify-content: center; gap: 8px; }
+    .op-btn { 
+        width: 44px; height: 44px; font-size: 1.6rem; font-weight: bold;
+        background: #fff; color: var(--accent); border: 2px solid var(--border); 
+        border-radius: 10px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .op-btn.selected, .op-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent-2); transform: translateY(-2px); }
+    #run-simulation-btn {
+        padding: 12px 20px; font-size: 1rem; font-weight: 600;
+        background: var(--ok); color: #fff; border: none; border-radius: 10px; cursor: pointer;
+        transition: background-color 0.2s; grid-column: 1 / -1; margin-top: 8px;
+    }
+    #run-simulation-btn:hover { background-color: #15803d; }
+
+    .simulation-area { 
+        background: #fff; border-radius: 12px; 
+        border: 1px solid var(--border); padding: 14px;
+        transition: all 0.3s ease;
+    }
+    .simulation-visual {
+      min-width: 240px;
+      background: var(--muted);
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.4rem; /* Balanced font size for math */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+    }
+    .simulation-explanation {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--ok-soft);
+      border-left: 4px solid var(--ok);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+     .simulation-nav {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .simulation-nav button {
+      background: var(--accent); color: #fff; border: none; padding: 8px 16px;
+      border-radius: 8px; font-weight: 600; cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .simulation-nav button:disabled { background: #ced4da; cursor: not-allowed; }
+    .simulation-nav button:hover:not(:disabled) { background: var(--accent-2); }
+    .step-counter { font-weight: 600; font-size: 1rem; color: #6c757d; }
+    .highlight { color: var(--highlight-color); font-weight: bold; }
+    .katex .mord.highlight { color: var(--highlight-color); }
+
+    /* Elegant Long Division Styles */
+    .long-division-container { font-family: var(--font-mono); font-size: 1.3rem; line-height: 1.35; display: inline-block; text-align: right; }
+    /* Concepts article styles (scoped) */
+    .concepts { text-align: left; }
+    .concepts h1 { text-align: left; margin: 12px 0; }
+    .concepts h2 { font-size: 1.2rem; margin-top: 20px; margin-bottom: 10px; color: var(--accent-2); border-bottom: none; padding-bottom: 0; text-align: left; }
+    .concepts h3 { font-size: 1rem; margin-top: 12px; color: var(--accent); text-align: left; }
+    .concepts p { margin-bottom: 12px; font-size: 1rem; text-align: left; }
+    .concepts ul { text-align: left; }
+    .concepts .story-box { background: var(--muted); padding: 12px 14px; border-left: 4px solid var(--accent); border-radius: 8px; margin-bottom: 14px; text-align: left; }
+    .concepts .example-list { margin: 10px 0 16px 18px; text-align: left; }
+    /* Desktop centering and tighter rhythm */
+@media (min-width: 992px) {
+  html, body { 
+    line-height: 1.45; 
+  }
+
+  /* Main wrapper stays centered with flexible margins */
+  .main-wrapper {
+    max-width: 800px;         /* Keeps content at an optimal width */
+    margin-left: auto;        /* Center horizontally */
+    margin-right: auto;
+    padding-left: clamp(16px, 5vw, 40px);  /* Responsive inner margins */
+    padding-right: clamp(16px, 5vw, 40px);
+  }
+
+  /* Center top-level content */
+  header, .container { 
+    text-align: center; 
+  }
+
+  /* Keep headings centered and balanced */
+  h1 { 
+    text-align: center; 
+    font-size: clamp(1.6rem, 2.5vw, 2rem); 
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Paragraphs have readable width, centered */
+  p.intro { 
+    max-width: 720px; 
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+
+  /* Content sections look centered */
+  .content-section > p, 
+  .content-section h2 { 
+    text-align: center; 
+  }
+
+  .practice-simulator { 
+    margin-top: 16px; 
+  }
+}
+
+    .long-division-container .grid { display: grid; grid-template-columns: auto 1fr; }
+    .long-division-container .divisor { grid-column: 1; padding-right: 0.5ch; }
+    .long-division-container .dividend { grid-column: 2; border-left: 2px solid var(--text); border-top: 2px solid var(--text); padding-left: 0.5ch; }
+    .long-division-container .quotient { grid-column: 2; }
+    .long-division-container .calc-row { grid-column: 2; }
+    .long-division-container .calc-row.subtraction { border-bottom: 2px solid var(--text); }
+    .long-division-container span { display: inline-block; }
+    .long-division-container .highlight { color: var(--highlight-color); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <header>
+        <div class="breadcrumbs">
+            <a href="#">Learning Center</a> &gt; <strong>Math Fun (5-8 Age)</strong>
+        </div>
+    </header>
+    <div class="container">
+        <div class="top-tabs" role="tablist">
+            <button class="top-tab active" id="tab-calculator" data-top="calculator" role="tab" aria-controls="pane-calculator" aria-selected="true">Calculator</button>
+            <button class="top-tab" id="tab-concepts" data-top="concepts" role="tab" aria-controls="pane-concepts" aria-selected="false">Concepts</button>
+        </div>
+
+        <div id="pane-calculator" class="top-pane active" role="tabpanel" aria-labelledby="tab-calculator">
+        <h1>Welcome, Math Explorer!</h1>
+        <p class="intro">
+            Get ready for an adventure into the world of numbers! Math is all around us, from counting your toys to sharing snacks with friends. We'll learn how to add, subtract, multiply, and divide in a fun, visual way. Let's start exploring the magic of numbers together!
+        </p>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="addition">➕ Addition</button>
+            <button class="tab-button" data-tab="subtraction">➖ Subtraction</button>
+            <button class="tab-button" data-tab="multiplication">✖️ Multiplication</button>
+            <button class="tab-button" data-tab="division">➗ Division</button>
+        </div>
+
+        <div id="addition-content" class="content-section active">
+            <h2>Let's Add Things Together!</h2>
+            <p>Click an example below to see how it works step-by-step in the simulator!</p>
+            <div class="example-list" id="addition-examples"></div>
+        </div>
+
+        <div id="subtraction-content" class="content-section">
+            <h2>Let's Take Things Away!</h2>
+            <p>Click an example below to see how it works step-by-step in the simulator!</p>
+            <div class="example-list" id="subtraction-examples"></div>
+        </div>
+        
+        <div id="multiplication-content" class="content-section">
+            <h2>Let's Make Equal Groups!</h2>
+            <p>Click an example below to see how it works step-by-step in the simulator!</p>
+            <div class="example-list" id="multiplication-examples"></div>
+        </div>
+
+        <div id="division-content" class="content-section">
+            <h2>Let's Share Fairly!</h2>
+            <p>Click an example below to see how it works step-by-step in the simulator!</p>
+            <div class="example-list" id="division-examples"></div>
+        </div>
+
+        <!-- Practice Simulator Section -->
+        <div class="practice-simulator" id="practice-simulator">
+            <h2>Create Your Own Math Problem!</h2>
+            <p style="margin-bottom: 20px; text-align: center;">Enter any two numbers, pick an operation, and see the magic happen!</p>
+            <div class="simulator-controls">
+                <input type="number" id="num1" placeholder="e.g., 98" min="0" max="9999">
+                <div class="operator-buttons">
+                    <button class="op-btn selected" data-op="+">➕</button>
+                    <button class="op-btn" data-op="-">➖</button>
+                    <button class="op-btn" data-op="*">✖️</button>
+                    <button class="op-btn" data-op="/">➗</button>
+                </div>
+                <input type="number" id="num2" placeholder="e.g., 7" min="0" max="9999">
+                <button id="run-simulation-btn">🚀 See Step-by-Step</button>
+            </div>
+            <div class="simulation-area" id="simulation-area">
+                 <div class="simulation-area-placeholder" style="min-height:200px; display:flex; align-items:center; justify-content:center;">Your step-by-step simulation will appear here!</div>
+            </div>
+        </div>
+        </div>
+
+        <div id="pane-concepts" class="top-pane concepts" role="tabpanel" aria-labelledby="tab-concepts">
+          <h1>Math Basics: Stories, Ideas, and Everyday Magic</h1>
+          <p>Math is not just numbers on a worksheet. It’s the way we count our toys, share pizza with friends, and find out how many steps it takes to reach the park. This article helps young learners (and parents guiding them) understand the four operations through stories, reasons, and playful tips.</p>
+
+          <h2>➕ Addition: Putting Things Together</h2>
+          <div class="story-box">
+            Maya has 2 balloons 🎈. Her brother brings 3 more. Suddenly, she has 5 balloons floating above her head. That’s addition — combining groups to see the total.
+          </div>
+          <h3>What It Means</h3>
+          <p>Addition is joining groups or numbers to make one bigger group. Every time you ask “How many in all?”, you are using addition.</p>
+          <h3>Why It Matters</h3>
+          <p>It helps us find totals: how many pencils you own, how much money you saved, or the score of your team in a game.</p>
+          <h3>Everyday Examples</h3>
+          <ul class="example-list">
+            <li>You put 4 apples in a basket and add 2 more: 4 + 2 = 6.</li>
+            <li>You scored 5 points in one round and 7 in the next: 5 + 7 = 12.</li>
+          </ul>
+          <h3>Do’s & Don’ts</h3>
+          <ul class="example-list">
+            <li><strong>Do:</strong> Line up numbers properly when adding bigger numbers.</li>
+            <li><strong>Don’t:</strong> Forget to carry over when the sum goes past 9.</li>
+          </ul>
+          <h3>Tips</h3>
+          <p>Use fingers, coins, or beads to count. Saying numbers aloud helps memory.</p>
+
+          <h2>➖ Subtraction: Taking Away</h2>
+          <div class="story-box">
+            Arjun had 8 cookies 🍪. He ate 3. Now only 5 are left on the plate. Subtraction is simply finding out what remains after something is taken away.
+          </div>
+          <h3>What It Means</h3>
+          <p>Subtraction is about “how many are left” when something is removed.</p>
+          <h3>Why It Matters</h3>
+          <p>We use subtraction for change in shops, sharing fairly, or knowing how many crayons remain when some are broken.</p>
+          <h3>Everyday Examples</h3>
+          <ul class="example-list">
+            <li>There were 12 mangoes in a basket. You ate 4. Now there are 8 left.</li>
+            <li>You had 20 rupees. You spent 7. Now you have 13 left.</li>
+          </ul>
+          <h3>Do’s & Don’ts</h3>
+          <ul class="example-list">
+            <li><strong>Do:</strong> Borrow carefully when the top digit is smaller than the bottom digit.</li>
+            <li><strong>Don’t:</strong> Try to subtract without borrowing — it leads to mistakes.</li>
+          </ul>
+          <h3>Tips</h3>
+          <p>Think of subtraction as asking, “How many remain?” Using counters or blocks makes it clearer.</p>
+
+          <h2>✖️ Multiplication: Making Equal Groups</h2>
+          <div class="story-box">
+            Four friends each bring 2 apples 🍎. When they put them together, there are 8 apples in total. Multiplication is adding equal groups quickly.
+          </div>
+          <h3>What It Means</h3>
+          <p>Multiplication is repeated addition. Instead of 2 + 2 + 2 + 2, you can write 2 × 4.</p>
+          <h3>Why It Matters</h3>
+          <p>It helps us work faster — rows of chairs, packs of pencils, or steps in a staircase can be counted in groups instead of one by one.</p>
+          <h3>Everyday Examples</h3>
+          <ul class="example-list">
+            <li>There are 5 shelves, each with 6 books. Total books = 5 × 6 = 30.</li>
+            <li>A carton has 10 rows of eggs, each row has 12 eggs. Total = 10 × 12 = 120.</li>
+          </ul>
+          <h3>Do’s & Don’ts</h3>
+          <ul class="example-list">
+            <li><strong>Do:</strong> Learn multiplication tables up to 10 or 12.</li>
+            <li><strong>Don’t:</strong> Mix up multiplication with addition when groups are equal.</li>
+          </ul>
+          <h3>Tips</h3>
+          <p>Practice skip counting (2, 4, 6, 8 …) — it’s a quick way to multiply.</p>
+
+          <h2>➗ Division: Sharing Fairly</h2>
+          <div class="story-box">
+            A pizza has 12 slices 🍕. Four friends want to share it equally. Each one gets 3 slices. Division makes sure everyone has a fair share.
+          </div>
+          <h3>What It Means</h3>
+          <p>Division is splitting into equal groups. It answers “How many in each group?”</p>
+          <h3>Why It Matters</h3>
+          <p>We divide when sharing food, dividing work, or splitting money among friends.</p>
+          <h3>Everyday Examples</h3>
+          <ul class="example-list">
+            <li>24 toffees shared among 6 children = 24 ÷ 6 = 4 each.</li>
+            <li>30 pages of a storybook read over 5 days = 30 ÷ 5 = 6 pages a day.</li>
+          </ul>
+          <h3>Do’s & Don’ts</h3>
+          <ul class="example-list">
+            <li><strong>Do:</strong> Check for remainders and write them clearly.</li>
+            <li><strong>Don’t:</strong> Divide by zero — it’s impossible!</li>
+          </ul>
+          <h3>Tips</h3>
+          <p>Think of division as the opposite of multiplication. If 4 × 5 = 20, then 20 ÷ 4 = 5.</p>
+        </div>
+
+    </div>
+    <footer>
+        &copy; 2025 Math Explorers Inc. Making learning an adventure!
+    </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof katex === 'undefined') {
+        const katexScript = document.querySelector('script[src*="katex.min.js"]');
+        katexScript.onload = main;
+    } else {
+        main();
+    }
+
+function main() {
+    // Top-level tab switching
+    const topTabs = document.querySelectorAll('.top-tab');
+    const topPanes = document.querySelectorAll('.top-pane');
+    topTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            topTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+            topPanes.forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            const target = document.getElementById(`pane-${tab.dataset.top}`);
+            if (target) target.classList.add('active');
+            // Scroll to top of container for better UX
+            document.querySelector('.main-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+    const examples = {
+        addition: [ '25 + 12', '158 + 45', '88 + 12', '487 + 329' ],
+        subtraction: [ '45 - 23', '110 - 50', '250 - 75', '502 - 139' ],
+        multiplication: [ '14 × 7', '25 × 4', '123 × 8', '45 × 23' ],
+        division: [ '98 ÷ 7', '125 ÷ 5', '48 ÷ 6', '20 ÷ 73' ]
+    };
+
+    const num1Input = document.getElementById('num1');
+    const num2Input = document.getElementById('num2');
+    const opBtns = document.querySelectorAll('.op-btn');
+    const runBtn = document.getElementById('run-simulation-btn');
+    const simArea = document.getElementById('simulation-area');
+    let selectedOp = '+';
+    let simulationSteps = [];
+    let currentStep = 0;
+
+    function createExampleLink(problem) {
+        const link = document.createElement('div');
+        link.className = 'example-link';
+        link.textContent = problem;
+        link.addEventListener('click', () => {
+            const parts = problem.split(/ [+\-×÷] /);
+            const opSymbol = problem.match(/[+\-×÷]/)[0];
+            const op = { '+': '+', '-': '-', '×': '*', '÷': '/' }[opSymbol];
+
+            num1Input.value = parts[0];
+            num2Input.value = parts[1];
+            opBtns.forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.op === op);
+            });
+            selectedOp = op;
+            runBtn.click();
+            document.getElementById('practice-simulator').scrollIntoView({ behavior: 'smooth' });
+        });
+        return link;
+    }
+
+    for (const op in examples) {
+        const list = document.getElementById(`${op}-examples`);
+        if(list) examples[op].forEach(ex => list.appendChild(createExampleLink(ex)));
+    }
+
+    const tabs = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('.content-section');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
+        });
+    });
+    
+    opBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            opBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOp = btn.dataset.op;
+        });
+    });
+    
+    runBtn.addEventListener('click', () => {
+        let n1 = parseInt(num1Input.value);
+        let n2 = parseInt(num2Input.value);
+
+        if (isNaN(n1) || isNaN(n2)) { simArea.innerHTML = '<div class="simulation-area-placeholder" style="color: var(--bad);">Please enter valid numbers in both boxes!</div>'; return; }
+        if (selectedOp === '-' && n1 < n2) { simArea.innerHTML = `<div class="simulation-area-placeholder" style="color: var(--bad);">For subtraction, the first number should be bigger!</div>`; return; }
+        if (selectedOp === '/' && n2 === 0) { simArea.innerHTML = `<div class="simulation-area-placeholder" style="color: var(--bad);">You cannot divide by zero!</div>`; return; }
+
+        simulationSteps = [];
+        currentStep = 0;
+        
+        switch (selectedOp) {
+            case '+': generateAdditionSteps(n1, n2); break;
+            case '-': generateSubtractionSteps(n1, n2); break;
+            case '*': generateMultiplicationSteps(n1, n2); break;
+            case '/': generateDivisionSteps(n1, n2); break;
+        }
+        
+        renderSimulationStep();
+    });
+    
+    function renderKatex(element, katexString) {
+        try {
+            katex.render(katexString, element, { throwOnError: false, displayMode: true, macros: {"\\highlight": "\\color{#fd7e14}"} });
+        } catch (e) { element.textContent = "Error rendering math."; console.error(e); }
+    }
+    
+    function renderHtml(element, htmlString) {
+        element.innerHTML = htmlString;
+    }
+
+    function renderSimulationStep() {
+        if (!simulationSteps || simulationSteps.length === 0) { simArea.innerHTML = '<div class="simulation-area-placeholder" style="color: var(--bad);">Could not generate steps for this problem.</div>'; return; };
+        const step = simulationSteps[currentStep];
+        simArea.innerHTML = `
+            <div class="simulation-visual" id="sim-visual-math"></div>
+            <div class="simulation-explanation">${step.explanation}</div>
+            <div class="simulation-nav">
+                <button id="prev-step-btn" ${currentStep === 0 ? 'disabled' : ''}>◀ Previous</button>
+                <span class="step-counter">Step ${currentStep + 1} of ${simulationSteps.length}</span>
+                <button id="next-step-btn" ${currentStep === simulationSteps.length - 1 ? 'disabled' : ''}>Next ▶</button>
+            </div>
+        `;
+        
+        const mathEl = document.getElementById('sim-visual-math');
+        if (step.renderer === 'html') {
+            renderHtml(mathEl, step.visual);
+        } else {
+            renderKatex(mathEl, step.visual);
+        }
+
+        document.getElementById('prev-step-btn').addEventListener('click', () => { if (currentStep > 0) { currentStep--; renderSimulationStep(); } });
+        document.getElementById('next-step-btn').addEventListener('click', () => { if (currentStep < simulationSteps.length - 1) { currentStep++; renderSimulationStep(); } });
+    }
+    
+    // --- STEP GENERATION LOGIC ---
+    function generateAdditionSteps(n1, n2) {
+        let s1 = String(n1), s2 = String(n2);
+        const len = Math.max(s1.length, s2.length);
+        s1 = s1.padStart(len, '0'); s2 = s2.padStart(len, '0');
+        let carry = 0; let result = '';
+        simulationSteps.push({ visual: `\\begin{array}{r} ${s1} \\\\ + ${s2} \\\\ \\hline \\end{array}`, explanation: `Let's add ${n1} and ${n2}. We always start from the rightmost column, the <span class="highlight">ones place</span>.` });
+        for (let i = len - 1; i >= 0; i--) {
+            const d1 = parseInt(s1[i]); const d2 = parseInt(s2[i]); const sum = d1 + d2 + carry;
+            const digit = sum % 10; result = digit + result; const oldCarry = carry;
+            carry = Math.floor(sum / 10);
+            let explanation = `In the current column, we add <span class="highlight">${d1} + ${d2}</span>`;
+            if (oldCarry > 0) explanation += ` plus the <span class="highlight">carry</span> of <span class="highlight">${oldCarry}</span>`;
+            explanation += `, which equals <span class="highlight">${sum}</span>. We write down the <span class="highlight">${digit}</span> and carry over the <span class="highlight">${carry}</span>.`;
+            const carryStr = carry > 0 ? `\\overset{\\highlight{${carry}}}{}` : '';
+            const visual = `\\begin{array}{r} ${carryStr}${s1} \\\\ + ${s2} \\\\ \\hline ${result.padStart(len, ' ')} \\end{array}`;
+            simulationSteps.push({ visual, explanation });
+        }
+        simulationSteps.push({ visual: `\\begin{array}{r} ${s1} \\\\ + ${s2} \\\\ \\hline ${n1 + n2} \\end{array}`, explanation: `All done! The final answer is <span class="highlight">${n1 + n2}</span>.` });
+    }
+
+    function generateSubtractionSteps(n1, n2) {
+        let s1_arr = String(n1).split('').map(Number);
+        let s2 = String(n2).padStart(s1_arr.length, '0');
+        let len = s1_arr.length;
+        let result = '';
+        let visual_arr = [...s1_arr].map(d => ` ${d} `);
+
+        simulationSteps.push({
+            visual: `\\begin{array}{r} ${s1_arr.join(' ')} \\\\ - ${s2} \\\\ \\hline \\end{array}`,
+            explanation: `Let's subtract ${n2} from ${n1}. We start from the ones place.`
+        });
+
+        for (let i = len - 1; i >= 0; i--) {
+            let d1 = s1_arr[i];
+            let d2 = parseInt(s2[i]);
+            let explanation = `In the current column, we need to calculate <span class="highlight">${d1} - ${d2}</span>. `;
+
+            if (d1 < d2) {
+                explanation += `Since ${d1} is smaller than ${d2}, we need to <span class="highlight">borrow</span> from the column to the left.`;
+                let j = i - 1;
+                while (j >= 0) {
+                    if (s1_arr[j] > 0) {
+                        visual_arr[j] = `\\overset{\\highlight{${s1_arr[j] - 1}}}{\\cancel{${s1_arr[j]}}}`;
+                        s1_arr[j]--;
+                        s1_arr[i] += 10;
+                        visual_arr[i] = `\\overset{\\highlight{${s1_arr[i]}}}{\\cancel{d1}}`;
+                        d1 = s1_arr[i];
+                        break;
+                    } else {
+                        visual_arr[j] = `\\overset{\\highlight{9}}{\\cancel{0}}`;
+                        s1_arr[j] = 9;
+                    }
+                    j--;
+                }
+                 explanation += ` After borrowing, our top number is updated. Now we can subtract.`;
+            }
+            
+            const diff = d1 - d2;
+            result = diff + result;
+            explanation += ` The result for this column is <span class="highlight">${diff}</span>.`;
+            
+            const visual = `\\begin{array}{r} ${visual_arr.join('')} \\\\ - ${s2} \\\\ \\hline ${result.padStart(len, ' ')} \\end{array}`;
+            simulationSteps.push({ visual, explanation });
+        }
+
+        simulationSteps.push({
+            visual: `\\begin{array}{r} ${String(n1)} \\\\ - ${String(n2).padStart(String(n1).length, ' ')} \\\\ \\hline ${n1-n2} \\end{array}`,
+            explanation: `Finished! The final answer is <span class="highlight">${n1-n2}</span>.`
+        });
+    }
+
+
+    function generateMultiplicationSteps(n1, n2) {
+        const s1 = String(n1), s2 = String(n2);
+        simulationSteps.push({
+            visual: `\\begin{array}{r} ${s1} \\\\ \\times ${s2} \\\\ \\hline \\end{array}`,
+            explanation: `Let's multiply ${n1} by ${n2}. We'll multiply the top number (${s1}) by each digit of the bottom number (${s2}), starting from the right.`
+        });
+
+        const partialProducts = [];
+        let fullVisual = `\\begin{array}{r} ${s1} \\\\ \\times ${s2} \\\\ \\hline`;
+
+        for (let i = s2.length - 1; i >= 0; i--) {
+            const multiplier = parseInt(s2[i]);
+            const placeholder = '0'.repeat(s2.length - 1 - i);
+            let carry = 0;
+            let partialResult = '';
+            
+            const multiplierHighlight = s2.substring(0, i) + `\\highlight{${multiplier}}` + s2.substring(i + 1);
+
+            simulationSteps.push({
+                visual: `\\begin{array}{r} ${s1} \\\\ \\times ${multiplierHighlight} \\\\ \\hline \\end{array}`,
+                explanation: `First, let's multiply the top number (${s1}) by the digit <span class="highlight">${multiplier}</span>.`
+            });
+
+            for (let j = s1.length - 1; j >= 0; j--) {
+                const multiplicand = parseInt(s1[j]);
+                const multiplicandHighlight = s1.substring(0, j) + `\\highlight{${multiplicand}}` + s1.substring(j + 1);
+                const oldCarry = carry;
+                const product = (multiplicand * multiplier) + carry;
+                const digit = product % 10;
+                partialResult = digit + partialResult;
+                carry = Math.floor(product / 10);
+                
+                let explanation = `Starting from the right of the top number, we calculate <span class="highlight">${multiplicand} × ${multiplier}</span>`;
+                if(oldCarry > 0) explanation += ` and add the carry <span class="highlight">${oldCarry}</span>`;
+                explanation += `, which is <span class="highlight">${product}</span>. We write down <span class="highlight">${digit}</span> and carry the new <span class="highlight">${carry}</span>.`;
+
+                const carryStr = carry > 0 ? `\\overset{\\highlight{${carry}}}{}` : '';
+                const visual = `\\begin{array}{r} ${carryStr}${multiplicandHighlight} \\\\ \\times ${multiplierHighlight} \\\\ \\hline ${partialResult.padStart(s1.length - j + partialResult.length -1, ' ')}${placeholder} \\end{array}`
+                simulationSteps.push({ visual, explanation });
+            }
+            
+            const finalPartial = partialResult + placeholder;
+            partialProducts.push(finalPartial);
+            fullVisual += ` ${finalPartial} \\\\`;
+            simulationSteps.push({
+                visual: `\\begin{array}{r} ${s1} \\\\ \\times ${s2} \\\\ \\hline ${finalPartial} \\end{array}`,
+                explanation: `This gives us our first <span class="highlight">partial product</span>: <span class="highlight">${finalPartial}</span>. We write it down.`
+            });
+        }
+
+        if (partialProducts.length > 1) {
+            simulationSteps.push({
+                visual: fullVisual + ` \\hline ${n1 * n2} \\end{array}`,
+                explanation: `Finally, we add all the partial products together to get our final answer.`
+            });
+        }
+        
+        simulationSteps.push({
+            visual: `\\begin{array}{r} ${s1} \\\\ \\times ${s2} \\\\ \\hline ${n1 * n2} \\end{array}`,
+            explanation: `All done! The final answer is <span class="highlight">${n1 * n2}</span>.`
+        });
+    }
+
+    function generateDivisionSteps(n1, n2) {
+        const dividendStr = String(n1);
+        let currentDividendStr = '';
+        let quotientStr = '';
+        let calcRows = [];
+        let renderer = 'html';
+
+        // Step 1: Initial check for decimal division
+        if (n1 < n2) {
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, '', []), explanation: `Let's divide ${n1} by ${n2}. We notice the <span class="highlight">numerator</span> (${n1}) is smaller than the <span class="highlight">denominator</span> (${n2}), so our answer will be less than 1.` });
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, '0.', []), explanation: `Because the answer is less than 1, we start by writing <span class="highlight">0.</span> in our quotient (the answer).` });
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, `${n1}.0`, '0.', []), explanation: `To start dividing, we add a decimal point and a zero to ${n1}, turning it into <span class="highlight">${n1}.0</span>.` });
+            generateDecimalDivisionSteps(n1, n2);
+            return;
+        }
+
+        // Standard Long Division
+        simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, '', []), explanation: `Let's divide ${n1} by ${n2}. We'll start from the left of ${n1}.` });
+
+        for (let i = 0; i < dividendStr.length; i++) {
+            currentDividendStr += dividendStr[i];
+            let currentDividend = parseInt(currentDividendStr);
+
+            let explanation = `Bring down the next digit, <span class="highlight">${dividendStr[i]}</span>, to make our new number <span class="highlight">${currentDividend}</span>.`;
+            if (i === 0) {
+                 explanation = `First, let's see how many times ${n2} goes into the first part of our number, <span class="highlight">${currentDividend}</span>.`
+            }
+            
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, quotientStr, calcRows, i + 1), explanation: explanation });
+            
+            let quotientDigit = Math.floor(currentDividend / n2);
+            quotientStr += quotientDigit;
+            
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, quotientStr, calcRows, i + 1), explanation: `${n2} goes into ${currentDividend} <span class="highlight">${quotientDigit}</span> time(s). We write <span class="highlight">${quotientDigit}</span> on top.` });
+
+            let product = quotientDigit * n2;
+            calcRows.push({ type: 'subtraction', value: product, offset: i });
+             simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, quotientStr, calcRows, i + 1), explanation: `Next, we multiply <span class="highlight">${quotientDigit} × ${n2}</span>, which equals <span class="highlight">${product}</span>.` });
+
+            let remainder = currentDividend - product;
+            calcRows.push({ type: 'remainder', value: remainder, offset: i });
+             simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, quotientStr, calcRows, i + 1), explanation: `Now we subtract: <span class="highlight">${currentDividend} - ${product}</span> gives us a remainder of <span class="highlight">${remainder}</span>.` });
+
+            currentDividendStr = String(remainder);
+        }
+
+        const finalRemainder = n1 % n2;
+        const remainderText = finalRemainder > 0 ? ` with a remainder of <span class="highlight">${finalRemainder}</span>` : '';
+        simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, n1, quotientStr, calcRows), explanation: `We are finished! The final answer is <span class="highlight">${Math.floor(n1 / n2)}</span>${remainderText}.` });
+    }
+
+    function generateDecimalDivisionSteps(n1, n2) {
+        let dividendStr = String(n1) + ".";
+        let quotientStr = '0.';
+        let currentDividendStr = '';
+        let calcRows = [];
+        let renderer = 'html';
+        
+        let remainder = n1;
+        
+        // Loop for 3 decimal places
+        for (let i = 0; i < 3; i++) {
+            currentDividendStr = String(remainder) + '0';
+            dividendStr += '0';
+            let currentDividend = parseInt(currentDividendStr);
+
+            calcRows.push({ type: 'remainder_decimal', value: remainder, offset: i+String(n1).length });
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, dividendStr, quotientStr, calcRows, String(n1).length + i + 1), explanation: `We bring down a <span class="highlight">0</span> to make our new number <span class="highlight">${currentDividend}</span>.` });
+
+            let quotientDigit = Math.floor(currentDividend / n2);
+            quotientStr += quotientDigit;
+             simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, dividendStr, quotientStr, calcRows, String(n1).length + i + 1), explanation: `${n2} goes into ${currentDividend} <span class="highlight">${quotientDigit}</span> time(s). We write ${quotientDigit} in our answer.` });
+
+            let product = quotientDigit * n2;
+            calcRows.push({ type: 'subtraction', value: product, offset: i+String(n1).length });
+            simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, dividendStr, quotientStr, calcRows, String(n1).length + i + 1), explanation: `Multiply: <span class="highlight">${quotientDigit} × ${n2} = ${product}</span>.` });
+            
+            remainder = currentDividend - product;
+            if (i < 2) { // Don't add a remainder row for the last step
+                 calcRows.push({ type: 'remainder', value: remainder, offset: i+String(n1).length });
+                 simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, dividendStr, quotientStr, calcRows, String(n1).length + i + 1), explanation: `Subtract: <span class="highlight">${currentDividend} - ${product} = ${remainder}</span>.` });
+            }
+            if(remainder === 0) break;
+        }
+
+         simulationSteps.push({ renderer, visual: buildDivisionHtml(n2, dividendStr, quotientStr, calcRows), explanation: `We've calculated a few decimal places. The final answer is approximately <span class="highlight">${quotientStr}</span>.` });
+
+    }
+
+
+    function buildDivisionHtml(divisor, dividend, quotient, calcRows) {
+        let dividendStr = String(dividend);
+        let html = `<div class="long-division-container"><div class="grid">`;
+        html += `<div class="quotient">${quotient}</div>`;
+        html += `<div class="divisor">${divisor}</div>`;
+        html += `<div class="dividend">${dividendStr}</div>`;
+
+        let currentOffset = 0;
+        let lastValStr = '';
+
+        calcRows.forEach(row => {
+            const valStr = String(row.value);
+            if (row.type === 'subtraction') {
+                currentOffset = row.offset - valStr.length + 1;
+                html += `<div class="calc-row subtraction" style="padding-left: ${currentOffset}ch;"><span>-${valStr}</span></div>`;
+            } else if (row.type === 'remainder' || row.type === 'remainder_decimal') {
+                const nextDigit = dividendStr[row.offset + 1] || (row.type === 'remainder_decimal' ? '0' : '');
+                let content = `<span>${valStr}<span class="highlight">${nextDigit}</span></span>`;
+                if(row.type === 'remainder' && nextDigit === '') {
+                    content = `<span>${valStr}</span>`;
+                }
+
+                currentOffset = row.offset - lastValStr.length + 2;
+                 if (row.type === 'remainder_decimal') {
+                     currentOffset = String(dividend).indexOf('.') - valStr.length;
+                 }
+
+
+                html += `<div class="calc-row" style="padding-left: ${currentOffset}ch;">${content}</div>`;
+            }
+            lastValStr = valStr;
+        });
+
+        html += `</div></div>`;
+        return html;
+    }
+}
+});
+</script>
+</body>
+</html>
+
+
