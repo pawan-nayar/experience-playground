@@ -206,6 +206,102 @@
   }
 }
 
+/* === MOBILE RESPONSIVENESS (3 Hops) === */
+@media (max-width: 600px) {
+  /* Hop 1: Stack Simulator Controls Vertically */
+  .simulator-controls {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .simulator-controls input {
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+  .operator-buttons {
+    justify-content: center;
+    gap: 12px;
+  }
+  .op-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+
+  /* Hop 2: Responsive Tabs & Example Links */
+  .tabs {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  .top-tabs {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .top-tab {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  .example-link {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+  }
+
+  /* Hop 3: Mobile Container, Simulation Area & Nav Fixes */
+  .main-wrapper {
+    margin: 8px 6px;
+    border-radius: 12px;
+  }
+  .container {
+    padding: 12px;
+  }
+  h1 {
+    font-size: 1.4rem;
+  }
+  h2 {
+    font-size: 1.1rem;
+    margin-top: 12px;
+  }
+  p.intro {
+    font-size: 0.95rem;
+  }
+  .practice-simulator {
+    padding: 12px;
+    margin-top: 14px;
+  }
+  .simulation-visual {
+    min-width: unset;
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .long-division-container {
+    font-size: 1.1rem;
+  }
+  
+  /* Navigation buttons - single row, compact for mobile */
+  .simulation-nav {
+    gap: 6px;
+  }
+  .simulation-nav button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+  .step-counter {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .simulation-explanation {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}
+
     .long-division-container .grid { display: grid; grid-template-columns: auto 1fr; }
     .long-division-container .divisor { grid-column: 1; padding-right: 0.5ch; }
     .long-division-container .dividend { grid-column: 2; border-left: 2px solid var(--text); border-top: 2px solid var(--text); padding-left: 0.5ch; }
@@ -237,10 +333,10 @@
         </p>
 
         <div class="tabs">
-            <button class="tab-button active" data-tab="addition">➕ Addition</button>
-            <button class="tab-button" data-tab="subtraction">➖ Subtraction</button>
-            <button class="tab-button" data-tab="multiplication">✖️ Multiplication</button>
-            <button class="tab-button" data-tab="division">➗ Division</button>
+            <button class="tab-button active" data-tab="addition">➕ Add</button>
+            <button class="tab-button" data-tab="subtraction">➖ Subtract</button>
+            <button class="tab-button" data-tab="multiplication">✖️ Multiply</button>
+            <button class="tab-button" data-tab="division">➗ Divide</button>
         </div>
 
         <div id="addition-content" class="content-section active">

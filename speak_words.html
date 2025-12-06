@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>English Buddy - Chapter 1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,6 +39,17 @@
             line-height: 1.3;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
+        /* Prevent unwanted zoom on input focus (mobile) */
+        @media (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
         }
 
         /* Subtle attention highlight for primary action */
@@ -68,8 +81,12 @@
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             }
             
+            .main-content {
+                padding: 16px;
+            }
+            
             .word-display {
-                padding: 20px 16px;
+                padding: 24px 20px;
             }
             
             .hindi-word {
@@ -87,6 +104,11 @@
             .btn {
                 padding: 10px 16px;
                 font-size: 0.9rem;
+                min-height: 40px;
+            }
+            
+            .nav-controls {
+                padding: 0 16px;
             }
         }
 
@@ -101,6 +123,11 @@
             
             .english-word {
                 font-size: 1.3rem !important;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.95rem;
             }
         }
 
@@ -611,7 +638,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--accent);
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 4vw, 1.2rem);
             font-weight: bold;
             animation: arrow-pulse 1.5s ease-in-out infinite;
         }
@@ -623,6 +650,32 @@
 
         .btn-with-arrows::after {
             right: -20px;
+        }
+        
+        /* Mobile arrow adjustments */
+        @media (max-width: 480px) {
+            .btn-with-arrows::before {
+                left: -16px;
+            }
+            
+            .btn-with-arrows::after {
+                right: -16px;
+            }
+            
+            .btn-with-arrows::before,
+            .btn-with-arrows::after {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .btn-with-arrows::before {
+                left: -12px;
+            }
+            
+            .btn-with-arrows::after {
+                right: -12px;
+            }
         }
 
         @keyframes arrow-pulse {
@@ -655,10 +708,17 @@
         }
 
         .countdown-number {
-            font-size: 3rem;
+            font-size: clamp(2rem, 15vw, 3rem);
             font-weight: bold;
             color: white;
             animation: countdown-bounce 0.8s ease-in-out;
+        }
+        
+        /* Mobile countdown adjustments */
+        @media (max-width: 480px) {
+            .countdown-number {
+                font-size: clamp(2.5rem, 18vw, 3.5rem);
+            }
         }
 
         @keyframes countdown-bounce {
@@ -667,16 +727,329 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Mobile adjustments */
-        @media (max-width: 380px) {
+        /* ===== MOBILE-FIRST RESPONSIVE DESIGN ===== */
+        
+        /* Safe area insets for notched devices (iPhone X and newer) */
+        @supports (padding: max(0px)) {
+            .app-container {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+            
+            .app-header {
+                padding-left: max(12px, env(safe-area-inset-left) + 12px);
+                padding-right: max(12px, env(safe-area-inset-right) + 12px);
+            }
+            
+            .progress-section {
+                padding-left: max(12px, env(safe-area-inset-left) + 12px);
+                padding-right: max(12px, env(safe-area-inset-right) + 12px);
+            }
+            
+            .nav-controls {
+                padding-left: max(12px, env(safe-area-inset-left) + 12px);
+                padding-right: max(12px, env(safe-area-inset-right) + 12px);
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Mobile: Small screens (up to 480px) */
+        @media (max-width: 480px) {
             .app-container {
                 max-width: 100vw;
                 margin: 0;
+                box-shadow: none;
+            }
+            
+            /* Header adjustments */
+            .app-header {
+                height: 40px;
+                padding: 0 16px;
+            }
+            
+            .app-title {
+                font-size: 0.85rem;
+            }
+            
+            .chapter-badge {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+            }
+            
+            .mic-status-header {
+                font-size: 0.65rem;
+            }
+            
+            /* Progress bar adjustments */
+            .progress-section {
+                height: 28px;
+                padding: 0 16px;
+            }
+            
+            .progress-label,
+            .progress-score {
+                font-size: 0.7rem;
+            }
+            
+            /* Main content - better mobile spacing */
+            .main-content {
+                padding: 12px;
+                height: calc(100vh - 40px - 28px - 56px);
+            }
+            
+            /* Game card */
+            .game-card {
+                padding: 16px;
+            }
+            
+            .game-title {
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+            
+            .game-subtitle {
+                font-size: 0.7rem;
+                margin-bottom: 12px;
+            }
+            
+            /* Word display - better mobile sizing */
+            .word-display {
+                padding: 20px 16px;
+                margin-bottom: 12px;
+            }
+            
+            .hindi-word {
+                font-size: clamp(1.6rem, 10vw, 2rem);
+                margin-bottom: 6px;
+            }
+            
+            .english-word {
+                font-size: clamp(1rem, 6vw, 1.2rem);
+                margin-bottom: 4px;
+            }
+            
+            .phonetic {
+                font-size: 0.8rem;
+            }
+            
+            /* Timer - larger on mobile for visibility */
+            .timer-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 1.3rem;
+            }
+            
+            .timer-text {
+                font-size: 0.75rem;
+            }
+            
+            /* Buttons - proper touch targets (min 44x44px) */
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                min-height: 44px;
+                border-radius: 8px;
+            }
+            
+            /* Controls - better spacing */
+            .controls {
+                gap: 10px;
+                margin-top: 16px;
             }
             
             .controls .btn {
                 flex: 1;
+                min-width: 0;
             }
+            
+            /* Navigation - better mobile layout */
+            .nav-controls {
+                height: 56px;
+                padding: 0 16px;
+                gap: 8px;
+            }
+            
+            .nav-controls .btn {
+                font-size: 0.75rem;
+                padding: 10px 12px;
+                min-height: 44px;
+                max-width: none;
+            }
+            
+            /* Setup card - better mobile sizing */
+            .setup-card {
+                padding: 28px 20px;
+                margin: 0 12px;
+                max-width: calc(100% - 24px);
+            }
+            
+            .setup-card h2 {
+                font-size: 1.2rem;
+            }
+            
+            .setup-card p {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+            
+            .setup-btn {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+            
+            /* Feedback section */
+            .feedback-section {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .feedback-icon {
+                font-size: 1.4rem;
+            }
+            
+            .feedback-text {
+                font-size: 0.85rem;
+            }
+            
+            .feedback-hint {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Mobile: Very small screens (up to 360px) */
+        @media (max-width: 360px) {
+            .app-header {
+                padding: 0 12px;
+            }
+            
+            .app-title {
+                font-size: 0.8rem;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .game-card {
+                padding: 12px;
+            }
+            
+            .word-display {
+                padding: 16px 12px;
+            }
+            
+            .hindi-word {
+                font-size: clamp(1.4rem, 9vw, 1.8rem);
+            }
+            
+            .english-word {
+                font-size: clamp(0.95rem, 5.5vw, 1.1rem);
+            }
+            
+            .btn {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .nav-controls {
+                padding: 0 12px;
+            }
+            
+            .nav-controls .btn {
+                font-size: 0.7rem;
+                padding: 8px 10px;
+            }
+        }
+
+        /* Mobile: Landscape orientation */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .app-header {
+                height: 36px;
+            }
+            
+            .progress-section {
+                height: 26px;
+            }
+            
+            .main-content {
+                height: calc(100vh - 36px - 26px - 52px);
+                padding: 8px;
+            }
+            
+            .word-display {
+                padding: 12px 16px;
+                margin-bottom: 8px;
+            }
+            
+            .hindi-word {
+                font-size: clamp(1.3rem, 8vw, 1.6rem);
+            }
+            
+            .english-word {
+                font-size: clamp(0.9rem, 5vw, 1rem);
+            }
+            
+            .timer-circle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.1rem;
+            }
+            
+            .nav-controls {
+                height: 52px;
+            }
+            
+            .controls {
+                margin-top: 8px;
+            }
+        }
+
+        /* Tablet: Medium screens (481px to 767px) */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .app-container {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .word-display {
+                padding: 24px 20px;
+            }
+            
+            .hindi-word {
+                font-size: clamp(1.8rem, 7vw, 2.2rem);
+            }
+            
+            .english-word {
+                font-size: clamp(1.1rem, 4vw, 1.3rem);
+            }
+            
+            .btn {
+                padding: 12px 18px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Prevent text selection on buttons for better mobile UX */
+        .btn {
+            -webkit-tap-highlight-color: rgba(253, 126, 20, 0.3);
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        /* Better touch feedback */
+        .btn:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+
+        /* Improve scrolling on mobile if needed */
+        .main-content {
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>

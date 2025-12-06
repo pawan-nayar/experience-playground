@@ -5,45 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gen Z Slang Glossary</title>
   <style>
+    :root {
+      --text:#212529;
+      --bg:#ffffff;
+      --muted:#f8f9fa;
+      --border:#e9ecef;
+      --accent:#fd7e14;
+      --accent-2:#e87312;
+      --header-bg:#212529;
+      --header-fg:#f8f9fa;
+    }
+
     body {
       margin: 0;
-      background: #f4f4f5;
-      font-family: 'Segoe UI', sans-serif;
-      height: 100vh;
+      background: var(--muted);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
-      color: #1f2937;
+      align-items: flex-start;
+      color: var(--text);
+      padding: 1.5rem 1.25rem;
     }
     .container {
       width: 90%;
       max-width: 650px;
-      background-color: white;
+      background-color: var(--bg);
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      padding: 1.25rem 2rem; /* Reduced padding */
+      padding: 1.5rem 1.5rem;
       display: flex;
       flex-direction: column;
       height: auto;
-      max-height: 95vh;
     }
     h3.main-title {
         text-align: center;
-        font-size: 1.4rem; /* Slightly smaller */
-        color: #374151;
+        font-size: 1.8rem;
+        color: var(--text);
         margin-top: 0;
         margin-bottom: 1rem; /* Reduced margin */
         font-weight: 600;
     }
     .card-content {
         flex-grow: 1;
-        overflow-y: auto;
-        padding-right: 15px;
+        overflow-y: visible;
+        padding: 0;
     }
     .term-title {
-        font-size: 1.6rem; /* Slightly smaller */
+        font-size: 1.5rem;
         font-weight: 700;
-        color: #111827;
+        color: var(--text);
         margin-bottom: 0.75rem; /* Reduced margin */
     }
     .section {
@@ -53,22 +64,22 @@
         font-weight: 600;
         font-size: 0.85rem; /* Slightly smaller */
         text-transform: uppercase;
-        color: #6b7280;
+        color: #6c757d;
         margin-bottom: 0.4rem;
         letter-spacing: 0.5px;
     }
     .definition-box, .insight-box {
-        background: #f9fafb;
-        border-left: 4px solid #d1d5db;
+        background: var(--muted);
+        border-left: 4px solid var(--border);
         padding: 0.75rem 1rem; /* Reduced padding */
         font-size: 0.95rem; /* Slightly smaller */
         line-height: 1.5;
     }
     .insight-box {
-        border-left-color: #6366f1;
+        border-left-color: var(--accent);
     }
     .emoji-equation {
-        background-color: #f3f4f6;
+        background-color: #fff7ed;
         padding: 0.75rem;
         border-radius: 8px;
         font-size: 1.25rem;
@@ -85,8 +96,8 @@
     }
     .tag {
         display: inline-block;
-        background-color: #e5e7eb;
-        color: #4b5563;
+        background-color: #e9ecef;
+        color: #495057;
         padding: 3px 10px;
         border-radius: 15px;
         font-size: 0.75rem;
@@ -96,25 +107,25 @@
     .tabs {
         display: flex;
         gap: 10px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
         margin-bottom: 1rem;
     }
     .tab {
         padding: 0.5rem 0.25rem; /* Reduced padding */
         cursor: pointer;
         font-weight: 600;
-        color: #6b7280;
+        color: #6c757d;
         border-bottom: 3px solid transparent;
         transition: color 0.2s, border-color 0.2s;
         flex-grow: 1;
         text-align: center;
     }
     .tab.active {
-        color: #4f46e5;
-        border-bottom-color: #4f46e5;
+        color: var(--accent);
+        border-bottom-color: var(--accent);
     }
     .example-box {
-        background-color: #eef2ff;
+        background-color: #fff3cd;
         padding: 1rem;
         border-radius: 8px;
         font-style: italic;
@@ -135,21 +146,21 @@
       cursor: pointer;
       padding: 8px 16px;
       border-radius: 20px;
-      background-color: #e5e7eb;
+      background-color: var(--muted);
       font-weight: 600;
       transition: background-color 0.2s;
     }
     .nav-button:hover {
-        background-color: #d1d5db;
+        background-color: #e9ecef;
     }
     .nav-button.disabled {
-        color: #9ca3af;
+        color: #adb5bd;
         cursor: not-allowed;
-        background-color: #f3f4f6;
+        background-color: #f8f9fa;
     }
     .nav-count {
         font-weight: 600;
-        color: #6b7280;
+        color: #6c757d;
     }
     /* Custom Tooltip Styles */
     .custom-tooltip {
@@ -157,8 +168,8 @@
       z-index: 80;
       min-width: 240px;
       max-width: min(92vw, 420px);
-      background: #374151;
-      color: #f9fafb;
+      background: var(--header-bg);
+      color: var(--header-fg);
       padding: 12px 14px;
       border-radius: 12px;
       box-shadow: 0 12px 28px rgba(0,0,0,0.25);
@@ -176,8 +187,64 @@
       position: absolute;
       width: 12px;
       height: 12px;
-      background: #374151;
+      background: var(--header-bg);
       transform: rotate(45deg);
+    }
+
+    /* --- Mobile Responsive Tweaks --- */
+    @media (max-width: 640px) {
+      body {
+        padding: 0.75rem 0.75rem;
+      }
+
+      .container {
+        width: 95%;
+        max-width: 100%;
+        padding: 1rem 1rem;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      }
+
+      h3.main-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .term-title {
+        font-size: 1.25rem;
+      }
+
+      .definition-box,
+      .insight-box {
+        font-size: 0.9rem;
+      }
+
+      .emoji-equation {
+        font-size: 1.1rem;
+        padding: 0.6rem;
+      }
+
+      .tabs {
+        gap: 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tab {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.2rem;
+        white-space: nowrap;
+      }
+
+      /* Keep nav as a single row on mobile for consistency */
+      .nav-count {
+        text-align: center;
+      }
+
+      /* Slightly reduce right padding so content uses more width on small screens */
+      .card-content {
+        padding: 0;
+      }
     }
   </style>
 </head>

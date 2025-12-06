@@ -45,33 +45,42 @@ body{
   background:var(--bg); color:var(--text);
   min-height:100vh; display:flex; flex-direction:column;
   overflow:hidden;
-  --headerCurrentH: 72px;
-  --footerCurrentH: 60px;
+  --headerCurrentH: 48px;
+  --footerCurrentH: 36px;
 }
 
 /* Common Header/Footer */
-.bd-header{background:#212529; color:#f8f9fa; border-bottom:3px solid var(--accent); height:var(--headerCurrentH); overflow:hidden}
-.bd-header .inner{max-width:1100px; margin:0 auto; padding:.7rem 1rem; display:flex; align-items:center; gap:1rem; height:100%}
+.bd-header{background:#212529; color:#f8f9fa; border-bottom:2px solid var(--accent); height:var(--headerCurrentH); overflow:hidden; transition:height 0.3s ease}
+.bd-header .inner{max-width:1100px; margin:0 auto; padding:.4rem 1rem; display:flex; align-items:center; gap:1rem; height:100%}
 .bd-header .sizer{margin-left:auto; display:none}
 .bd-header.collapsed .sizer{display:flex}
-.bd-toggle{background:transparent; color:#f8f9fa; border:1px solid #495057; padding:.25rem .5rem; border-radius:999px; font-weight:800; cursor:pointer}
+.bd-toggle{background:transparent; color:#f8f9fa; border:1px solid #495057; padding:.2rem .4rem; border-radius:999px; font-weight:800; cursor:pointer; font-size:.75rem}
 .bd-toggle:hover{background:#343a40}
 .bd-header.collapsed .bd-brand, .bd-header.collapsed .bd-nav, .bd-header.collapsed .bd-search{display:none}
-.bd-brand{font-weight:900; letter-spacing:.3px; color:#fff; text-decoration:none; font-size:1.05rem; white-space:nowrap}
+.bd-brand{font-weight:900; letter-spacing:.3px; color:#fff; text-decoration:none; font-size:.95rem; white-space:nowrap}
 .bd-nav{margin-left:auto; display:flex; gap:.9rem; flex-wrap:wrap}
-.bd-nav a{color:#ced4da; text-decoration:none; font-weight:700; font-size:.9rem}
+.bd-nav a{color:#ced4da; text-decoration:none; font-weight:700; font-size:.85rem}
 .bd-nav a:hover{color:#fff}
 .bd-search{display:flex; align-items:center; gap:.4rem}
-.bd-search input{background:#343a40; color:#fff; border:1px solid #495057; padding:.45rem .6rem; border-radius:8px; width:170px}
-.bd-search button{background:var(--accent); color:#fff; border:none; padding:.45rem .7rem; border-radius:8px; font-weight:800; cursor:pointer}
+.bd-search input{background:#343a40; color:#fff; border:1px solid #495057; padding:.35rem .5rem; border-radius:8px; width:150px; font-size:.85rem}
+.bd-search button{background:var(--accent); color:#fff; border:none; padding:.35rem .6rem; border-radius:8px; font-weight:800; cursor:pointer; font-size:.85rem}
 .bd-search button:hover{background:var(--accent-deep)}
-.bd-footer{background:#212529; color:#ced4da; height:var(--footerCurrentH); overflow:hidden; border-top:1px solid #343a40}
-.bd-footer .inner{max-width:1100px; margin:0 auto; padding:.4rem 1rem; display:flex; align-items:center; gap:1rem; height:100%}
+
+/* Hamburger Menu */
+.hamburger{display:none; background:transparent; border:none; color:#f8f9fa; font-size:1.5rem; cursor:pointer; padding:.25rem; margin-left:auto}
+.hamburger-menu{display:none; position:fixed; top:var(--headerCurrentH); left:0; right:0; background:#212529; border-bottom:2px solid var(--accent); z-index:1000; padding:1rem; box-shadow:0 4px 6px rgba(0,0,0,0.3)}
+.hamburger-menu.active{display:block}
+.hamburger-menu .bd-nav{display:flex; flex-direction:column; gap:.75rem; margin:0 0 1rem 0}
+.hamburger-menu .bd-search{display:flex; flex-direction:column; gap:.5rem; width:100%}
+.hamburger-menu .bd-search input{width:100%}
+
+.bd-footer{background:#212529; color:#ced4da; height:var(--footerCurrentH); overflow:hidden; border-top:1px solid #343a40; transition:height 0.3s ease}
+.bd-footer .inner{max-width:1100px; margin:0 auto; padding:.25rem 1rem; display:flex; align-items:center; gap:1rem; height:100%; font-size:.75rem}
 .bd-footer .expander{margin-left:auto; display:none}
 .bd-footer.collapsed .expander{display:block}
 .bd-footer.collapsed .inner > :not(.expander){display:none}
 
-.content{flex:1 1 auto; display:flex; justify-content:center; padding:.5rem; height:calc(100vh - var(--headerCurrentH) - var(--footerCurrentH));}
+.content{flex:1 1 auto; display:flex; justify-content:center; padding:.5rem; min-height:calc(100vh - var(--headerCurrentH) - var(--footerCurrentH));}
 .app{
   width:100%; max-width:860px; height:100%; background:var(--surface);
   border-radius:14px; box-shadow:0 10px 28px rgba(0,0,0,.08);
@@ -139,14 +148,30 @@ body{
 .expl .model{margin-top:.5rem; font-weight:600}
 
 /* Footer Navigation */
-.nav{border-top:1px solid var(--line); padding:.7rem 1rem; display:flex; justify-content:space-between; align-items:center; gap:.6rem; background:var(--surface);}
+.nav{
+  border-top:1px solid var(--line);
+  padding:.7rem 1rem;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:.5rem;
+  align-items:stretch;
+  background:var(--surface);
+}
+.nav__primary{
+  display:flex;
+  justify-content:flex-end;
+  gap:.35rem;
+}
+.nav .btn{
+  width:100%;
+}
 .btn{border:none; border-radius:.65rem; padding:.55rem 1rem; font-weight:800; cursor:pointer; transition:.2s; font-size:.92rem;}
 .btn--pri{background:var(--accent); color:#fff}
 .btn--pri:hover{background:var(--accent-deep)}
 .btn--sec{background:var(--surface-soft); color:var(--muted); border:1px solid var(--line)}
 .btn--sec:hover{background:var(--accent-tint); color:#5a2e1f; border-color:var(--accent-tint)}
 .btn[disabled]{opacity:.6; cursor:not-allowed}
-.score{font-weight:800; color:var(--accent); font-size:.95rem;}
+.badge--score{background:rgba(255,255,255,.12); color:#ffe8d9;}
 
 /* Hint Modal */
 .modal-overlay{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity .3s ease;}
@@ -157,11 +182,40 @@ body{
 .modal-close{margin-top:1rem;}
 
 /* Small screens */
+@media(max-width:768px){
+  .hamburger{display:block}
+  .bd-header .bd-nav, .bd-header .bd-search{display:none}
+  body{
+    --headerCurrentH: 44px;
+    --footerCurrentH: 32px;
+  }
+}
+
 @media(max-width:480px){
   .app__title{font-size:.95rem}
   .app__subtitle{font-size:.72rem}
-  .q-text{font-size:.98rem}
-  .btn{font-size:.9rem}
+  .q-text{font-size:.98rem; margin:.5rem 0 .7rem}
+  .btn{font-size:.85rem; padding:.5rem .6rem}
+  .main{padding:.75rem .75rem .5rem;}
+  .card{padding:.9rem;}
+  .options{gap:.35rem;}
+  /* Mobile nav: compact, two-row layout to avoid text shifting */
+  .nav{
+    padding:.6rem .6rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+  }
+  .nav__btn{
+    flex:1 1 calc(33.333% - .4rem);
+  }
+  .nav__primary{
+    flex:1 1 100%;
+    justify-content:space-between;
+  }
+  .nav__primary .nav__btn{
+    flex:1 1 auto;
+  }
 }
 
 /* Motion safe */
@@ -183,9 +237,21 @@ body{
       <input type="search" placeholder="Search..." aria-label="Search" />
       <button type="submit">Search</button>
     </form>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">☰</button>
     <div class="sizer"><button id="toggleHeader" class="bd-toggle" title="Collapse header">▲</button></div>
   </div>
 </header>
+
+<div class="hamburger-menu" id="hamburgerMenu">
+  <nav class="bd-nav">
+    <a href="#">Home</a>
+    <a href="#">About</a>
+  </nav>
+  <form class="bd-search" onsubmit="event.preventDefault();">
+    <input type="search" placeholder="Search..." aria-label="Search" />
+    <button type="submit">Search</button>
+  </form>
+</div>
 
 <div class="content">
 <div class="app" id="app">
@@ -197,6 +263,7 @@ body{
       <span class="badge" id="badgeIndex">Q 1 / 60</span>
       <span class="badge" id="badgeType">MCQ</span>
       <span class="badge" id="badgeMarks">10 Marks</span>
+      <span class="badge badge--score" id="badgeScore">Score: 0</span>
     </div>
   </header>
 
@@ -207,14 +274,13 @@ body{
   </main>
 
   <footer class="nav">
-    <button class="btn btn--sec" id="btnPrev">← Prev</button>
-    <div class="score" id="scoreMini">Score: 0</div>
-    <div>
-      <button class="btn btn--sec" id="btnHint">Hint (-5)</button>
-      <button class="btn btn--sec" id="btnSkip">Skip</button>
-      <button class="btn btn--pri" id="btnSubmit">Submit</button>
-      <button class="btn btn--pri" id="btnNext" style="display:none">Next →</button>
-      <button class="btn btn--pri" id="btnFinish" style="display:none">Finish</button>
+    <button class="btn btn--sec nav__btn" id="btnPrev">← Prev</button>
+    <button class="btn btn--sec nav__btn" id="btnHint">Hint (-5)</button>
+    <button class="btn btn--sec nav__btn" id="btnSkip">Skip</button>
+    <div class="nav__primary">
+      <button class="btn btn--pri nav__btn" id="btnSubmit">Submit</button>
+      <button class="btn btn--pri nav__btn" id="btnNext" style="display:none">Next →</button>
+      <button class="btn btn--pri nav__btn" id="btnFinish" style="display:none">Finish</button>
     </div>
   </footer>
 </div>
@@ -237,19 +303,49 @@ body{
 </div>
 
 <script>
-// Layout controls (unchanged from original)
+// Layout controls
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('.bd-header');
   const footer = document.getElementById('bdFooter');
   const toggleHeaderBtn = document.getElementById('toggleHeader');
   const toggleFooterBtn = document.getElementById('toggleFooter');
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
 
   function collapseHeader(){ document.body.style.setProperty('--headerCurrentH','3vh'); header.classList.add('collapsed'); }
-  function expandHeader(){ document.body.style.setProperty('--headerCurrentH','72px'); header.classList.remove('collapsed'); }
+  function expandHeader(){ document.body.style.setProperty('--headerCurrentH','48px'); header.classList.remove('collapsed'); }
   function collapseFooter(){ document.body.style.setProperty('--footerCurrentH','3vh'); footer.classList.add('collapsed'); }
+  function expandFooter(){ document.body.style.setProperty('--footerCurrentH','36px'); footer.classList.remove('collapsed'); }
   
   if(toggleHeaderBtn) toggleHeaderBtn.addEventListener('click', () => header.classList.contains('collapsed') ? expandHeader() : collapseHeader());
   if(toggleFooterBtn) toggleFooterBtn.addEventListener('click', () => footer.classList.contains('collapsed') ? expandFooter() : collapseFooter());
+
+  // Hamburger menu toggle
+  if(hamburgerBtn && hamburgerMenu) {
+    hamburgerBtn.addEventListener('click', () => {
+      hamburgerMenu.classList.toggle('active');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if(!hamburgerBtn.contains(e.target) && !hamburgerMenu.contains(e.target)) {
+        hamburgerMenu.classList.remove('active');
+      }
+    });
+    
+    // Close menu when clicking a link
+    hamburgerMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburgerMenu.classList.remove('active');
+      });
+    });
+  }
+
+  // On small screens, start with a compact header/footer to maximize quiz area
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    collapseHeader();
+    collapseFooter();
+  }
 
   const app = document.getElementById('app');
   if(app) ['click','touchstart','keydown','wheel'].forEach(evt => app.addEventListener(evt, () => { collapseHeader(); collapseFooter(); }, { passive:true, once: true }));
@@ -351,13 +447,13 @@ const progressBar = el('#progressBar');
 const badgeIndex = el('#badgeIndex');
 const badgeType = el('#badgeType');
 const badgeMarks = el('#badgeMarks');
+const badgeScore = el('#badgeScore');
 const btnPrev = el('#btnPrev');
 const btnNext = el('#btnNext');
 const btnSubmit = el('#btnSubmit');
 const btnSkip = el('#btnSkip');
 const btnHint = el('#btnHint');
 const btnFinish = el('#btnFinish');
-const scoreMini = el('#scoreMini');
 const hintModal = el('#hintModal');
 const hintText = el('#hintText');
 const closeHintModal = el('#closeHintModal');
@@ -367,6 +463,7 @@ function updateHeader(){
   badgeIndex.textContent = `Q ${idx+1} / ${QUIZ.questions.length}`;
   badgeType.textContent = QUIZ.questions[idx].type;
   badgeMarks.textContent = `10 Marks`;
+  badgeScore.textContent = `Score: ${score}`;
   const pct = ((idx)/QUIZ.questions.length)*100;
   progressBar.style.width = `${pct}%`;
 }
@@ -692,7 +789,7 @@ function grade(){
     score += 10;
     if(q.type==='RTC') answers[idx]._scored = true; else answers[idx] = '__scored__';
   }
-  scoreMini.textContent = `Score: ${score}`;
+  badgeScore.textContent = `Score: ${score}`;
   showExplanation(ok, modelTxt);
 }
 
@@ -704,7 +801,7 @@ btnHint.addEventListener('click', () => {
     score -= 5;
     hintsUsed[idx] = true;
     btnHint.disabled = true;
-    scoreMini.textContent = `Score: ${score}`;
+    badgeScore.textContent = `Score: ${score}`;
 
     // Show hint in modal
     const q = QUIZ.questions[idx];

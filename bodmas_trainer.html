@@ -2,32 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>BODMAS Learn Component (Full Experience)</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ================= Base / Theme (Aligned with CBSE Framework) ================= */
         :root {
-            --bd-dark-brown: #3a2e2c;
-            --bd-orange: #ff6b35;
-            --bd-cream: #fdfbf8;
+            /* Core palette */
+            --text: #212529;
+            --bg: #fff;
+            --muted: #f8f9fa;
+            --border: #e9ecef;
+            
+            /* Accent colors */
+            --accent: #fd7e14;
+            --accent-2: #e87312;
+            
+            /* Header */
+            --header-bg: #212529;
+            --header-fg: #f8f9fa;
+            
+            /* Feedback colors */
+            --ok: #16a34a;
+            --ok-soft: #dcfce7;
+            --bad: #dc2626;
+            --bad-soft: #fee2e2;
+            
+            /* Legacy mappings for compatibility */
+            --bd-dark-brown: #212529;
+            --bd-orange: #fd7e14;
+            --bd-cream: #fff7ed;
             --bd-blue: #3b82f6;
-            --header-bg: var(--bd-dark-brown); 
-            --header-text: #ffffff;
-            --background: #f4f7f9;
-            --card: #ffffff;
-            --foreground: #1a1a1a;
-            --muted-foreground: #6b7280;
-            --primary: var(--bd-orange);
+            --primary: var(--accent);
             --primary-foreground: #ffffff;
-            --accent: var(--bd-blue);
-            --accent-light: var(--bd-cream);
-            --border: #e5e7eb;
-            --radius: 0.75rem;
+            --correct: var(--ok);
+            --incorrect: var(--bad);
+            --correct-light: var(--ok-soft);
+            --incorrect-light: var(--bad-soft);
+            
+            /* Spacing & Radius */
+            --radius: 12px;
+            --radius-sm: 10px;
+            --radius-pill: 999px;
+            
+            /* Shadows */
             --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-elegant: 0 10px 20px rgba(139, 92, 246, 0.15);
-            --correct: #22c55e;
-            --incorrect: #ef4444;
-            --correct-light: #dcfce7;
-            --incorrect-light: #fee2e2;
+            --shadow-elegant: 0 10px 20px rgba(253, 126, 20, 0.15);
+            
+            /* Touch targets */
+            --touch-min: 44px;
+        }
+
+        /* ================= Reset & Base ================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         @keyframes fadeInUp {
@@ -36,29 +71,187 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--background);
-            color: var(--foreground);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--muted);
+            color: var(--text);
+            line-height: 1.7;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
+            min-height: 100dvh; /* Dynamic viewport height for mobile */
+            padding: 16px;
+            padding: env(safe-area-inset-top, 16px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 16px) env(safe-area-inset-left, 16px);
         }
 
+        /* ================= Welcome Card ================= */
+        .welcome-card {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: clamp(1.25rem, 4vw, 2rem);
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+            margin: 2rem 0; /* Desktop top/bottom margin */
+        }
+
+        .welcome-icon {
+            font-size: clamp(2.5rem, 8vw, 3.2rem);
+            margin-bottom: 0.25rem;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .welcome-title {
+            font-size: clamp(1.35rem, 4.5vw, 1.75rem);
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+            line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .bodmas-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .bodmas-letter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bd-cream), #fff);
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-sm);
+            padding: 0.4rem 0.5rem;
+            min-width: 44px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .bodmas-letter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(253, 126, 20, 0.2);
+        }
+
+        .bodmas-letter .letter {
+            font-size: clamp(1rem, 2.8vw, 1.25rem);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .bodmas-letter .meaning {
+            font-size: clamp(0.55rem, 1.6vw, 0.65rem);
+            color: #6c757d;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .welcome-features {
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: clamp(0.8rem, 2.2vw, 0.88rem);
+            color: var(--text);
+        }
+
+        .feature-item .feature-icon {
+            font-size: 1rem;
+        }
+
+        .feature-item strong {
+            color: var(--accent);
+        }
+
+        /* ================= Launch Button ================= */
         .launch-button {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             color: var(--primary-foreground);
             border: none;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: var(--radius);
+            padding: 0.85rem 1.75rem;
+            font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+            font-weight: 700;
+            border-radius: var(--radius-pill);
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-soft);
+            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+            min-height: var(--touch-min);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
         }
 
+        .launch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(253, 126, 20, 0.4);
+        }
+
+        .launch-button:active {
+            transform: scale(0.97);
+        }
+
+        .launch-button .btn-icon {
+            font-size: 1.1rem;
+        }
+
+        .welcome-footer {
+            margin-top: 0.875rem;
+            font-size: clamp(0.7rem, 1.8vw, 0.78rem);
+            color: #adb5bd;
+        }
+
+        .welcome-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Responsive adjustments for welcome card */
+        @media (max-width: 480px) {
+            .welcome-card {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .bodmas-letter {
+                padding: 0.35rem 0.45rem;
+                min-width: 40px;
+            }
+
+            .welcome-features {
+                gap: 0.875rem;
+            }
+
+            .welcome-subtitle {
+                margin-bottom: 0.75rem;
+            }
+        }
+
+        /* ================= Modal Overlay ================= */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -73,8 +266,7 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease;
-            padding: 3vh 1rem; 
-            box-sizing: border-box;
+            padding: env(safe-area-inset-top, 16px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 16px) env(safe-area-inset-left, 16px);
         }
 
         .modal-overlay.show {
@@ -82,14 +274,16 @@
             opacity: 1;
         }
 
+        /* ================= Modal ================= */
         .modal {
-            background: var(--card);
+            background: var(--bg);
             border-radius: var(--radius);
-            padding: 1rem;
+            padding: 1.25rem;
             max-width: 580px;
             width: 100%;
             box-shadow: var(--shadow-elegant);
-            max-height: 94vh;
+            max-height: calc(100vh - 32px);
+            max-height: calc(100dvh - 32px);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -99,211 +293,857 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.75rem;
             flex-shrink: 0;
+            gap: 0.5rem;
         }
 
-        .modal-header h2 { margin: 0; color: var(--header-bg); font-size: 1.25rem; }
+        .modal-header h2 { 
+            margin: 0; 
+            color: var(--header-bg); 
+            font-size: clamp(1.1rem, 4vw, 1.25rem);
+            font-weight: 700;
+        }
         
         .close-btn {
-            background: none; border: none; color: var(--muted-foreground);
-            font-size: 1.75rem; cursor: pointer; line-height: 1;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
             transition: color 0.2s ease, transform 0.2s ease;
-            padding: 0.25rem 0.5rem;
+            min-width: var(--touch-min);
+            min-height: var(--touch-min);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
         }
-        .close-btn:hover { color: var(--primary); transform: scale(1.1); }
         
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
+            margin-left: auto;
         }
-        .audio-toggle-btn {
-            background: none; border: none; font-size: 1.2rem; cursor: pointer;
-            color: var(--muted-foreground); transition: color 0.2s ease;
+
+        .audio-toggle-btn,
+        .hear-again-btn {
+            background: var(--muted);
+            border: 1px solid var(--border);
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+            min-width: var(--touch-min);
+            min-height: var(--touch-min);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
         }
-        .audio-toggle-btn.active { color: var(--accent); }
+
+        .audio-toggle-btn.active { 
+            color: var(--accent);
+            background: var(--bd-cream);
+            border-color: var(--accent);
+        }
+
+        /* ================= Audio Toast Notification ================= */
+        /* Toast is positioned in the overlay, outside the modal */
+        .audio-toast {
+            position: fixed;
+            z-index: 1100;
+            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: min(90vw, 320px);
+            width: max-content;
+            pointer-events: none;
+            transform: translateY(10px);
+        }
+
+        .audio-toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Arrow pointing down to the audio button */
+        .audio-toast::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: var(--arrow-right, 25px);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--header-bg);
+        }
+
+        .audio-toast-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .audio-toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .audio-toast-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 0.15rem;
+            color: var(--accent);
+        }
+
+        .audio-toast-text {
+            font-size: 0.78rem;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .audio-toast-dismiss {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s ease;
+            line-height: 1;
+        }
+
+        .audio-toast-dismiss:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Toast positioning adjustments for mobile */
+        @media (max-width: 600px) {
+            .audio-toast {
+                padding: 0.6rem 0.8rem;
+                max-width: min(85vw, 280px);
+            }
+
+            .audio-toast::after {
+                right: 15px;
+            }
+
+            .audio-toast-icon {
+                font-size: 1.2rem;
+            }
+
+            .audio-toast-title {
+                font-size: 0.8rem;
+            }
+
+            .audio-toast-text {
+                font-size: 0.72rem;
+            }
+        }
+
+        .modal-header {
+            position: relative;
+        }
+
+        .header-controls {
+            position: relative;
+        }
 
         .modal-body {
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
             flex-grow: 1;
-            min-height: 0; /* allow flex child to scroll inside modal */
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
-        /* Visible, subtle scrollbars where content overflows */
-        .modal-body::-webkit-scrollbar { width: 10px; }
-        .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; }
-        .modal-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); border-radius: 8px; }
-        .modal-body { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) rgba(0,0,0,0.06); }
 
+        /* Scrollbar styling */
+        .modal-body::-webkit-scrollbar { width: 8px; }
+        .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .modal-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 8px; }
+        .modal-body { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.2) rgba(0,0,0,0.05); }
+
+        /* ================= Action Button ================= */
         .action-button {
-            width: 100%; padding: 0.75rem; font-size: 1rem;
-            background-color: var(--primary); margin-top: 1rem;
-            border: none; color: white; border-radius: var(--radius); cursor: pointer;
-            transition: background-color 0.2s ease;
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            margin-top: 1rem;
+            border: none;
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: var(--touch-min);
         }
-        .action-button:hover { background-color: #e65c2e; }
 
+        .action-button:hover {
+            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+        }
+
+        .action-button:active {
+            transform: scale(0.98);
+        }
+
+        /* ================= Intro Screen ================= */
         .intro-text p {
-             line-height: 1.5;
-            font-size: 0.9rem;
+            line-height: 1.7;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             margin-bottom: 0.75rem;
         }
 
         .bodmas-explanation {
-            background-color: var(--accent-light);
-            border-left: 4px solid var(--primary);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin: 0.75rem 0;
+            background: linear-gradient(135deg, var(--bd-cream), #fff);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         }
-        .bodmas-explanation strong { color: var(--header-bg); }
 
-        /* RE-IMAGINED LEARN COMPONENT STYLES */
+        .bodmas-explanation strong { 
+            color: var(--accent-2);
+            font-weight: 700;
+        }
+
+        /* ================= Learn Component ================= */
         .learn-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.75rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
+
         .equation-counter {
-            font-size: 0.85rem; font-weight: 600; color: var(--muted-foreground);
-            background-color: #f0f0f0; padding: 0.3rem 0.7rem; border-radius: 99px;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-weight: 600;
+            color: var(--text);
+            background-color: var(--muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border);
         }
+
         .nav-btn {
-            background-color: var(--primary); color: var(--primary-foreground); border: none;
-            padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;
-            font-size: 0.85rem; font-weight: 500; transition: background-color 0.2s ease;
+            background: var(--accent);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-weight: 600;
+            transition: all 0.2s ease;
+            min-height: var(--touch-min);
+            min-width: 80px;
         }
-        .nav-btn:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+
+        .nav-btn:hover {
+            background: var(--accent-2);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.96);
+        }
+
+        .nav-btn:disabled { 
+            background: #ced4da;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
 
         .equation-display {
-            background-color: var(--header-bg); color: var(--header-text);
-            padding: 1rem; text-align: center; font-size: 1.75rem;
-            font-family: 'Courier New', monospace; border-radius: var(--radius);
-            margin-bottom: 1rem; font-weight: bold;
+            background: var(--header-bg);
+            color: var(--header-fg);
+            padding: clamp(0.75rem, 3vw, 1rem);
+            text-align: center;
+            font-size: clamp(1.25rem, 5vw, 1.75rem);
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-weight: bold;
             transition: all 0.4s ease-in-out;
         }
         
         .thought-process {
-            background-color: var(--accent-light);
-            border-left: 4px solid var(--accent);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
+            background: linear-gradient(135deg, var(--bd-cream), #fff);
+            border-left: 4px solid var(--bd-blue);
+            padding: 0.875rem;
+            border-radius: var(--radius-sm);
             margin-bottom: 1rem;
             min-height: 80px;
         }
+
         .thought-process h3 {
             margin: 0 0 0.5rem 0;
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             color: var(--header-bg);
+            font-weight: 700;
         }
+
         .thought-process p {
-            margin: 0 0 0.25rem 0;
-            font-size: 0.9rem;
-            line-height: 1.5;
+            margin: 0 0 0.35rem 0;
+            font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+            line-height: 1.6;
             opacity: 0;
             transform: translateY(10px);
             animation: fadeInUp 0.5s ease forwards;
         }
         
+        /* ================= Solution Area ================= */
         .solution-area {
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg);
         }
+
         .solution-tabs {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 0.75rem;
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.75rem;
+            flex-wrap: wrap;
         }
+
         .tab-btn {
             flex: 1;
-            padding: 0.5rem; font-size: 0.85rem; font-weight: 600;
-            background-color: transparent; border: 2px solid var(--border);
-            color: var(--muted-foreground); border-radius: 0.5rem; cursor: pointer;
+            min-width: 120px;
+            padding: 0.6rem 0.5rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-weight: 600;
+            background-color: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
             transition: all 0.2s ease;
+            min-height: var(--touch-min);
         }
+
+        .tab-btn:active {
+            transform: scale(0.97);
+        }
+
         .tab-btn.active {
             color: var(--accent);
             border-color: var(--accent);
-            background-color: var(--accent-light);
+            background-color: var(--bd-cream);
         }
         
         .solution-step {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.75rem;
             margin-bottom: 0.5rem;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            background-color: #f9fafb;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            padding: 0.6rem;
+            border-radius: var(--radius-sm);
+            background-color: var(--muted);
             opacity: 0;
             animation: fadeInUp 0.5s ease forwards;
         }
+
         .solution-step .step-icon {
-            width: 1.5rem; height: 1.5rem; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem; color: white; flex-shrink: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
-        .solution-step .step-icon.correct { background-color: var(--correct); }
-        .solution-step .step-icon.incorrect { background-color: var(--incorrect); }
+
+        .solution-step .step-icon.correct { background-color: var(--ok); }
+        .solution-step .step-icon.incorrect { background-color: var(--bad); }
+
         .solution-step .step-explanation {
-            font-size: 0.8rem;
-            font-family: sans-serif;
+            font-size: clamp(0.75rem, 2vw, 0.8rem);
+            font-family: 'Inter', sans-serif;
             font-style: italic;
-            color: var(--muted-foreground);
+            color: #6c757d;
+            margin-top: 0.25rem;
         }
+
         .final-answer {
             text-align: center;
-            font-size: 1.25rem;
+            font-size: clamp(1rem, 3vw, 1.25rem);
             font-weight: bold;
             margin-top: 0.75rem;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            padding: 0.6rem;
+            border-radius: var(--radius-sm);
         }
-        .final-answer.correct { color: var(--correct); background-color: var(--correct-light); }
-        .final-answer.incorrect { color: var(--incorrect); background-color: var(--incorrect-light); }
 
-        /* Quiz Styles */
-        #quizProgressContainer { width: 100%; background-color: var(--border); border-radius: 99px; height: 8px; margin: 0.5rem 0 1rem 0; }
-        #quizProgressBar { height: 100%; width: 0%; background-color: var(--primary); border-radius: 99px; transition: width 0.3s ease-in-out; }
-        #quizQuestionText { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; text-align: center; font-family: 'Courier New', monospace; }
-        #quizOptionsContainer { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
-        .quiz-option { padding: 0.75rem; border: 2px solid var(--border); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; text-align: center; font-size: 1.1rem; font-weight: 500; }
-        .quiz-option:hover { border-color: var(--primary); background-color: var(--accent-light); }
-        .quiz-option.correct { border-color: var(--correct); background-color: var(--correct-light); color: var(--correct); font-weight: 700; }
-        .quiz-option.incorrect { border-color: var(--incorrect); background-color: var(--incorrect-light); color: var(--incorrect); }
-        .quiz-option.disabled { pointer-events: none; opacity: 0.8; }
-        #quizExplanationBox { margin-top: 1rem; padding: 1rem; border-radius: var(--radius); font-size: 0.9rem; line-height: 1.5; border-left: 4px solid; display: none; animation: fadeInUp 0.5s; }
-        #quizExplanationBox.correct { background-color: var(--correct-light); border-color: var(--correct); }
-        #quizExplanationBox.incorrect { background-color: var(--incorrect-light); border-color: var(--incorrect); }
-        #quizExplanationBox strong { font-weight: 700; display: block; margin-bottom: 0.5rem; font-size: 1rem; }
+        .final-answer.correct { 
+            color: var(--ok);
+            background-color: var(--ok-soft);
+        }
+
+        .final-answer.incorrect { 
+            color: var(--bad);
+            background-color: var(--bad-soft);
+        }
+
+        /* ================= Quiz Styles ================= */
+        #quizProgressContainer { 
+            width: 100%;
+            background-color: var(--border);
+            border-radius: var(--radius-pill);
+            height: 8px;
+            margin: 0.5rem 0 0.75rem 0;
+            overflow: hidden;
+        }
+
+        #quizProgressBar { 
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: var(--radius-pill);
+            transition: width 0.3s ease-in-out;
+        }
+
+        #quizProgressText {
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+
+        #quizQuestionText { 
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 0.5rem;
+            background: var(--muted);
+            border-radius: var(--radius-sm);
+        }
+
+        #quizOptionsContainer { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-option { 
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: clamp(1rem, 3vw, 1.15rem);
+            font-weight: 600;
+            min-height: var(--touch-min);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+        }
+
+        .quiz-option:active {
+            transform: scale(0.97);
+        }
+
+        .quiz-option.correct { 
+            border-color: var(--ok);
+            background-color: var(--ok-soft);
+            color: var(--ok);
+            font-weight: 700;
+        }
+
+        .quiz-option.incorrect { 
+            border-color: var(--bad);
+            background-color: var(--bad-soft);
+            color: var(--bad);
+        }
+
+        .quiz-option.disabled { 
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        #quizExplanationBox { 
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            line-height: 1.6;
+            border-left: 4px solid;
+            display: none;
+            animation: fadeInUp 0.5s;
+        }
+
+        #quizExplanationBox.correct { 
+            background-color: var(--ok-soft);
+            border-color: var(--ok);
+        }
+
+        #quizExplanationBox.incorrect { 
+            background-color: var(--bad-soft);
+            border-color: var(--bad);
+        }
+
+        #quizExplanationBox strong { 
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
         
-        #quizResultsScreen h3 { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; text-align: center; }
-        #quizScoreText { font-size: 1.1rem; text-align: center; margin-bottom: 1.5rem; }
-        #quizSummaryContainer { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem; }
-        #quizSummaryContainer::-webkit-scrollbar { width: 8px; }
-        #quizSummaryContainer::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; }
-        #quizSummaryContainer::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); border-radius: 8px; }
-        #quizSummaryContainer { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) rgba(0,0,0,0.06); }
-        .summary-item { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+        /* ================= Quiz Results ================= */
+        #quizResultsScreen h3 { 
+            font-size: clamp(1.25rem, 4vw, 1.5rem);
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        #quizScoreText { 
+            font-size: clamp(1rem, 3vw, 1.15rem);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        #quizSummaryContainer { 
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #quizSummaryContainer::-webkit-scrollbar { width: 6px; }
+        #quizSummaryContainer::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 6px; }
+        #quizSummaryContainer::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 6px; }
+        #quizSummaryContainer { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.2) rgba(0,0,0,0.05); }
+
+        .summary-item { 
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
         .summary-item:last-child { border-bottom: none; }
-        .summary-question { font-weight: 600; font-family: 'Courier New', monospace; }
-        .summary-answer { margin-top: 0.5rem; }
-        .summary-answer.correct { color: var(--correct); }
-        .summary-answer.incorrect { color: var(--incorrect); }
-        .summary-answer span { font-weight: 500; }
+
+        .summary-question { 
+            font-weight: 600;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .summary-answer { 
+            margin-top: 0.5rem;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        }
+
+        .summary-answer.correct { color: var(--ok); }
+        .summary-answer.incorrect { color: var(--bad); }
+        .summary-answer span { font-weight: 600; }
+
+        /* ================= Hover States (Desktop Only) ================= */
+        @media (hover: hover) and (pointer: fine) {
+            .close-btn:hover { 
+                color: var(--accent);
+                background: var(--muted);
+            }
+
+            .audio-toggle-btn:hover,
+            .hear-again-btn:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .tab-btn:hover:not(.active) { 
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .quiz-option:hover:not(.correct):not(.incorrect):not(.disabled) { 
+                border-color: var(--accent);
+                background-color: var(--bd-cream);
+            }
+        }
+
+        /* ================= Responsive: Tablet (768px) ================= */
+        @media (max-width: 768px) {
+            .modal {
+                padding: 1rem;
+                max-height: calc(100vh - 24px);
+                max-height: calc(100dvh - 24px);
+            }
+
+            .modal-header {
+                padding-bottom: 0.625rem;
+                margin-bottom: 0.625rem;
+            }
+
+            .thought-process {
+                min-height: 70px;
+            }
+        }
+
+        /* ================= Responsive: Mobile (600px) ================= */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .modal {
+                padding: 0.875rem;
+                border-radius: var(--radius-sm);
+            }
+
+            .equation-display {
+                padding: 0.75rem;
+            }
+
+            .solution-tabs {
+                gap: 0.4rem;
+            }
+
+            .tab-btn {
+                min-width: 100px;
+                padding: 0.5rem 0.4rem;
+            }
+
+            .thought-process,
+            .bodmas-explanation {
+                padding: 0.75rem;
+            }
+
+            #quizSummaryContainer {
+                max-height: 220px;
+            }
+        }
+
+        /* ================= Responsive: Small Mobile (480px) ================= */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            }
+
+            .modal {
+                padding: 0.75rem;
+                max-height: calc(100vh - 16px);
+                max-height: calc(100dvh - 16px);
+            }
+
+            .modal-header h2 {
+                font-size: 1rem;
+            }
+
+            .header-controls {
+                gap: 0.15rem;
+            }
+
+            .audio-toggle-btn,
+            .hear-again-btn,
+            .close-btn {
+                min-width: 40px;
+                min-height: 40px;
+                font-size: 1rem;
+            }
+
+            /* Quiz options: single column on very small screens */
+            #quizOptionsContainer { 
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .quiz-option {
+                padding: 0.75rem;
+            }
+
+            .nav-btn {
+                min-width: 70px;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .equation-counter {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+
+            .learn-nav {
+                justify-content: center;
+            }
+
+            #quizSummaryContainer {
+                max-height: 180px;
+            }
+        }
+
+        /* ================= Responsive: Extra Small (360px) ================= */
+        @media (max-width: 360px) {
+            .modal {
+                padding: 0.625rem;
+            }
+
+            .solution-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .equation-display {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ================= Landscape Orientation ================= */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal {
+                max-height: 100vh;
+                max-height: 100dvh;
+            }
+
+            .modal-body {
+                max-height: 55vh;
+            }
+
+            .thought-process {
+                min-height: 50px;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .bodmas-explanation {
+                padding: 0.5rem 0.75rem;
+                margin: 0.5rem 0;
+            }
+
+            .equation-display {
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .action-button {
+                margin-top: 0.5rem;
+                padding: 0.625rem;
+            }
+
+            #quizSummaryContainer {
+                max-height: 120px;
+            }
+        }
+
+        /* ================= Print Styles ================= */
+        @media print {
+            .modal-overlay {
+                position: static;
+                background: none;
+            }
+
+            .modal {
+                max-height: none;
+                box-shadow: none;
+            }
+
+            .close-btn,
+            .audio-toggle-btn,
+            .hear-again-btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <button class="launch-button" id="launchModalBtn">Learn BODMAS</button>
+    <div class="welcome-card">
+        <span class="welcome-icon">🧮</span>
+        <h1 class="welcome-title">Master the Order of Operations</h1>
+        <p class="welcome-subtitle">Learn BODMAS the fun way — with guided examples and interactive quizzes!</p>
+        
+        <div class="bodmas-visual">
+            <div class="bodmas-letter">
+                <span class="letter">B</span>
+                <span class="meaning">Brackets</span>
+            </div>
+            <div class="bodmas-letter">
+                <span class="letter">O</span>
+                <span class="meaning">Orders</span>
+            </div>
+            <div class="bodmas-letter">
+                <span class="letter">D</span>
+                <span class="meaning">Division</span>
+            </div>
+            <div class="bodmas-letter">
+                <span class="letter">M</span>
+                <span class="meaning">Multiply</span>
+            </div>
+            <div class="bodmas-letter">
+                <span class="letter">A</span>
+                <span class="meaning">Addition</span>
+            </div>
+            <div class="bodmas-letter">
+                <span class="letter">S</span>
+                <span class="meaning">Subtract</span>
+            </div>
+        </div>
+
+        <div class="welcome-features">
+            <div class="feature-item">
+                <span class="feature-icon">📖</span>
+                <span><strong>10</strong> Guided Examples</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✏️</span>
+                <span><strong>25</strong> Quiz Questions</span>
+            </div>
+        </div>
+
+        <button class="launch-button" id="launchModalBtn">
+            <span class="btn-icon">🚀</span>
+            Start Learning
+        </button>
+
+        <p class="welcome-footer">Perfect for students learning math fundamentals</p>
+    </div>
 
     <div class="modal-overlay" id="learnModalOverlay">
         <div class="modal" id="learnModal">
@@ -342,17 +1182,116 @@
             return solutionsMap[expression] || [];
         }
 
+        // --- CONVERSATIONAL NARRATION DATA (Teacher-style, kid-friendly) ---
+        // Target: Ages 6-10 for easy, 9-13 for harder problems
+        // Speech rate will be 0.7 (~80 words per minute)
+        
         const narrationData = {
-            "7 + 3 * 5": { thoughtProcess: ["Okay, let's look at our first problem.", "We have an addition and a multiplication.", "BODMAS tells us Multiplication is stronger, so we must solve three times five first.", "Then, we'll add. That's our plan."], "Correct Way": "Perfect, this follows our plan exactly.", "Common Mistake": "Ah, a common trap. Addition was done first here, which breaks our plan." },
-            "12 - 6 / 2": { thoughtProcess: ["Here we see subtraction and division.", "Division is the stronger operation.", "So our plan is to handle six divided by two first."], "Correct Way": "Excellent. We followed the plan.", "Common Mistake": "This is a common mistake. We have to respect the power of the division operator first." },
-            "5 * (4 + 2)": { thoughtProcess: ["This one has brackets! That's a big clue.", "The 'B' in BODMAS is the most important rule.", "So, our plan is to solve four plus two, and then multiply."], "Correct Way": "Perfect! We handled the brackets first.", "Common Mistake": "Here, the brackets were ignored completely. This shows why you must always look for brackets first." },
-            "16 / 4 * 2": { thoughtProcess: ["Here we have division and multiplication.", "They are partners with equal priority.", "So the rule is to solve from left to right. First, sixteen divided by four."], "Correct Way": "Great, we followed the left-to-right rule for partners.", "Common Mistake": "This is a tricky one. It's easy to think multiplication comes first, but for partners, the order they appear in is what matters." },
-            "20 - 5 + 3": { thoughtProcess: ["We have subtraction and addition.", "They are also partners.", "So we solve from left to right. First, twenty minus five."], "Correct Way": "Exactly right. Solving left to right gives the correct answer.", "Common Mistake": "Here, addition was done first. This breaks the left-to-right rule for partners and gives the wrong result." },
-            "3 + 2 * (6 - 1)": { thoughtProcess: ["This problem has three operations!", "First, we must solve the brackets: six minus one.", "Next, we look for multiplication or division. We have two times the result.", "Finally, we'll do the addition."], "Correct Way": "Excellent, we followed the order perfectly: Brackets, then Multiplication, then Addition.", "Common Mistake": "This is a major error. The addition was done before the brackets, which is a big no-no." },
-            "10 / 2 + 3 * 4": { thoughtProcess: ["We have division, addition, and multiplication.", "We must do division and multiplication before addition.", "So, we can solve ten divided by two, and three times four, in any order.", "Finally, we add their results together."], "Correct Way": "Perfect. We cleared all the strong operations first before adding.", "Common Mistake": "Here, the addition was done right in the middle, breaking up the stronger operations." },
-            "8 * 3 - 10 / 5": { thoughtProcess: ["Multiplication, subtraction, and division.", "Again, we must do multiplication and division before subtraction.", "So, let's solve eight times three, and ten divided by five.", "Finally, we subtract the second result from the first."], "Correct Way": "Great job. We handled the multiplication and division first.", "Common Mistake": "This is incorrect because the subtraction was done before all the multiplication and division were finished." },
-            "5 + (12 - 2 * 3)": { thoughtProcess: ["This one is tricky! We have brackets, with two operations inside.", "We must apply BODMAS inside the brackets too!", "So, inside the bracket, we do multiplication first: two times three.", "Then we finish the bracket by subtracting. Finally, we do the addition outside."], "Correct Way": "Fantastic! You remembered to use BODMAS even inside the brackets.", "Common Mistake": "This is a common error. The subtraction inside the bracket was done first, but the multiplication inside was stronger." },
-            "3 * 3 + 3 / 3": { thoughtProcess: ["Multiplication, addition, and division.", "We need to solve multiplication and division before we add.", "So, we'll solve three times three, and three divided by three.", "Finally, we add the two results."], "Correct Way": "Perfect. We solved the multiplication and division before adding.", "Common Mistake": "This is wrong because the addition was done before the division was handled." }
+            "7 + 3 * 5": { 
+                intro: "Alright friends, here's our first puzzle! We have seven... plus three... times five. Let's figure this out together!",
+                thoughtProcess: [
+                    "Hmm, I see two things happening here... adding and multiplying.",
+                    "Now, remember BODMAS? Multiplication is stronger than addition!",
+                    "So our plan is... first, we do three times five. Then we add seven to that answer."
+                ], 
+                "Correct Way": "Wonderful! You got it! Three times five is fifteen... then seven plus fifteen gives us twenty-two. Great job!", 
+                "Common Mistake": "Oops! This is a sneaky trap. Here, someone added first... seven plus three is ten, then times five is fifty. But that's not right because we forgot... multiplication comes first!"
+            },
+            "12 - 6 / 2": { 
+                intro: "Okay, here's an interesting one! Twelve... minus six... divided by two. Let's think about this carefully.",
+                thoughtProcess: [
+                    "I see subtraction and division in this problem.",
+                    "Now, which one is stronger? That's right... division!",
+                    "So our plan is... first, divide six by two. Then subtract from twelve."
+                ], 
+                "Correct Way": "Excellent work! Six divided by two is three... then twelve minus three equals nine. You're getting really good at this!", 
+                "Common Mistake": "Uh oh! This is a common mix-up. Someone did twelve minus six first, getting six... then divided by two to get three. But wait... we should do division first, not subtraction!"
+            },
+            "5 * (4 + 2)": { 
+                intro: "Ooh, look at this one! Five times... and there are brackets! What's inside? Four plus two. Interesting!",
+                thoughtProcess: [
+                    "Wait, I see brackets! That's like a special signal.",
+                    "The B in BODMAS tells us... brackets always come first!",
+                    "So our plan is... first solve what's inside the brackets, then multiply by five."
+                ], 
+                "Correct Way": "Perfect! Four plus two in the brackets equals six... then five times six is thirty. You remembered the brackets rule!", 
+                "Common Mistake": "Oh no! Someone forgot about the brackets completely. They did five times four first, then added two. But the brackets are like a shield... we must solve inside them first!"
+            },
+            "16 / 4 * 2": { 
+                intro: "Here's a tricky one! Sixteen... divided by four... times two. Two operations that are equally strong!",
+                thoughtProcess: [
+                    "Division and multiplication are both here. They're like partners!",
+                    "When partners appear together, we have a special rule...",
+                    "We go from left to right, just like reading a book! So sixteen divided by four comes first."
+                ], 
+                "Correct Way": "Brilliant! Sixteen divided by four is four... then four times two is eight. You followed the left-to-right rule perfectly!", 
+                "Common Mistake": "This is a common trick! Someone did multiplication first, thinking it's always stronger. But remember... when D and M are together, we just go left to right!"
+            },
+            "20 - 5 + 3": { 
+                intro: "Let's look at this one! Twenty... minus five... plus three. Simple operations, but be careful!",
+                thoughtProcess: [
+                    "Subtraction and addition... these two are also partners!",
+                    "Just like division and multiplication, they have equal power.",
+                    "So what do we do? Left to right! Twenty minus five first."
+                ], 
+                "Correct Way": "You got it! Twenty minus five is fifteen... then fifteen plus three is eighteen. The left-to-right rule saves the day!", 
+                "Common Mistake": "Careful! Someone added five plus three first, getting eight... then twenty minus eight is twelve. But that's not following our left-to-right rule for partners!"
+            },
+            "3 + 2 * (6 - 1)": { 
+                intro: "Wow, this one has it all! Three... plus two times... and brackets with six minus one inside!",
+                thoughtProcess: [
+                    "Three operations! Let's take it step by step.",
+                    "First, the brackets... six minus one.",
+                    "Next, the multiplication... two times that answer.",
+                    "Finally, we add the three. One step at a time!"
+                ], 
+                "Correct Way": "Amazing work! Brackets first: six minus one is five. Then two times five is ten. Finally, three plus ten is thirteen. You're a BODMAS star!", 
+                "Common Mistake": "Oh dear! Someone added first, doing three plus two. But remember... brackets and multiplication are stronger than addition!"
+            },
+            "10 / 2 + 3 * 4": { 
+                intro: "Here's a busy one! Ten divided by two... plus three times four. Multiple strong operations!",
+                thoughtProcess: [
+                    "I see division, addition, and multiplication.",
+                    "Division and multiplication are both strong... they come before addition.",
+                    "Let's do ten divided by two first... then three times four...",
+                    "Finally, we add those two answers together!"
+                ], 
+                "Correct Way": "Fantastic! Ten divided by two is five... three times four is twelve... five plus twelve is seventeen. You handled all those operations beautifully!", 
+                "Common Mistake": "Oops! Someone got confused and added in the middle. But remember... do all the strong operations first, then add at the end!"
+            },
+            "8 * 3 - 10 / 5": { 
+                intro: "Let's tackle this one! Eight times three... minus ten divided by five. Strong operations everywhere!",
+                thoughtProcess: [
+                    "Multiplication, subtraction, and division... quite a mix!",
+                    "Multiplication and division are the strong ones here.",
+                    "So first, eight times three... then ten divided by five...",
+                    "At the end, we subtract the second from the first!"
+                ], 
+                "Correct Way": "Excellent! Eight times three is twenty-four... ten divided by five is two... twenty-four minus two is twenty-two. You're getting so good at this!", 
+                "Common Mistake": "Watch out! Someone tried to subtract before finishing the other operations. Always do multiplication and division first!"
+            },
+            "5 + (12 - 2 * 3)": { 
+                intro: "This is a clever puzzle! Five plus... brackets with something interesting inside... twelve minus two times three!",
+                thoughtProcess: [
+                    "Brackets first, as always! But wait... there's more inside.",
+                    "Inside the brackets, we have subtraction AND multiplication!",
+                    "Even inside brackets, BODMAS rules apply! Two times three first.",
+                    "Then finish the bracket, and finally add the five."
+                ], 
+                "Correct Way": "Wonderful thinking! Inside brackets: two times three is six... twelve minus six is six. Then five plus six is eleven. You used BODMAS inside the brackets too!", 
+                "Common Mistake": "Tricky! Someone did twelve minus two first inside the brackets. But even inside brackets, multiplication is stronger than subtraction!"
+            },
+            "3 * 3 + 3 / 3": { 
+                intro: "A playful one! Three times three... plus three divided by three. The number three everywhere!",
+                thoughtProcess: [
+                    "Multiplication, addition, and division with threes!",
+                    "Multiplication and division come before addition.",
+                    "First, three times three... then three divided by three...",
+                    "Finally, add those two results!"
+                ], 
+                "Correct Way": "Perfect! Three times three is nine... three divided by three is one... nine plus one is ten. Even with the same number everywhere, you kept the rules straight!", 
+                "Common Mistake": "Careful! Someone added before dividing. Remember... the strong operations come first, then we add!"
+            }
         };
         
         const quizData = [
@@ -395,13 +1334,66 @@
             <div class="modal-header">
                 <h2>${titleKey}</h2>
                 <div class="header-controls">
-                    <button class="hear-again-btn" title="Hear again">🔁</button>
-                    <button class="audio-toggle-btn">🔇</button>
+                    <button class="hear-again-btn" title="Hear again" aria-label="Hear explanation again">🔁</button>
+                    <button class="audio-toggle-btn" aria-label="Toggle audio narration">🔇</button>
                 </div>
-                <button class="close-btn">&times;</button>
+                <button class="close-btn" aria-label="Close modal">&times;</button>
             </div>`;
 
-        const introScreenHTML = `
+        // Audio toast is created dynamically and positioned outside the modal
+        function createAudioToast() {
+            // Remove existing toast if any
+            const existingToast = document.getElementById('audioToast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'audio-toast';
+            toast.id = 'audioToast';
+            toast.innerHTML = `
+                <span class="audio-toast-icon">🔊</span>
+                <div class="audio-toast-content">
+                    <div class="audio-toast-title">Enhance Your Experience</div>
+                    <div class="audio-toast-text">Turn on audio for guided voice explanations!</div>
+                </div>
+                <button class="audio-toast-dismiss" aria-label="Dismiss" onclick="dismissAudioToast()">✕</button>
+            `;
+            // Append to overlay (outside modal) so it doesn't get clipped
+            learnModalOverlay.appendChild(toast);
+            return toast;
+        }
+        
+        function positionAudioToast() {
+            const toast = document.getElementById('audioToast');
+            const audioBtn = modal.querySelector('.audio-toggle-btn');
+            if (!toast || !audioBtn) return;
+            
+            const btnRect = audioBtn.getBoundingClientRect();
+            const toastWidth = toast.offsetWidth;
+            const toastHeight = toast.offsetHeight;
+            
+            // Position toast above the audio button, arrow pointing to button center
+            const topPosition = btnRect.top - toastHeight - 14;
+            
+            // Calculate position so arrow points to button center
+            const btnCenterX = btnRect.left + (btnRect.width / 2);
+            const arrowOffset = 30; // Distance from right edge of toast to arrow center
+            const rightPosition = window.innerWidth - btnCenterX - arrowOffset;
+            
+            // Ensure toast doesn't go off screen
+            const maxRight = window.innerWidth - toastWidth - 10;
+            const finalRight = Math.min(Math.max(10, rightPosition), maxRight);
+            
+            toast.style.top = Math.max(10, topPosition) + 'px';
+            toast.style.right = finalRight + 'px';
+            toast.style.left = 'auto';
+            
+            // Calculate arrow position to point at button center
+            const toastRight = window.innerWidth - finalRight - toastWidth;
+            const arrowRight = btnCenterX - toastRight - 10;
+            toast.style.setProperty('--arrow-right', Math.max(15, Math.min(arrowRight, toastWidth - 25)) + 'px');
+        }
+
+        const getIntroScreenHTML = () => `
             ${getHeaderHTML('Guided Practice')}
             <div class="modal-body intro-text">
                 <p>Welcome! This module will help you master the Order of Operations, known as BODMAS.</p>
@@ -457,27 +1449,81 @@
             </div>`;
 
         // --- CORE APP LOGIC ---
+        let audioToastTimeout = null;
+        
         function showScreen(screenHTML) {
             modal.innerHTML = screenHTML;
             attachCommonListeners();
         }
 
+        let audioToastShowTimeout = null;
+        
+        function showAudioToast() {
+            if (isAudioEnabled) return; // Don't show if audio already enabled
+            
+            // Clear any existing timeouts
+            if (audioToastShowTimeout) clearTimeout(audioToastShowTimeout);
+            if (audioToastTimeout) clearTimeout(audioToastTimeout);
+            
+            // Show toast after 5 seconds
+            audioToastShowTimeout = setTimeout(() => {
+                if (isAudioEnabled) return; // Check again in case audio was enabled
+                
+                const toast = createAudioToast();
+                
+                // Position and show after a brief moment for DOM to settle
+                requestAnimationFrame(() => {
+                    positionAudioToast();
+                    toast.classList.add('show');
+                });
+                
+                // Auto-dismiss after 8 seconds of being visible
+                audioToastTimeout = setTimeout(() => {
+                    dismissAudioToast();
+                }, 8000);
+            }, 5000);
+        }
+
+        function dismissAudioToast() {
+            const toast = document.getElementById('audioToast');
+            if (toast) {
+                toast.classList.remove('show');
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    toast.remove();
+                }, 400);
+            }
+            if (audioToastTimeout) {
+                clearTimeout(audioToastTimeout);
+                audioToastTimeout = null;
+            }
+            if (audioToastShowTimeout) {
+                clearTimeout(audioToastShowTimeout);
+                audioToastShowTimeout = null;
+            }
+        }
+        // Make dismissAudioToast available globally for onclick
+        window.dismissAudioToast = dismissAudioToast;
+
         function openModal() {
             // Enter cleanly: stop any ongoing speech
             stopSpeech(true);
             learnModalOverlay.classList.add('show');
-            showScreen(introScreenHTML);
-            // Intro narration
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+            showScreen(getIntroScreenHTML());
+            
+            // Show audio toast if audio is not enabled
+            showAudioToast();
+            
+            // Conversational intro narration
             if (isAudioEnabled) {
-                // Force resume in case engine is paused by prior page interaction
                 try { if (window.speechSynthesis?.resume) window.speechSynthesis.resume(); } catch {}
-                queueSpeech('Welcome! This module will help you master the Order of Operations, known as BODMAS.');
-                queueSpeech('B stands for Brackets, O for Orders, D for Division, M for Multiplication, A for Addition, and S for Subtraction.');
-                queueSpeech('We will start with ten guided examples, then a quiz.');
+                introNarration.forEach(line => queueSpeech(line));
                 playNextInQueue();
             }
             document.getElementById('startPracticeBtn').addEventListener('click', () => {
                 stopSpeech(true);
+                dismissAudioToast();
                 showScreen(learnScreenHTML);
                 currentEquationIndex = 0;
                 renderLearnComponent();
@@ -486,7 +1532,9 @@
 
         function closeModal() {
             window.speechSynthesis.cancel();
+            dismissAudioToast(); // Remove toast when closing
             learnModalOverlay.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scroll
         }
         
         function attachCommonListeners() {
@@ -502,25 +1550,53 @@
                 hearBtn.addEventListener('click', (e) => {
                     e.preventDefault(); e.stopPropagation();
                     if (!isAudioEnabled) return;
-                    // Replay the current context
+                    
+                    stopSpeech(true);
+                    
+                    // Replay based on current screen
                     const equationEl = modal.querySelector('#equationDisplay');
                     const equation = equationEl ? equationEl.textContent.replace(' = ?', '') : '';
+                    
                     if (equation) {
-                        stopSpeech(true);
-                        queueSpeech(`This BODMAS learning is for the equation ${equation}. Select one of the two buttons: Correct Way or Common Mistake.`);
-                        playNextInQueue();
+                        // On learn screen - replay the equation intro
+                        const narration = narrationData[equation];
+                        if (narration?.intro) {
+                            queueSpeech(narration.intro);
+                        }
+                        queueSpeech("Choose 'Correct Way' or 'Common Mistake' to explore!");
                     } else if (modal.querySelector('.intro-text')) {
-                        stopSpeech(true);
-                        queueSpeech('Welcome! This module will help you master BODMAS. We will start with ten guided examples, then a quiz.');
-                        playNextInQueue();
+                        // On intro screen - replay conversational intro
+                        introNarration.slice(0, 4).forEach(line => queueSpeech(line));
+                    } else if (modal.querySelector('#quizQuestionText')) {
+                        // On quiz screen - replay current question
+                        const questionText = modal.querySelector('#quizQuestionText').textContent;
+                        queueSpeech("The question is... " + speakEquation(questionText));
                     }
+                    
+                    playNextInQueue();
                 });
             }
+            
+            // Close modal on overlay click (outside modal)
+            learnModalOverlay.addEventListener('click', (e) => {
+                if (e.target === learnModalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && learnModalOverlay.classList.contains('show')) {
+                    closeModal();
+                }
+            });
         }
 
         // --- LEARN COMPONENT LOGIC ---
         function renderLearnComponent() {
             const equationData = equationsData[currentEquationIndex];
+            const narration = narrationData[equationData.expression];
+            
             modal.querySelector('#equationCounter').textContent = `${currentEquationIndex + 1} / ${equationsData.length}`;
             modal.querySelector('#equationDisplay').innerHTML = equationData.expression + " = ?";
             
@@ -536,9 +1612,13 @@
             nextBtn.onclick = () => { if (currentEquationIndex < equationsData.length - 1) { stopSpeech(true); currentEquationIndex++; renderLearnComponent(); } };
             quizBtn.onclick = () => { stopSpeech(true); startQuiz(); };
             
-            // Always start with the problem prompt
+            // Conversational intro for the equation
             stopSpeech(true);
-            queueSpeech(`This BODMAS learning is for the equation ${equationData.expression}. Select one of the two buttons: Correct Way or Common Mistake.`);
+            if (narration?.intro) {
+                queueSpeech(narration.intro);
+            }
+            queueSpeech("Choose 'Correct Way' or 'Common Mistake' to see how to solve it!");
+            
             renderThoughtProcess(equationData);
             renderSolutionTabs(equationData);
         }
@@ -548,44 +1628,36 @@
             stepsEl.innerHTML = '';
             const narration = narrationData[equationData.expression]?.thoughtProcess || [];
             const total = equationData.thoughtProcess.length;
+            
             function formatSequencedStep(raw, idx) {
-                if (/^(Scan:|Plan:)/i.test(raw)) return raw; // keep meta lines
+                if (/^(Scan:|Plan:)/i.test(raw)) return raw;
                 let cleaned = String(raw).replace(/^\s*(First|Then|Next|Finally|Lastly)\s*[:,]?\s*/i, '');
                 if (idx === 0) return `First, ${cleaned}`;
                 if (idx === total - 1) return `Finally, ${cleaned}`;
                 return `Next, ${cleaned}`;
             }
-            let delay = 500;
+            
+            let delay = 800;
             equationData.thoughtProcess.forEach((raw, index) => {
                 setTimeout(() => {
                     const p = document.createElement('p');
                     p.innerHTML = formatSequencedStep(raw, index);
                     stepsEl.appendChild(p);
-                    queueSpeech(narration[index]);
+                    // Use the conversational narration
+                    if (narration[index]) {
+                        queueSpeech(narration[index]);
+                    }
                 }, delay);
-                delay += 2500;
+                delay += 3000; // More time between steps for kids
             });
         }
         
         function renderSolutionTabs(equationData) {
             const solutions = generateSolutionData(equationData.expression);
+            const narration = narrationData[equationData.expression];
             const tabsEl = modal.querySelector('#solutionTabs');
             tabsEl.innerHTML = '';
-            const correctSol = solutions.find(s => s.isCorrect) || solutions[0];
-            function describeOrder(sol){
-                if (!sol || !sol.steps) return '';
-                const parts = sol.steps.map(st => st.calc);
-                if (parts.length === 1) return `Do ${parts[0]}.`;
-                return `First ${parts[0]}, then ${parts.slice(1, -1).map(p=>p).join(', then ')}${parts.length>1? (parts.length>2?', then ':'') : ''}${parts[parts.length-1]}.`;
-            }
-            function opType(calc){
-                if (/\(|\)/.test(calc)) return 'brackets';
-                if (calc.includes('*')) return 'multiplication';
-                if (calc.includes('/')) return 'division';
-                if (calc.includes('+')) return 'addition';
-                if (calc.includes('-')) return 'subtraction';
-                return 'operation';
-            }
+            
             solutions.forEach((sol) => {
                 const tab = document.createElement('button');
                 tab.className = 'tab-btn';
@@ -593,33 +1665,19 @@
                 tab.onclick = () => {
                     tabsEl.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-                    // On user selection, stop current narration and speak appropriate guidance
                     stopSpeech(true);
                     renderSolution(sol, equationData.expression);
-                    const order = describeOrder(sol).replace(/\s+/g,' ').trim();
-                    if (sol.isCorrect) {
-                        const rightFinal = sol.steps[sol.steps.length - 1]?.result;
-                        const spokenOrder = speakifyExpr(order);
-                        queueSpeech(`Right order. ${spokenOrder} Total equals ${rightFinal}. That is correct.`);
-                    } else {
-                        const rightOrder = describeOrder(correctSol);
-                        const wrongType = opType(sol.steps[0]?.calc || '');
-                        const rightType = opType(correctSol.steps[0]?.calc || '');
-                        const wrongFinal = sol.steps[sol.steps.length - 1]?.result;
-                        const rightFinal = correctSol.steps[correctSol.steps.length - 1]?.result;
-                        const ruleHint = (rightType === 'multiplication' || rightType === 'division') && (wrongType === 'addition' || wrongType === 'subtraction')
-                            ? 'Remember: multiplication and division come before addition and subtraction.'
-                            : (rightType === 'brackets' ? 'Remember: always solve inside brackets first.' : 'Remember the left-to-right rule for partner operations.');
-                        const spokenWrong = speakifyExpr(order);
-                        const spokenRight = speakifyExpr(rightOrder);
-                        queueSpeech(`Wrong order. ${spokenWrong} Correct order is: ${spokenRight} You did ${wrongType} before ${rightType}. ${ruleHint} Let\'s compare: your path gives ${wrongFinal}, correct gives ${rightFinal}.`);
+                    
+                    // Use conversational narration from narrationData
+                    if (narration && narration[sol.title]) {
+                        queueSpeech(narration[sol.title]);
                     }
                 };
                 tabsEl.appendChild(tab);
             });
             // Do not auto-select. Prompt the learner to pick a button.
             const contentEl = modal.querySelector('#solutionContent');
-            contentEl.innerHTML = '<div style="padding:0.5rem; color:#555;">Select one of the two buttons above to explore the solution.</div>';
+            contentEl.innerHTML = '<div style="padding:0.75rem; color:#6c757d; text-align:center; font-size:0.9rem;">👆 Select one of the buttons above to explore the solution.</div>';
         }
 
         function renderSolution(solution, expression) {
@@ -650,6 +1708,12 @@
             currentQuizQuestionIndex = 0;
             userQuizAnswers = new Array(quizData.length).fill(null);
             quizScore = 0;
+            
+            // Voice intro for quiz
+            if (isAudioEnabled) {
+                quizNarration.intro.forEach(line => queueSpeech(line));
+            }
+            
             renderQuizQuestion();
         }
 
@@ -664,11 +1728,26 @@
                 const optionEl = document.createElement('div');
                 optionEl.className = 'quiz-option';
                 optionEl.textContent = option;
+                optionEl.setAttribute('role', 'button');
+                optionEl.setAttribute('tabindex', '0');
                 optionEl.onclick = () => selectQuizAnswer(index);
+                optionEl.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectQuizAnswer(index); } };
                 optionsContainer.appendChild(optionEl);
             });
             modal.querySelector('#quizExplanationBox').style.display = 'none';
             modal.querySelector('#quizNextBtn').style.display = 'none';
+            
+            // Voice narration for the question
+            if (isAudioEnabled && currentQuizQuestionIndex > 0) {
+                // Add prefix for questions after the first
+                const prefix = getRandomPhrase(quizNarration.questionPrefix);
+                queueSpeech(prefix + speakEquation(q.question));
+            } else if (isAudioEnabled) {
+                // First question gets read after intro
+                setTimeout(() => {
+                    queueSpeech("Question one... " + speakEquation(q.question));
+                }, 500);
+            }
         }
 
         function selectQuizAnswer(selectedIndex) {
@@ -689,19 +1768,39 @@
             explanationBox.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
             explanationBox.style.display = 'block';
 
+            // Voice feedback
+            if (isAudioEnabled) {
+                stopSpeech(true); // Clear any pending speech
+                if (isCorrect) {
+                    queueSpeech(getRandomPhrase(quizNarration.correct));
+                } else {
+                    queueSpeech(getRandomPhrase(quizNarration.incorrect));
+                    // Explain the correct answer in kid-friendly way
+                    queueSpeech("The answer is " + q.options[q.correct] + ".");
+                }
+            }
+
             const nextBtn = modal.querySelector('#quizNextBtn');
             nextBtn.style.display = 'block';
             if (currentQuizQuestionIndex < quizData.length - 1) {
                 nextBtn.textContent = 'Next Question';
-                nextBtn.onclick = () => { currentQuizQuestionIndex++; renderQuizQuestion(); };
+                nextBtn.onclick = () => { 
+                    stopSpeech(true);
+                    currentQuizQuestionIndex++; 
+                    renderQuizQuestion(); 
+                };
             } else {
                 nextBtn.textContent = 'Show Results';
-                nextBtn.onclick = showQuizResults;
+                nextBtn.onclick = () => {
+                    stopSpeech(true);
+                    showQuizResults();
+                };
             }
         }
 
         function showQuizResults() {
             showScreen(resultsScreenHTML);
+            const scorePercent = Math.round((quizScore / quizData.length) * 100);
             modal.querySelector('#quizScoreText').textContent = `You scored ${quizScore} out of ${quizData.length}!`;
             const summaryContainer = modal.querySelector('#quizSummaryContainer');
             summaryContainer.innerHTML = '';
@@ -717,9 +1816,74 @@
                     </div>`;
             });
             modal.querySelector('#restartModuleBtn').addEventListener('click', openModal);
+            
+            // Voice results
+            if (isAudioEnabled) {
+                quizNarration.complete.forEach(line => queueSpeech(line));
+                queueSpeech(`You got ${quizScore} out of ${quizData.length} questions right!`);
+                
+                if (scorePercent >= 80) {
+                    queueSpeech("Amazing job! You're a BODMAS champion!");
+                } else if (scorePercent >= 60) {
+                    queueSpeech("Good work! Keep practicing and you'll be even better!");
+                } else {
+                    queueSpeech("Nice try! Practice makes perfect... want to try again?");
+                }
+            }
         }
 
-        // --- SPEECH & UTILITIES ---
+        // --- SPEECH & UTILITIES (Kid-friendly: ~80 words per minute) ---
+        const SPEECH_RATE = 0.7;  // Slower for kids (6-13 age)
+        const PAUSE_BETWEEN_SENTENCES = 600; // ms pause between utterances
+        
+        // Conversational intro narration
+        const introNarration = [
+            "Hello there, young mathematician!",
+            "Welcome to BODMAS... your guide to solving tricky math problems!",
+            "Do you know what BODMAS means?",
+            "B is for Brackets... always solve what's inside brackets first!",
+            "O is for Orders... that's powers and roots.",
+            "D and M are for Division and Multiplication... they're partners, so we go left to right.",
+            "A and S are for Addition and Subtraction... also partners, left to right!",
+            "We're going to practice with ten examples together...",
+            "Then you can test yourself with a fun quiz!",
+            "Ready? Let's go!"
+        ];
+        
+        // Quiz voice narration
+        const quizNarration = {
+            intro: [
+                "Alright, quiz time!",
+                "Let's see what you've learned.",
+                "Take your time... there's no rush!",
+                "Read each problem carefully... and pick the right answer."
+            ],
+            questionPrefix: [
+                "Here's one for you... ",
+                "Try this one... ",
+                "Okay, next problem... ",
+                "Let's see... ",
+                "How about this one... "
+            ],
+            correct: [
+                "Fantastic! You got it right!",
+                "Excellent work! That's correct!",
+                "You're a BODMAS star! Right answer!",
+                "Brilliant! Keep going!",
+                "Perfect! You're doing great!"
+            ],
+            incorrect: [
+                "Oops! Not quite, but that's okay... let's learn from this.",
+                "Close! Let me explain the right way...",
+                "Good try! Here's how to solve it...",
+                "Not this time... but you'll get the next one!"
+            ],
+            complete: [
+                "You finished the quiz! Well done!",
+                "Let's see how you did..."
+            ]
+        };
+        
         function speakifyExpr(str) {
             if (!str) return '';
             return String(str)
@@ -729,27 +1893,41 @@
                 .replace(/-/g, ' minus ')
                 .replace(/\(/g, ' open bracket ')
                 .replace(/\)/g, ' close bracket ')
-                .replace(/\s+/g, ' ') // collapse spaces
+                .replace(/(\d+)/g, (match) => {
+                    // Add slight pause after numbers for clarity
+                    return match + '... ';
+                })
+                .replace(/\s+/g, ' ')
                 .trim();
         }
+        
+        function speakEquation(expr) {
+            // Convert equation to kid-friendly speech
+            return speakifyExpr(expr).replace(/\.\.\./g, '');
+        }
+        
         function toggleAudio(e) {
             isAudioEnabled = !isAudioEnabled;
             e.target.textContent = isAudioEnabled ? '🔊' : '🔇';
             e.target.classList.toggle('active', isAudioEnabled);
-            // Note: Speech queue preserved, only playback state changes
+            
+            // Dismiss the audio toast when audio is enabled
+            if (isAudioEnabled) {
+                dismissAudioToast();
+            }
+            
             if (isAudioEnabled) {
                 try { if (window.speechSynthesis?.resume) window.speechSynthesis.resume(); } catch {}
-                // If currently on intro screen, auto-narrate
+                // If currently on intro screen, use conversational narration
                 if (modal.querySelector('.intro-text')) {
-                    queueSpeech('Welcome! This module will help you master the Order of Operations, known as BODMAS.');
-                    queueSpeech('B stands for Brackets, O for Orders, D for Division, M for Multiplication, A for Addition, and S for Subtraction.');
-                    queueSpeech('We will start with ten guided examples, then a quiz.');
+                    introNarration.forEach(line => queueSpeech(line));
                     playNextInQueue();
                 }
             } else {
                 try { if (window.speechSynthesis?.pause) window.speechSynthesis.pause(); } catch {}
             }
         }
+        
         function stopSpeech(clearQueue=false) {
             try {
                 if (window.speechSynthesis) {
@@ -760,37 +1938,63 @@
             if (clearQueue) speechQueue = [];
         }
         
-        function queueSpeech(text) {
+        function queueSpeech(text, pause = PAUSE_BETWEEN_SENTENCES) {
             if (!text) return;
-            speechQueue.push(text);
+            speechQueue.push({ text, pause });
             if (isAudioEnabled && !isSpeaking) {
                 playNextInQueue();
             }
         }
+        
         function playNextInQueue() {
             if (speechQueue.length === 0) { isSpeaking = false; return; }
             if (!isAudioEnabled) { isSpeaking = false; return; }
             isSpeaking = true;
-            speak(speechQueue.shift(), playNextInQueue);
+            
+            const item = speechQueue.shift();
+            const text = typeof item === 'string' ? item : item.text;
+            const pause = typeof item === 'string' ? PAUSE_BETWEEN_SENTENCES : (item.pause || PAUSE_BETWEEN_SENTENCES);
+            
+            speak(text, () => {
+                // Add pause between utterances for better comprehension
+                setTimeout(playNextInQueue, pause);
+            });
         }
+        
         function speak(text, callback) {
             try {
                 if (!isAudioEnabled || !window.speechSynthesis) {
                     isSpeaking = false;
                     return;
                 }
-                // interrupt current utterance only, do not wipe queue here
+                // interrupt current utterance only
                 try { window.speechSynthesis.cancel(); } catch {}
+                
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.onend = () => { isSpeaking = false; if (callback) callback(); };
-                utterance.onerror = (e) => { console.error('Speech error', e); isSpeaking = false; if (callback) callback(); };
+                utterance.rate = SPEECH_RATE;  // Slow for kids (~80 wpm)
+                utterance.pitch = 1.05;        // Slightly warmer tone
+                
+                utterance.onend = () => { 
+                    isSpeaking = false; 
+                    if (callback) callback(); 
+                };
+                utterance.onerror = (e) => { 
+                    console.error('Speech error', e); 
+                    isSpeaking = false; 
+                    if (callback) callback(); 
+                };
+                
                 window.speechSynthesis.speak(utterance);
             } catch (err) {
                 console.warn('Speak failed:', err);
                 isSpeaking = false;
                 if (callback) callback();
             }
+        }
+        
+        // Helper to get random encouraging phrase
+        function getRandomPhrase(array) {
+            return array[Math.floor(Math.random() * array.length)];
         }
 
         // --- INITIALIZATION ---

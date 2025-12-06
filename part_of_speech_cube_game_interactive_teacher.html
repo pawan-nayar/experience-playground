@@ -15,7 +15,7 @@
 
     <style>
         :root {
-            --cube-size: 350px;
+            --cube-size: 380px;
             --tile-gap: 8px;
             --border-radius: 10px;
             --transition-speed: 0.5s;
@@ -86,7 +86,9 @@
         }
         
         .game-view {
-            overflow: hidden; /* Prevents double scrollbars on the game screen only */
+            /* Allow vertical scroll so content is never clipped on small screens */
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         /* --- 1. CUBE GAME STYLES --- */
@@ -107,7 +109,7 @@
         
         .info-button { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); width: 30px; height: 30px; border-radius: 50%; font-size: 1.1rem; font-style: italic; font-family: serif; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; touch-action: manipulation; }
         .info-button:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .game-wrapper { flex-grow: 1; display: grid; grid-template-columns: 2fr 1fr; align-items: flex-start; padding: 2vw; gap: 2vw; overflow: hidden; width: 100%; box-sizing: border-box; }
+        .game-wrapper { flex-grow: 1; display: grid; grid-template-columns: 2fr 1fr; align-items: center; padding: 2vw; gap: 2vw; overflow: hidden; width: 100%; box-sizing: border-box; }
         .cube-area { display: flex; align-items: center; justify-content: center; perspective: 2000px; padding-top: 2rem; cursor: grab; flex-grow: 1; }
         .cube-area:active { cursor: grabbing; }
         
@@ -131,10 +133,39 @@
         .tile.pos-preposition { background-color: var(--preposition-bg); }
         
         .control-group h3 { margin: 0 0 15px 0; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); }
-        .button-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .control-btn { background-color: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); height: 50px; border-radius: var(--border-radius); font-size: 1.5rem; cursor: pointer; transition: all 0.2s; touch-action: manipulation; display:flex; align-items:center; justify-content:center; }
-        .control-btn:hover { background-color: var(--text-secondary); border-color: var(--text-secondary); color: white; }
-        .control-btn svg { width: 24px; height: 24px; }
+        .arrow-row { display: flex; gap: 10px; justify-content: center; }
+        .control-btn { 
+            background-color: var(--bg-panel); 
+            color: var(--text-primary); 
+            border: 2px solid var(--border-color); 
+            height: 50px; 
+            width: 50px;
+            border-radius: var(--border-radius); 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            touch-action: manipulation; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .control-btn:hover { 
+            background-color: var(--accent-color); 
+            border-color: var(--accent-color); 
+            color: white; 
+            box-shadow: 0 4px 8px rgba(0,123,255,0.25);
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        .control-btn svg { 
+            width: 22px; 
+            height: 22px; 
+            stroke: currentColor;
+            stroke-width: 2.5;
+            fill: none;
+        }
 
         .zoom-controls { display: flex; align-items: center; gap: 10px; }
         #zoom-slider { width: 100%; cursor: pointer; }
@@ -151,6 +182,11 @@
 
         @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
         @keyframes modal-fade-in { from { opacity: 0; transform: scale(0.9) translateY(-20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes cube-preview-rock {
+            0% { transform: rotateX(18deg) rotateY(-22deg) translateY(0); }
+            50% { transform: rotateX(22deg) rotateY(-35deg) translateY(-4px); }
+            100% { transform: rotateX(18deg) rotateY(-18deg) translateY(0); }
+        }
 
         /* --- 2. WELCOME, SUMMARY & QUIZ STYLES --- */
         .welcome-view, .quiz-view, .summary-view { font-family: 'Montserrat', sans-serif; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box; height: 100%; }
@@ -165,6 +201,88 @@
         .app-main h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--text-primary); }
         .app-main ul { padding-left: 20px; margin-top: 10px; line-height: 1.7; }
         .app-main li { margin-bottom: 15px; }
+
+        .welcome-hero {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .welcome-hero-visual {
+            flex-shrink: 0;
+        }
+        .cube-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(0,0,0,0.15), rgba(255,255,255,0.25));
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateX(20deg) rotateY(-25deg);
+            transform-style: preserve-3d;
+            animation: cube-preview-rock 10s ease-in-out infinite alternate;
+        }
+        .cube-preview-grid {
+            width: 78%;
+            height: 78%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 3px;
+        }
+        .cube-preview-tile {
+            border-radius: 5px;
+            color: var(--tile-text-color);
+            font-size: 0.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: lowercase;
+        }
+        .cube-preview-tile.noun { background-color: var(--noun-bg); }
+        .cube-preview-tile.verb { background-color: var(--verb-bg); }
+        .cube-preview-tile.adj { background-color: var(--adjective-bg); }
+        .cube-preview-tile.adv { background-color: var(--adverb-bg); }
+        .cube-preview-tile.conj { background-color: var(--conjunction-bg); }
+        .cube-preview-tile.prep { background-color: var(--preposition-bg); }
+
+        .welcome-tagline {
+            font-weight: 700;
+            margin: 0 0 .5rem;
+            font-size: 0.98rem;
+        }
+        .welcome-points {
+            margin: 0;
+            padding-left: 1.2rem;
+            line-height: 1.55;
+        }
+        .welcome-points li {
+            margin-bottom: 0.35rem;
+        }
+
+        .welcome-details {
+            margin-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+        .welcome-details > summary {
+            font-weight: 700;
+            cursor: pointer;
+            list-style: none;
+            margin-bottom: 0.5rem;
+        }
+        .welcome-details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .welcome-details > summary::after {
+            content: "▾";
+            margin-left: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
 
         .action-container { padding: 1rem 0; text-align: center; }
         .byline { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1.5rem; }
@@ -233,94 +351,173 @@
             width: 100%; max-width: 300px; justify-self: start;
         }
 
+        .controls-row-2 {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* MOBILE STYLES */
         @media (max-width: 900px) {
-            :root { --cube-size: min(250px, 65vh); }
+            :root { --cube-size: min(220px, 50vh); }
             
-            .game-view { display: flex; flex-direction: column; }
+            .game-view { display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
             
             .game-wrapper {
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between; /* Pushes cube up, controls down */
+                justify-content: flex-start;
                 align-items: center;
                 flex-grow: 1;
-                padding: 15px 15px 5px 15px; /* Less padding at bottom */
+                padding: 10px 15px 15px 15px;
                 gap: 15px;
             }
+
+            .cube-area {
+                padding: 15px;
+                flex-grow: 0;
+            }
+
             .controls-area {
-                order: 3;
                 flex-shrink: 0;
                 width: 100%;
-                max-width: 420px;
-                height: auto;
-                background: transparent; /* Make background transparent */
-                border: none; /* Remove border */
-                box-shadow: none;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                padding: 0;
-                gap: 8px;
+                max-width: 300px;
+                background: var(--bg-panel);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                padding: 14px 16px;
+                gap: 12px;
             }
             
-            .controls-row-1 {
-                display: flex;
-                width: 100%;
-                gap: 10px;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .controls-area > .control-group {
-               flex-grow: 1;
-            }
-            .controls-area > .control-group:first-of-type {
-                max-width: 100px;
-            }
-
             .control-group h3 { display: none; }
             
-            .button-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 5px;
+            .control-group-rotate {
+                width: 100%;
+            }
+
+            /* All 4 arrows in one row */
+            .arrow-row {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+            }
+
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+            }
+
+            .control-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .controls-row-2 {
+                width: 100%;
+                gap: 8px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .control-group-zoom {
+                flex: 1;
             }
 
             .zoom-controls {
                 display: flex;
                 align-items: center;
-                gap: 5px;
-            }
-            .control-btn { 
-                height: 40px; 
-                width: 40px;
-                font-size: 1.1rem;
-                flex-shrink: 0;
-            }
-
-            .button-grid .control-btn {
-                width: 100%;
+                gap: 6px;
             }
 
             .zoom-controls .control-btn {
-                font-size: 1.4rem;
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
             }
-            
+
             #new-puzzle-btn { 
-                width: 100%; 
-                height: 45px;
-                display: none; /* Initially hidden */
+                flex: 0 0 auto;
+                height: 36px;
+                padding: 0 12px;
+                font-size: 0.85rem;
+                display: none;
+            }
+
+            #new-puzzle-btn svg {
+                width: 16px;
+                height: 16px;
             }
             
-            .header { padding: 0 15px; }
+            .header { padding: 0 12px; height: 50px; }
+            .header h1 { font-size: 0.95rem; }
+            .header-stats { gap: 0.8rem; }
+            .timer-display, .score-display { font-size: 1.1rem; }
+            .info-button { width: 28px; height: 28px; font-size: 1rem; }
         }
         @media (max-width: 480px) {
-            :root { --cube-size: min(220px, 60vh); }
-            .game-wrapper { padding: 10px 10px 5px 10px; gap: 10px; }
+            :root { --cube-size: min(190px, 45vh); }
+
+            .controls-area {
+                max-width: 280px;
+                padding: 12px 14px;
+            }
+
+            .control-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .zoom-controls .control-btn {
+                width: 32px;
+                height: 32px;
+            }
             .modal-content { padding: 20px; }
             .welcome-app, .quiz-app, .summary-app { border-radius: 0; height: 100%; max-height: 100%;}
             .app-main { padding: 1rem; }
+
+            .welcome-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .cube-preview {
+                width: 110px;
+                height: 110px;
+            }
+
+            /* Slightly soften typography and metrics on the tightest screens */
+            .header h1 {
+                font-size: 1rem;
+            }
+            .timer-display,
+            .score-display {
+                font-size: 1.2rem;
+            }
+            .btn {
+                font-size: 0.88rem;
+                padding: 0.5rem 0.85rem;
+            }
+
+            /* Quiz footer tray: keep controls grouped but avoid cramping */
+            .quiz-nav {
+                flex-wrap: wrap;
+                row-gap: 0.4rem;
+            }
+            .quiz-nav .score {
+                font-size: 0.85rem;
+                order: 3;
+                width: 100%;
+                text-align: center;
+            }
+            .quiz-nav > button:first-child {
+                order: 1; /* Prev */
+            }
+            .quiz-nav > div:last-child {
+                order: 2; /* CTA cluster: Hint / Submit / Next / Finish */
+                margin-left: auto;
+            }
         }
     </style>
 </head>
@@ -335,20 +532,50 @@
                 <p class="app__subtitle">Your journey to mastering English grammar starts now.</p>
             </header>
             <main class="app-main">
-                <h3>Part 1: The Cube Challenge</h3>
-                <ul>
-                    <li><strong>The Objective:</strong> Your goal is to solve the puzzle by making each of the cube's six faces a single, solid color.</li>
-                    <li><strong>Colors are Categories:</strong> Each color represents a specific Part of Speech (Nouns, Verbs, Adjectives, etc.).</li>
-                    <li><strong>How to Play:</strong> Use your mouse or finger to drag and rotate the cube. Click one tile to select it, then another to swap their positions.</li>
-                </ul>
-                <h3>Scoring System</h3>
-                 <ul>
-                    <li><strong>Solve a Face:</strong> +45 points.</li>
-                    <li><strong>Upright Bonus:</strong> If a face's text is upright when solved, you get a 3x bonus for 135 points!</li>
-                    <li><strong>Quiz Questions:</strong> +10 points for correct MCQ/TF answers, and +20 for correct Fill-in-the-Blanks.</li>
-                </ul>
-                <h3>Part 2: Milestone Quizzes</h3>
-                <p>Each time you successfully solve a face, the game will pause and you'll take a **short, 3-question quiz** on the words you just sorted. This reinforces your learning as you play!</p>
+                <div class="welcome-hero">
+                    <div class="welcome-hero-visual">
+                        <div class="cube-preview" aria-hidden="true">
+                            <div class="cube-preview-grid">
+                                <div class="cube-preview-tile noun">art</div>
+                                <div class="cube-preview-tile prep">about</div>
+                                <div class="cube-preview-tile conj">and</div>
+                                <div class="cube-preview-tile verb">put</div>
+                                <div class="cube-preview-tile adj">adept</div>
+                                <div class="cube-preview-tile adv">fully</div>
+                                <div class="cube-preview-tile noun">age</div>
+                                <div class="cube-preview-tile prep">around</div>
+                                <div class="cube-preview-tile conj">because</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="welcome-hero-copy">
+                        <p class="welcome-tagline">Solve the color cube to sort words by their part of speech.</p>
+                        <ul class="welcome-points">
+                            <li>Spin the cube and swap tiles to group words by role.</li>
+                            <li>Each solid-colored face you solve boosts your score.</li>
+                            <li>Quick 3‑question quizzes lock in what you’ve just learned.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <details class="welcome-details">
+                    <summary>See full rules & scoring</summary>
+
+                    <h3>Part 1: The Cube Challenge</h3>
+                    <ul>
+                        <li><strong>The Objective:</strong> Your goal is to solve the puzzle by making each of the cube's six faces a single, solid color.</li>
+                        <li><strong>Colors are Categories:</strong> Each color represents a specific Part of Speech (Nouns, Verbs, Adjectives, etc.).</li>
+                        <li><strong>How to Play:</strong> Use your mouse or finger to drag and rotate the cube. Click one tile to select it, then another to swap their positions.</li>
+                    </ul>
+                    <h3>Scoring System</h3>
+                    <ul>
+                        <li><strong>Solve a Face:</strong> +45 points.</li>
+                        <li><strong>Upright Bonus:</strong> If a face's text is upright when solved, you get a 3x bonus for 135 points!</li>
+                        <li><strong>Quiz Questions:</strong> +10 points for correct MCQ/TF answers, and +20 for correct Fill-in-the-Blanks.</li>
+                    </ul>
+                    <h3>Part 2: Milestone Quizzes</h3>
+                    <p>Each time you successfully solve a face, the game will pause and you'll take a short, 3-question quiz on the words you just sorted. This reinforces your learning as you play.</p>
+                </details>
                
                 <div class="action-container">
                     <button class="btn btn--pri" id="lets-play-btn" style="font-size: 1.1rem; padding: .8rem 2rem;">Let's Play!</button>
@@ -373,17 +600,25 @@
         <div class="game-wrapper">
             <div class="cube-area"><div id="cube"></div></div>
             <section class="controls-area">
-                <div class="controls-row-1">
-                    <div class="control-group">
-                        <h3>Rotate Cube</h3>
-                        <div class="button-grid">
-                            <button class="control-btn" id="arrow-up" title="Rotate Up">↑</button>
-                            <button class="control-btn" id="arrow-down" title="Rotate Down">↓</button>
-                            <button class="control-btn" id="arrow-left" title="Rotate Left">←</button>
-                            <button class="control-btn" id="arrow-right" title="Rotate Right">→</button>
-                        </div>
+                <div class="control-group control-group-rotate">
+                    <h3>Rotate Cube</h3>
+                    <div class="arrow-row">
+                        <button class="control-btn" id="arrow-left" title="Rotate Left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="control-btn" id="arrow-up" title="Rotate Up">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                        </button>
+                        <button class="control-btn" id="arrow-down" title="Rotate Down">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <button class="control-btn" id="arrow-right" title="Rotate Right">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                     </div>
-                    <div class="control-group">
+                </div>
+                <div class="controls-row-2">
+                    <div class="control-group control-group-zoom">
                         <h3>Zoom (50% - 125%)</h3>
                         <div class="zoom-controls">
                             <button class="control-btn" id="zoom-out-btn" title="Zoom Out">-</button>
@@ -391,11 +626,11 @@
                             <button class="control-btn" id="zoom-in-btn" title="Zoom In">+</button>
                         </div>
                     </div>
-                </div>
-                <button class="btn btn--sec" id="new-puzzle-btn" title="New Game / Reshuffle" style="font-weight: 600; display:flex; align-items:center; justify-content:center; gap: 8px;">
+                    <button class="btn btn--sec" id="new-puzzle-btn" title="New Game / Reshuffle" style="font-weight: 600; display:flex; align-items:center; justify-content:center; gap: 8px;">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
                     New Game
-                </button>
+                    </button>
+                </div>
             </section>
         </div>
     </div>

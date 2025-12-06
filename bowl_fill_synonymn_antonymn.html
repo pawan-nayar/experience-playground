@@ -2,86 +2,344 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Brilliant Bowl</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bowl-bg: #111;
+      --bowl-rim: #333;
+      --bowl-inside: #1a1a1a;
+      --fluid-start: #ff6a00;
+      --fluid-end: #b54201;
+      --accent-blue: #2563eb;
+      --accent-red: #dc2626;
+      --accent-green: #22c55e;
+      --text-muted: #aaa;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+    
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
     body {
-      font-family: 'Inter', sans-serif;
-      background: #444;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(145deg, #2d2d2d 0%, #444 50%, #3a3a3a 100%);
       color: white;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
     }
+    
+    /* Header */
     header {
-      padding: 0.5rem 1rem 0 1rem;
+      padding: clamp(0.5rem, 2vw, 1rem) clamp(0.75rem, 3vw, 1.5rem);
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      font-size: 0.9rem;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
     }
+    
     header .title-block {
       flex: 1;
+      min-width: 0;
     }
-    h1 { font-size: 1.5rem; font-weight: 700; }
-    p { font-style: italic; font-size: 0.9rem; }
+    
+    h1 { 
+      font-size: clamp(1.25rem, 5vw, 2rem); 
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle { 
+      font-style: italic; 
+      font-size: clamp(0.75rem, 2.5vw, 1rem);
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+    
+    /* Speech Toggle - larger touch target */
     .speech-toggle {
-      border-radius: 50%; background: #666; padding: 0.5rem;
-      border: none; cursor: pointer;
+      width: clamp(44px, 12vw, 56px);
+      height: clamp(44px, 12vw, 56px);
+      border-radius: 50%;
+      background: linear-gradient(145deg, #555, #444);
+      border: 2px solid #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      flex-shrink: 0;
     }
-    .speech-enabled { background: #22c55e; }
+    
+    .speech-toggle:hover {
+      transform: scale(1.05);
+    }
+    
+    .speech-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .speech-enabled { 
+      background: linear-gradient(145deg, #2dd4bf, var(--accent-green));
+      border-color: #34d399;
+      box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+    }
+    
+    /* Bowl Section */
     .bowl-section {
-      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(0.5rem, 2vw, 1rem);
+      min-height: 0;
     }
+    
     .bowl-container {
-      width: 70vmin; height: 70vmin; position: relative;
+      width: min(70vmin, 400px);
+      height: min(70vmin, 400px);
+      position: relative;
+      transform: translateZ(0);
+      will-change: transform;
     }
+    
+    @media (max-height: 600px) {
+      .bowl-container {
+        width: min(55vmin, 320px);
+        height: min(55vmin, 320px);
+      }
+    }
+    
+    @media (max-height: 500px) and (orientation: landscape) {
+      .bowl-container {
+        width: min(50vmin, 280px);
+        height: min(50vmin, 280px);
+      }
+    }
+    
     .bowl-shape {
-      position: absolute; background: #111; width: 100%; height: 100%; border-radius: 50%;
+      position: absolute;
+      background: var(--bowl-bg);
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
       clip-path: polygon(0 43.75%, 100% 43.75%, 100% 100%, 0 100%);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
+    
     .bowl-label {
-      position: absolute; top: 91%; left: 50%; transform: translate(-50%, -50%) rotateX(18deg);
-      text-align: center; font-size: 1rem; font-weight: 600; color: #bbb;
-      font-style: italic; text-shadow: 0 1px 3px #000; z-index: 2;
+      position: absolute;
+      top: 91%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateX(18deg);
+      text-align: center;
+      font-size: clamp(0.8rem, 3vw, 1.1rem);
+      font-weight: 600;
+      color: #999;
+      font-style: italic;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 2;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
+    
     .bowl-rim {
-      position: absolute; width: 100%; height: 62.5%; top: 16.25%; background: #333;
-      border-radius: 50%; overflow: hidden;
+      position: absolute;
+      width: 100%;
+      height: 62.5%;
+      top: 16.25%;
+      background: linear-gradient(180deg, #444 0%, var(--bowl-rim) 50%, #2a2a2a 100%);
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: inset 0 -10px 30px rgba(0,0,0,0.4);
     }
+    
     .bowl-inside {
-      position: absolute; width: 75%; height: 80%; top: 10%; left: 12.5%; background: #222;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      width: 75%;
+      height: 80%;
+      top: 10%;
+      left: 12.5%;
+      background: radial-gradient(ellipse at center top, #2a2a2a 0%, var(--bowl-inside) 60%, #111 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
+    
     .fluid {
-      position: absolute; border-radius: 50%; background: radial-gradient(circle at center, #ff6a00, #b54201);
-      background-size: 200% 200%; animation: ripple 4s infinite;
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 30% 30%, #ff8533 0%, var(--fluid-start) 40%, var(--fluid-end) 100%);
+      background-size: 200% 200%;
+      animation: ripple 4s ease-in-out infinite;
+      transform: translateZ(0);
+      will-change: transform, width, height, top, left;
+      box-shadow: 
+        0 -5px 20px rgba(255, 106, 0, 0.3),
+        inset 0 -10px 30px rgba(181, 66, 1, 0.5);
     }
+    
     .word-text {
-      position: absolute; text-align: center; font-weight: 700; font-size: 1.6rem;
-      z-index: 10; width: 100%; transform: translateY(-50%);
+      position: absolute;
+      text-align: center;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 5vw, 2rem);
+      z-index: 10;
+      width: 100%;
+      padding: 0 0.5rem;
+      transform: translateY(-50%);
       animation: wordRipple 1.5s ease-out;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 20px rgba(255,106,0,0.5);
+      letter-spacing: 0.02em;
     }
+    
+    /* Controls */
     .controls {
-      padding: 0.5rem 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;
+      padding: clamp(0.75rem, 3vw, 1.25rem);
+      display: flex;
+      justify-content: center;
+      gap: clamp(0.75rem, 3vw, 1rem);
+      flex-shrink: 0;
     }
+    
     button {
-      border: none; padding: 0.5rem 1rem; border-radius: 9999px;
-      font-weight: 600; cursor: pointer;
+      border: none;
+      padding: clamp(0.75rem, 2.5vw, 1rem) clamp(1.5rem, 5vw, 2rem);
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 48px;
+      min-width: 100px;
+      font-family: inherit;
+      letter-spacing: 0.02em;
     }
-    .start-btn { background: #2563eb; color: white; }
-    .reset-btn { background: #dc2626; color: white; }
+    
+    .start-btn { 
+      background: linear-gradient(145deg, #3b82f6, var(--accent-blue));
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+    
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+    
+    .start-btn:active {
+      transform: translateY(0);
+    }
+    
+    .reset-btn { 
+      background: linear-gradient(145deg, #ef4444, var(--accent-red));
+      color: white;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+    }
+    
+    .reset-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    }
+    
+    .reset-btn:active {
+      transform: translateY(0);
+    }
+    
+    /* Animations */
     @keyframes ripple {
-      0%, 100% { background-position: 50% 50%; }
-      50% { background-position: 48% 52%; }
+      0%, 100% { 
+        background-position: 50% 50%;
+        transform: translateZ(0) scale(1);
+      }
+      25% { 
+        background-position: 45% 55%;
+        transform: translateZ(0) scale(1.01);
+      }
+      50% { 
+        background-position: 55% 45%;
+        transform: translateZ(0) scale(1.02);
+      }
+      75% { 
+        background-position: 48% 52%;
+        transform: translateZ(0) scale(1.01);
+      }
     }
+    
     @keyframes wordRipple {
-      0% { transform: scale(0.8) translateY(-50%); opacity: 0; }
-      50% { transform: scale(1.1) translateY(-50%); opacity: 1; }
-      100% { transform: scale(1) translateY(-50%); opacity: 1; }
+      0% { 
+        transform: scale(0.7) translateY(-50%); 
+        opacity: 0;
+        filter: blur(4px);
+      }
+      40% { 
+        transform: scale(1.15) translateY(-50%); 
+        opacity: 1;
+        filter: blur(0);
+      }
+      70% {
+        transform: scale(0.95) translateY(-50%);
+      }
+      100% { 
+        transform: scale(1) translateY(-50%); 
+        opacity: 1;
+      }
+    }
+    
+    /* Landscape mode adjustments */
+    @media (orientation: landscape) and (max-height: 450px) {
+      header {
+        padding: 0.4rem 1rem;
+      }
+      .controls {
+        padding: 0.5rem 1rem;
+      }
+      h1 {
+        font-size: 1.1rem;
+      }
+      .subtitle {
+        display: none;
+      }
+    }
+    
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .fluid {
+        animation: none;
+      }
+      .word-text {
+        animation: none;
+        opacity: 1;
+      }
+      button {
+        transition: none;
+      }
     }
   </style>
 </head>
@@ -89,10 +347,11 @@
   <header>
     <div class="title-block">
       <h1>Brilliant</h1>
-      <p>An exploration of its meaning</p>
+      <p class="subtitle">An exploration of its meaning</p>
     </div>
-    <button id="speechToggle" class="speech-toggle" aria-label="Toggle speech">🔊</button>
+    <button id="speechToggle" class="speech-toggle" aria-label="Toggle speech" type="button">🔊</button>
   </header>
+  
   <div class="bowl-section">
     <div class="bowl-container">
       <div class="bowl-shape"></div>
@@ -105,46 +364,76 @@
       </div>
     </div>
   </div>
+  
   <div class="controls">
-    <button class="start-btn" id="startBtn">Start</button>
-    <button class="reset-btn" id="resetBtn" style="display: none;">Reset</button>
+    <button class="start-btn" id="startBtn" type="button">Start</button>
+    <button class="reset-btn" id="resetBtn" type="button" style="display: none;">Reset</button>
   </div>
+  
   <script>
     const synonyms = ['Smart', 'Shining', 'Radiant', 'Gleaming', 'Luminous', 'Sparkling', 'Dazzling', 'Intelligent'];
     const antonyms = ['Foolish', 'Incompetent', 'Mediocre', 'Ignorant', 'Unintelligent', 'Obscure', 'Dull', 'Dark'];
+    
     const fluid = document.getElementById('fluid');
     const wordText = document.getElementById('wordText');
     const bowlLabel = document.getElementById('bowlLabel');
     const speechToggle = document.getElementById('speechToggle');
     const startBtn = document.getElementById('startBtn');
     const resetBtn = document.getElementById('resetBtn');
+    
     let isSpeakingEnabled = false;
-    const maxWidth = document.querySelector('.bowl-inside').clientWidth;
-    const maxHeight = document.querySelector('.bowl-inside').clientHeight;
+    let animationId = null;
+    let bowlInside = document.querySelector('.bowl-inside');
+    let maxWidth, maxHeight;
+    
+    // Calculate dimensions - recalculate on resize
+    function updateDimensions() {
+      maxWidth = bowlInside.clientWidth;
+      maxHeight = bowlInside.clientHeight;
+    }
+    
+    updateDimensions();
+    
+    // Debounced resize handler
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updateDimensions, 150);
+    });
+    
+    // Handle orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateDimensions, 300);
+    });
 
-    speechToggle.onclick = () => {
+    // Speech toggle
+    speechToggle.onclick = function() {
       isSpeakingEnabled = !isSpeakingEnabled;
       speechToggle.classList.toggle('speech-enabled', isSpeakingEnabled);
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      speechToggle.setAttribute('aria-pressed', isSpeakingEnabled);
+      
+      if (window.speechSynthesis) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Activate speech synthesis on user gesture (required by mobile browsers)
+        if (isSpeakingEnabled) {
+          const activate = new SpeechSynthesisUtterance('');
+          activate.volume = 0;
+          window.speechSynthesis.speak(activate);
+        }
+      }
     };
 
-    startBtn.onclick = () => {
+    // Start button
+    startBtn.onclick = function() {
+      updateDimensions();
       startBtn.style.display = 'none';
       resetBtn.style.display = 'inline-block';
       wordText.textContent = '';
       bowlLabel.textContent = '';
-      if (isSpeakingEnabled) {
-        speak("Experience the synonyms and antonyms of Brilliant. Let's start.", () => {
-          runPhase(synonyms, 'fill', () => {
-            celebrateRipple(() => {
-              setTimeout(() => runPhase(antonyms, 'drain', () => {
-                startBtn.style.display = 'inline-block';
-                resetBtn.style.display = 'none';
-              }), 3000);
-            });
-          });
-        });
-      } else {
+      
+      const runGame = () => {
         runPhase(synonyms, 'fill', () => {
           celebrateRipple(() => {
             setTimeout(() => runPhase(antonyms, 'drain', () => {
@@ -153,14 +442,27 @@
             }), 3000);
           });
         });
+      };
+      
+      if (isSpeakingEnabled) {
+        speak("Experience the synonyms and antonyms of Brilliant. Let's start.", runGame);
+      } else {
+        runGame();
       }
     };
 
-    resetBtn.onclick = () => {
+    // Reset button
+    resetBtn.onclick = function() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
       fluid.style.cssText = `top:${maxHeight}px;left:${maxWidth / 2}px;width:0px;height:0px;`;
       wordText.textContent = '';
       bowlLabel.textContent = '';
-      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
       startBtn.style.display = 'inline-block';
       resetBtn.style.display = 'none';
     };
@@ -169,45 +471,88 @@
       let idx = 0;
       const delayPerWord = 2000;
       const total = words.length;
-      const wordDelayOffset = 2000; // Wait 2s before first word
+      const wordDelayOffset = 2000;
       bowlLabel.textContent = mode === 'fill' ? 'Synonym' : 'Antonym';
-      const startTime = Date.now();
+      const startTime = performance.now();
 
-      function frame() {
-        const elapsed = Date.now() - startTime;
+      function frame(currentTime) {
+        const elapsed = currentTime - startTime;
         const p = Math.min(elapsed / (delayPerWord * total), 1);
         const factor = mode === 'fill' ? p : 1 - p;
         const w = maxWidth * factor;
         const h = w * (maxHeight / maxWidth);
         const top = maxHeight - h;
         const left = (maxWidth - w) / 2;
-        fluid.style.cssText = `top:${top}px;left:${left}px;width:${w}px;height:${h}px;`;
+        
+        fluid.style.top = `${top}px`;
+        fluid.style.left = `${left}px`;
+        fluid.style.width = `${w}px`;
+        fluid.style.height = `${h}px`;
         wordText.style.top = `${top + h / 2}px`;
 
         if ((elapsed - wordDelayOffset) >= idx * delayPerWord && idx < total) {
           wordText.textContent = words[idx];
-          wordText.style.animation = 'none'; wordText.offsetHeight;
+          wordText.style.animation = 'none';
+          void wordText.offsetHeight;
           wordText.style.animation = 'wordRipple 1.5s ease-out';
           speak(words[idx]);
           idx++;
         }
-        if (p < 1) requestAnimationFrame(frame);
-        else onDone();
+        
+        if (p < 1) {
+          animationId = requestAnimationFrame(frame);
+        } else {
+          animationId = null;
+          onDone();
+        }
       }
-      frame();
+      
+      animationId = requestAnimationFrame(frame);
     }
 
     function celebrateRipple(cb) {
-      wordText.style.animation = 'none'; wordText.offsetHeight;
+      wordText.style.animation = 'none';
+      void wordText.offsetHeight;
       wordText.style.animation = 'wordRipple 1.5s ease-out';
       setTimeout(cb, 2000);
     }
 
     function speak(text, cb = () => {}) {
       if (!isSpeakingEnabled || !window.speechSynthesis) return cb();
+      
+      // Resume speech synthesis if paused (Chrome bug fix)
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      
       const u = new SpeechSynthesisUtterance(text);
-      u.onend = cb;
+      u.lang = 'en-US';
+      u.rate = 0.9;
+      u.pitch = 1;
+      u.volume = 1;
+      
+      u.onend = function() {
+        cb();
+      };
+      
+      u.onerror = function(e) {
+        console.log('Speech error:', e);
+        cb();
+      };
+      
+      // Speak immediately
       window.speechSynthesis.speak(u);
+    }
+    
+    // Initial fluid state - ensure dimensions are ready
+    window.addEventListener('load', function() {
+      updateDimensions();
+      fluid.style.cssText = `top:${maxHeight}px;left:${maxWidth / 2}px;width:0px;height:0px;`;
+    });
+    
+    // Also set initial state immediately as fallback
+    if (maxWidth && maxHeight) {
+      fluid.style.cssText = `top:${maxHeight}px;left:${maxWidth / 2}px;width:0px;height:0px;`;
     }
   </script>
 </body>

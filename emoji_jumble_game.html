@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Emoji Jumble</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,11 @@
             color: var(--dark-gray);
             overflow: hidden;
             height: 100vh;
+            height: 100dvh;
+            min-height: -webkit-fill-available;
             width: 100vw;
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Screen Management */
@@ -52,6 +56,11 @@
             transform: scale(0.95);
             pointer-events: none;
             z-index: -1;
+            visibility: hidden;
+        }
+        
+        .screen:not(.hidden) {
+            z-index: 1;
         }
 
         /* Header and Footer */
@@ -98,27 +107,140 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.2rem;
-            padding: 20px;
+            gap: 1.5rem;
+            padding: 24px;
+            padding-left: max(24px, env(safe-area-inset-left));
+            padding-right: max(24px, env(safe-area-inset-right));
             height: calc(100vh - var(--header-height) - var(--footer-height));
+            height: calc(100dvh - var(--header-height) - var(--footer-height));
             text-align: center;
+            overflow-y: auto;
         }
 
-        .help-title { font-size: clamp(1.1rem, 2.6vh, 1.4rem); font-weight: 700; }
-        .help-byline { font-size: clamp(0.9rem, 2vh, 1.1rem); color: #555; }
-        .help-desc { max-width: 70ch; color: #444; line-height: 1.6; }
+        /* Hero Emoji Animation */
+        .help-hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .help-hero-emoji {
+            font-size: clamp(3rem, 12vw, 5rem);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .help-hero-arrow {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            color: var(--primary-color);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .help-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            padding: 6px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .help-hero-grid span {
+            width: clamp(24px, 6vw, 36px);
+            height: clamp(24px, 6vw, 36px);
+            background: linear-gradient(135deg, #ffd93d, #ff6b6b);
+            border-radius: 4px;
+            opacity: 0.7;
+        }
+
+        .help-hero-grid span:nth-child(2) { background: linear-gradient(135deg, #6bcb77, #4d96ff); }
+        .help-hero-grid span:nth-child(3) { background: linear-gradient(135deg, #4d96ff, #9b59b6); }
+        .help-hero-grid span:nth-child(4) { background: linear-gradient(135deg, #ff6b6b, #ffd93d); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .help-title { 
+            font-size: clamp(1.4rem, 5vw, 1.8rem); 
+            font-weight: 700; 
+            color: var(--dark-gray);
+            line-height: 1.3;
+        }
+
+        .help-byline { 
+            font-size: clamp(1rem, 3.5vw, 1.2rem); 
+            color: #666;
+            margin-top: -0.5rem;
+        }
+
+        /* Visual Steps */
+        .help-steps {
+            display: flex;
+            justify-content: center;
+            gap: clamp(16px, 4vw, 32px);
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .help-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+        }
+
+        .help-step-icon {
+            width: clamp(48px, 12vw, 64px);
+            height: clamp(48px, 12vw, 64px);
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+        }
+
+        .help-step-text {
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            color: #555;
+            font-weight: 600;
+        }
         .primary-button {
             background: var(--primary-color);
             color: #fff;
             border: none;
-            padding: 12px 22px;
-            border-radius: 12px;
+            padding: 16px 40px;
+            border-radius: 16px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+            transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            min-height: 56px;
+            min-width: 180px;
+            touch-action: manipulation;
+            font-size: clamp(1.1rem, 3.5vw, 1.25rem);
+            margin-top: 0.5rem;
         }
-        .primary-button:hover { background-color: #357bd8; transform: translateY(-1px); }
+        .primary-button:active { 
+            background-color: #357bd8; 
+            transform: scale(0.95); 
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .primary-button:hover { 
+                background-color: #357bd8; 
+                transform: translateY(-1px); 
+            }
+        }
 
         /* Screen 1: Emoji Selection */
         #home-screen .content {
@@ -128,18 +250,30 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
             height: calc(100vh - var(--header-height) - var(--footer-height));
+            height: calc(100dvh - var(--header-height) - var(--footer-height));
+            overflow-y: auto;
         }
 
         .emoji-grid-6x6 {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: clamp(8px, 2vmin, 20px);
+            gap: clamp(6px, 1.5vmin, 20px);
             width: 100%;
             height: 75vh;
-            max-width: 95vmin;
-            max-height: 95vmin;
+            height: 75dvh;
+            max-width: min(95vmin, 600px);
+            max-height: min(95vmin, 600px);
             aspect-ratio: 1 / 1;
+        }
+
+        @media (max-width: 480px) {
+            .emoji-grid-6x6 {
+                height: auto;
+                max-height: 70dvh;
+            }
         }
 
         .emoji-cell {
@@ -152,26 +286,37 @@
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            min-height: 48px;
+            min-width: 48px;
+            touch-action: manipulation;
         }
 
-        .emoji-cell:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        .emoji-cell:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .emoji-cell:hover {
+                transform: scale(1.1);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            }
         }
 
         /* Screen 2: Game Screen */
         #game-screen {
-            justify-content: space-between;
+            justify-content: flex-start;
         }
 
         #game-screen .content {
-            flex-grow: 1;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 1rem;
+            padding: 0.75rem;
             overflow: hidden;
+            min-height: 0;
         }
 
         .grid-4x4 {
@@ -180,13 +325,28 @@
             gap: var(--grid-gap);
             width: 100%;
             height: auto;
-            max-width: 85vmin;
-            max-height: 85vmin;
+            max-width: min(75vmin, 400px);
+            max-height: min(75vmin, 400px);
             aspect-ratio: 1 / 1;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
             padding: var(--grid-gap);
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Prevent tiles from bleeding outside rounded corners */
+        }
+
+        @media (max-width: 600px) {
+            .grid-4x4 {
+                max-width: min(80vw, 320px);
+                max-height: min(80vw, 320px);
+            }
+        }
+
+        @media (max-height: 700px) {
+            .grid-4x4 {
+                max-width: min(55vh, 280px);
+                max-height: min(55vh, 280px);
+            }
         }
 
         .tile-container {
@@ -202,6 +362,7 @@
             background-color: var(--light-gray);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
         }
         
         .tile-canvas.selected {
@@ -216,51 +377,290 @@
             cursor: not-allowed;
         }
 
-        /* Game Controls */
-        .game-controls {
+        /* Game Header */
+        .game-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 0 1rem;
             flex-shrink: 0;
+        }
+
+        .game-emoji {
+            font-size: clamp(1.2rem, 3vh, 1.8rem);
+            line-height: 1;
+        }
+
+        .game-header h1 {
+            font-size: clamp(0.9rem, 2.2vh, 1.2rem);
+            font-weight: 600;
+        }
+
+        /* Original Emoji Reference */
+        .emoji-reference {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            z-index: 50;
+        }
+
+        .emoji-reference-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .emoji-reference-emoji {
+            font-size: 4rem;
+            line-height: 1;
+        }
+
+        /* Mobile: Smaller floating reference in top-right */
+        @media (max-width: 900px) {
+            .emoji-reference {
+                position: fixed;
+                right: 12px;
+                top: calc(var(--header-height) + 12px);
+                transform: none;
+                padding: 8px 12px;
+                border-radius: 12px;
+                gap: 4px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            }
+            
+            .emoji-reference-label {
+                font-size: 0.55rem;
+            }
+            
+            .emoji-reference-emoji {
+                font-size: 2rem;
+            }
+        }
+
+        /* SVG Icon Buttons */
+        .icon-btn .icon-svg {
+            width: 24px;
+            height: 24px;
+            stroke: #555;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .icon-btn:disabled .icon-svg {
+            stroke: #999;
+        }
+
+        /* Game Footer */
+        .game-footer {
+            height: var(--footer-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: clamp(0.7rem, 1.5vh, 0.9rem);
+            color: #666;
+            border-top: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            .game-footer {
+                display: none;
+            }
+        }
+
+        /* Game Controls Wrapper */
+        .game-controls-wrapper {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 15px;
-            width: 100%;
-            min-height: var(--controls-min-height);
+            gap: 12px;
+            padding: 8px 16px;
+            font-size: clamp(0.85rem, 2vh, 1rem);
+            font-weight: 600;
+            color: var(--dark-gray);
         }
 
-        .control-item, .control-button {
-            background: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            font-size: clamp(0.8rem, 2vh, 1.1rem);
-            font-weight: 600;
+        .stat {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
-        .control-button {
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s, opacity 0.2s;
-        }
-
-        .control-button:hover:not(:disabled) {
-            background-color: #eef;
-        }
-
-        .control-button:disabled {
-            background-color: #e2e8f0;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .control-item span {
+        .stat span {
             color: var(--primary-color);
-            min-width: 30px;
-            text-align: left;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            stroke: #888;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .stat-divider {
+            color: #ccc;
+            font-size: 0.8em;
+        }
+
+        /* Action Bar - Compact Icons */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 8px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+        }
+
+        .icon-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: background-color 0.15s, transform 0.1s;
+            touch-action: manipulation;
+            position: relative;
+            min-width: 56px;
+            min-height: 44px;
+        }
+
+        .icon-btn .icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .icon-btn .icon-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .icon-btn:active:not(:disabled) {
+            transform: scale(0.92);
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .icon-btn:hover:not(:disabled) {
+                background-color: rgba(74, 144, 226, 0.08);
+            }
+        }
+
+        .icon-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .icon-btn:disabled .badge {
+            background: #999;
+        }
+
+        /* Desktop: Show labels inline, more spacing */
+        @media (min-width: 601px) {
+            .action-bar {
+                gap: 32px;
+            }
+            
+            .icon-btn {
+                flex-direction: row;
+                gap: 6px;
+                padding: 10px 18px;
+            }
+            
+            .icon-btn .icon-label {
+                font-size: 0.75rem;
+            }
+            
+            .icon-btn .badge {
+                position: static;
+                margin-left: -2px;
+            }
+        }
+
+        /* Mobile: Tighter layout */
+        @media (max-width: 400px) {
+            .stats-bar {
+                gap: 8px;
+                font-size: 0.8rem;
+            }
+            
+            .action-bar {
+                gap: 16px;
+                padding: 6px 12px;
+            }
+            
+            .icon-btn {
+                padding: 6px 12px;
+                min-width: 48px;
+            }
+            
+            .icon-btn .icon {
+                font-size: 1.3rem;
+            }
+            
+            .icon-btn .icon-label {
+                font-size: 0.6rem;
+            }
         }
 
         /* Modal Dialog */
@@ -285,12 +685,17 @@
 
         .modal-content {
             background: white;
-            padding: 40px;
+            padding: clamp(20px, 5vw, 40px);
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
             transform: scale(0.8);
             transition: transform 0.3s ease;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 32px);
+            max-height: calc(100dvh - 32px);
+            overflow-y: auto;
+            margin: 16px;
         }
         
         .modal-overlay.visible .modal-content {
@@ -298,18 +703,19 @@
         }
 
         .modal-content h2 {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             margin-bottom: 10px;
         }
         
         .modal-content p {
-            font-size: 1.2rem;
+            font-size: clamp(0.95rem, 3vw, 1.2rem);
             color: #555;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         .modal-button {
-            padding: 12px 30px;
+            padding: 14px 30px;
             border: none;
             border-radius: 10px;
             background-color: var(--primary-color);
@@ -317,11 +723,20 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.1s;
+            min-height: 48px;
+            min-width: 120px;
+            touch-action: manipulation;
         }
 
-        .modal-button:hover {
-            background-color: #357bd8;
+        .modal-button:active {
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .modal-button:hover {
+                background-color: #357bd8;
+            }
         }
         
         /* Confetti Animation */
@@ -368,16 +783,41 @@
 
     <div id="help-screen" class="screen">
         <header>
-            <h1>Emoji Jumble — Help</h1>
+            <h1>Emoji Jumble</h1>
         </header>
         <main class="content">
-            <div class="help-title">Unscramble the emoji, tile by tile</div>
-            <div class="help-byline">A quick, joyful brain teaser for all ages</div>
-            <p class="help-desc">Pick any emoji you like. We’ll slice it into a neat 4×4 grid and shuffle the pieces. Tap two tiles to swap them and reconstruct the original emoji. Use hints if you’re stuck—fewer moves, higher score!</p>
-            <button id="start-joining" class="primary-button">Start Joining</button>
+            <!-- Visual Hero -->
+            <div class="help-hero">
+                <div class="help-hero-grid">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <span class="help-hero-arrow">→</span>
+                <span class="help-hero-emoji">🥳</span>
+            </div>
+            
+            <div class="help-title">Unscramble the Emoji</div>
+            <div class="help-byline">A joyful brain teaser for all ages</div>
+            
+            <!-- Visual Steps -->
+            <div class="help-steps">
+                <div class="help-step">
+                    <div class="help-step-icon">👆</div>
+                    <div class="help-step-text">Pick emoji</div>
+                </div>
+                <div class="help-step">
+                    <div class="help-step-icon">🔀</div>
+                    <div class="help-step-text">Swap tiles</div>
+                </div>
+                <div class="help-step">
+                    <div class="help-step-icon">✨</div>
+                    <div class="help-step-text">Solve it!</div>
+                </div>
+            </div>
+            
+            <button id="start-joining" class="primary-button">Start Playing</button>
         </main>
         <footer>
-            <p>copyright beyond dictionary 2025</p>
+            <p>© beyond dictionary 2025</p>
         </footer>
     </div>
 
@@ -395,17 +835,75 @@
     </div>
 
     <div id="game-screen" class="screen hidden">
+        <header class="game-header">
+            <span id="game-emoji-display" class="game-emoji">😀</span>
+            <h1>Emoji Jumble</h1>
+        </header>
         <main class="content">
             <div class="grid-4x4" id="puzzle-grid"></div>
         </main>
-         <div class="game-controls">
-            <div class="control-item">Moves: <span id="moves-display">0</span></div>
-            <div class="control-item">Score: <span id="score-display">0</span></div>
-            <div class="control-item">Points: <span id="points-display">0</span></div>
-            <button class="control-button" id="hint-button">💡 Hint (<span id="hint-count">2</span>)</button>
-            <button class="control-button" id="voice-toggle">🔊 Voice On</button>
-            <button class="control-button" id="back-to-home">🏠 Home</button>
+        <!-- Original emoji reference for desktop -->
+        <div class="emoji-reference" id="emoji-reference">
+            <span class="emoji-reference-label">Original</span>
+            <span class="emoji-reference-emoji" id="reference-emoji">😀</span>
         </div>
+        <div class="game-controls-wrapper">
+            <div class="stats-bar">
+                <span class="stat">
+                    <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <polyline points="17 1 21 5 17 9"/>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                        <polyline points="7 23 3 19 7 15"/>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
+                    <span id="moves-display">0</span>
+                </span>
+                <span class="stat-divider">•</span>
+                <span class="stat">
+                    <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span id="score-display">0</span>
+                </span>
+                <span class="stat-divider">•</span>
+                <span class="stat">
+                    <svg class="stat-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                        <polyline points="2 17 12 22 22 17"/>
+                        <polyline points="2 12 12 17 22 12"/>
+                    </svg>
+                    <span id="points-display">0</span>
+                </span>
+            </div>
+            <div class="action-bar">
+                <button class="icon-btn" id="hint-button" title="Use Hint">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M9 21h6M12 3a6 6 0 0 0-6 6c0 2.22 1.21 4.16 3 5.19V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.81c1.79-1.03 3-2.97 3-5.19a6 6 0 0 0-6-6z"/>
+                        <path d="M12 12v2"/>
+                    </svg>
+                    <span class="badge" id="hint-count">2</span>
+                    <span class="icon-label">Hint</span>
+                </button>
+                <button class="icon-btn" id="voice-toggle" title="Toggle Voice">
+                    <svg class="icon-svg" id="voice-icon-svg" viewBox="0 0 24 24">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <span class="icon-label" id="voice-label">Voice</span>
+                </button>
+                <button class="icon-btn" id="back-to-home" title="Back to Home">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <span class="icon-label">Home</span>
+                </button>
+            </div>
+        </div>
+        <footer class="game-footer">
+            <p>© beyond dictionary 2025</p>
+        </footer>
     </div>
     
     <div id="game-modal" class="modal-overlay">
@@ -452,6 +950,18 @@
         let gameWon = false;
         let startTimeMs = 0;
 
+        // DEBUG MODE - Set to true to see console logs
+        const DEBUG_MODE = false;
+        
+        function debugLog(...args) {
+            if (DEBUG_MODE) {
+                console.log('[EMOJI-DEBUG]', ...args);
+            }
+        }
+        
+        // Detect if device supports touch
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
         // --- Functions ---
         
         function launchConfetti() {
@@ -494,7 +1004,10 @@
         }
         
         function selectEmoji(emoji) {
+            debugLog('selectEmoji called:', emoji);
             selectedEmoji = emoji;
+            document.getElementById('game-emoji-display').textContent = emoji;
+            document.getElementById('reference-emoji').textContent = emoji;
             homeScreen.style.opacity = '0';
             setTimeout(() => {
                 showScreen('game-screen');
@@ -530,7 +1043,21 @@
 
         function toggleVoice() {
             voiceOn = !voiceOn;
-            voiceToggleBtn.textContent = voiceOn ? "🔊 Voice On" : "🔇 Voice Off";
+            const voiceSvg = document.getElementById('voice-icon-svg');
+            if (voiceOn) {
+                voiceSvg.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                `;
+            } else {
+                voiceSvg.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                `;
+            }
+            document.getElementById('voice-label').textContent = voiceOn ? "Voice" : "Muted";
             speak(voiceOn ? "Voice enabled" : "Voice disabled");
         }
 
@@ -626,7 +1153,22 @@
                     tileCanvas.classList.add("selected");
                 }
 
-                tileCanvas.addEventListener('click', () => handleTileClick(cellIndex));
+                // TOUCH ONLY on mobile - no click events
+                if (isTouchDevice) {
+                    tileCanvas.addEventListener('touchend', (e) => {
+                        window._lastTileTouch = Date.now(); // Track for debugging
+                        console.log('📱 TILE touchend:', cellIndex, 'at', window._lastTileTouch);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleTileClick(cellIndex);
+                    });
+                } else {
+                    // CLICK ONLY on desktop
+                    tileCanvas.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleTileClick(cellIndex);
+                    });
+                }
                 
                 container.appendChild(tileCanvas);
                 puzzleGrid.appendChild(container);
@@ -651,7 +1193,11 @@
         }
 
         function handleTileClick(index) {
-            if (gameWon || lockedTiles.includes(index)) return;
+            debugLog('handleTileClick called with index:', index);
+            if (gameWon || lockedTiles.includes(index)) {
+                debugLog('  -> Ignored (gameWon:', gameWon, ', locked:', lockedTiles.includes(index), ')');
+                return;
+            }
 
             if (selectedTileIndex === null) {
                 selectedTileIndex = index;
@@ -731,18 +1277,84 @@
         }
         
         function goHome() {
+            // ALWAYS log when goHome is called - for debugging the phantom navigation
+            console.log('🏠 goHome() CALLED at:', new Date().toISOString());
+            console.trace('goHome stack trace');
+            
+            // Show alert on mobile to catch the phantom call
+            if (isTouchDevice && window._lastTileTouch && (Date.now() - window._lastTileTouch < 500)) {
+                console.error('⚠️ goHome called within 500ms of tile touch! This is the bug!');
+                alert('BUG DETECTED: goHome called right after tile touch!');
+                return; // Block the navigation for debugging
+            }
+            
             homeScreen.style.opacity = '1';
             showScreen('home-screen');
         }
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
+            debugLog('DOM loaded, isTouchDevice:', isTouchDevice);
             populateEmojiGrid();
             showScreen('help-screen');
+            
+            // CRITICAL: On touch devices, block ALL click events on game screen
+            // This prevents the phantom click-to-home bug
+            if (isTouchDevice) {
+                gameScreen.addEventListener('click', (e) => {
+                    debugLog('🚫 BLOCKING click on game screen (touch device)');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }, true); // Capture phase - catches it first!
+            }
         });
-        backToHomeBtn.addEventListener('click', goHome);
-        voiceToggleBtn.addEventListener('click', toggleVoice);
-        hintButton.addEventListener('click', useHint);
+        
+        // HOME BUTTON - touch only on mobile
+        backToHomeBtn.addEventListener('touchend', (e) => {
+            console.log('🏠 HOME BUTTON touchend received!');
+            e.stopPropagation();
+            e.preventDefault();
+            goHome();
+        });
+        
+        // Desktop only
+        if (!isTouchDevice) {
+            backToHomeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goHome();
+            });
+        }
+        
+        // VOICE BUTTON
+        voiceToggleBtn.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            toggleVoice();
+        });
+        
+        if (!isTouchDevice) {
+            voiceToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleVoice();
+            });
+        }
+        
+        // HINT BUTTON
+        hintButton.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            useHint();
+        });
+        
+        if (!isTouchDevice) {
+            hintButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                useHint();
+            });
+        }
+        
         if (startJoiningBtn) startJoiningBtn.addEventListener('click', ()=> showScreen('home-screen'));
 
     </script>

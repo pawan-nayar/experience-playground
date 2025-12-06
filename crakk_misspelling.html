@@ -61,62 +61,105 @@
             color: #a78bfa; /* Purple for strong text */
         }
 
-        /* Style for the message box */
+        /* Centered overlay message box */
         #message-box {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #48bb78; /* Green for success */
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            font-weight: 600;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.75); /* slate-900 with opacity */
+            z-index: 2000;
         }
         #message-box.show {
-            opacity: 1;
+            display: flex;
         }
-        #message-box.error {
-            background-color: #ef4444; /* Red for error */
+        .message-box-panel {
+            max-width: 24rem;
+            width: 100%;
+            margin: 0 1.5rem;
+            background-color: #020617; /* slate-950 */
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+        }
+        .message-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .message-box-title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .message-box-body {
+            font-size: 0.9rem;
+            color: #e5e7eb; /* gray-200 */
+        }
+        .message-box-close {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.15rem 0.25rem;
+            line-height: 1;
+        }
+        .message-box-close:hover {
+            color: #f9fafb;
+        }
+        .message-success {
+            border-left: 4px solid #22c55e; /* green-500 */
+        }
+        .message-error {
+            border-left: 4px solid #ef4444; /* red-500 */
+        }
+        .message-info {
+            border-left: 4px solid #38bdf8; /* sky-400 */
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
     <div id="message-box" class="hidden"></div>
 
-    <div class="container mx-auto px-4 py-8 md:py-12 max-w-4xl">	
+    <div class="container mx-auto px-4 py-6 sm:py-8 md:py-12 max-w-4xl">
+
+        <!-- Hidden input used by JS to keep \"crakk\" as the active word without showing a search bar -->
+        <input id="wordInput" type="hidden" value="crakk" />
 
         <!-- Main Article Content - Initially visible for 'magk' demo -->
         <div id="articleContent" class="space-y-12">
             <!-- I. Compelling Title & Subtitle -->
             <header class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-3">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-3">
                     <span class="text-purple-400">Unraveling the Enigma of "crakk"</span>
                 </h1>
-                <p class="text-xl md:text-2xl text-gray-400">A deep dive into its spellings, meanings, digital footprints, and creative interpretations.</p>
+                <p class="text-base sm:text-lg md:text-xl text-gray-400 px-2 sm:px-0">
+                    A deep dive into its spellings, meanings, digital footprints, and creative interpretations.
+                </p>
             </header>
 
             <!-- II. Introduction -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-4">The Curious Case of "crakk"</h2>
-                <p class="text-gray-300 mb-4">The word 'crakk' is a fascinating example of how language evolves, often through informal channels and phonetic spellings. While not a standard dictionary entry, 'crakk' can carry a surprising array of connotations depending on its context.</p>
-                <p class="text-gray-300">This article aims to demystify 'crakk', exploring its most common interpretations, uncovering its digital presence, and even indulging in creative possibilities. Whether you're interested in slang, digital culture, or simply curious, join us as we break down this intriguing term.</p>
-                <p class="text-gray-300 mt-4 italic">Got a 'crakk' meaning we missed? Share your insights in the comments below!</p>
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4">The Curious Case of "crakk"</h2>
+                <p class="text-gray-300 mb-4 text-sm sm:text-base">The word 'crakk' is a fascinating example of how language evolves, often through informal channels and phonetic spellings. While not a standard dictionary entry, 'crakk' can carry a surprising array of connotations depending on its context.</p>
+                <p class="text-gray-300 text-sm sm:text-base">This article aims to demystify 'crakk', exploring its most common interpretations, uncovering its digital presence, and even indulging in creative possibilities. Whether you're interested in slang, digital culture, or simply curious, join us as we break down this intriguing term.</p>
+                <p class="text-gray-300 mt-4 italic text-sm sm:text-base">Got a 'crakk' meaning we missed? Share your insights in the comments below!</p>
             </section>
 
             <!-- III. The Core Interpretations -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">"crakk" Explained: From Typo to Term</h2>
-                <p class="text-gray-300 mb-8">Our analysis of 'crakk' reveals several distinct pathways of interpretation. We've categorized them for clarity:</p>
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">"crakk" Explained: From Typo to Term</h2>
+                <p class="text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">Our analysis of 'crakk' reveals several distinct pathways of interpretation. We've categorized them for clarity:</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 card-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 card-content">
                     <!-- A. Common Misspellings / Phonetic Look-alikes -->
-                    <div class="bg-gray-900 p-6 rounded-xl shadow-inner border border-gray-700">
-                        <h3 class="text-2xl font-semibold text-blue-400 mb-4">Common Misspellings / Phonetic Look-alikes</h3>
+                    <div class="bg-gray-900 p-5 sm:p-6 rounded-xl shadow-inner border border-gray-700">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-400 mb-3 sm:mb-4">Common Misspellings / Phonetic Look-alikes</h3>
                         <ul>
                             <li>
                                 <strong>Crack:</strong> (verb/noun) A common English word with multiple meanings, including to break, a narrow opening, or a highly addictive drug. "Crakk" is often a phonetic misspelling or intentional alteration of this word.
@@ -128,8 +171,8 @@
                     </div>
 
                     <!-- B. Foreign Language Equivalents / Linguistic Roots -->
-                    <div class="bg-gray-900 p-6 rounded-xl shadow-inner border border-gray-700">
-                        <h3 class="text-2xl font-semibold text-green-400 mb-4">Foreign Language Equivalents / Linguistic Roots</h3>
+                    <div class="bg-gray-900 p-5 sm:p-6 rounded-xl shadow-inner border border-gray-700">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-green-400 mb-3 sm:mb-4">Foreign Language Equivalents / Linguistic Roots</h3>
                         <ul>
                             <li>
                                 <strong>Krak (Polish/Czech):</strong> (Noun) Refers to "Kraków" (a city) or can be related to "krakowiaczek" (a type of dance). Phonetically similar but unrelated in meaning.
@@ -141,8 +184,8 @@
                     </div>
 
                     <!-- C. Acronyms & Initialisms -->
-                    <div class="bg-gray-900 p-6 rounded-xl shadow-inner border border-gray-700">
-                        <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Possible Acronyms & Initialisms</h3>
+                    <div class="bg-gray-900 p-5 sm:p-6 rounded-xl shadow-inner border border-gray-700">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-400 mb-3 sm:mb-4">Possible Acronyms & Initialisms</h3>
                         <ul>
                             <li>
                                 <strong>C.R.A.K.K. (Creative Rhythmic Artistic Kinetic Komposition):</strong> (Art/Performance) A hypothetical acronym for a performance art collective or style emphasizing dynamic movement and rhythm.
@@ -154,8 +197,8 @@
                     </div>
 
                     <!-- D. Slang, Pop Culture & Informal Usage -->
-                    <div class="bg-gray-900 p-6 rounded-xl shadow-inner border border-gray-700">
-                        <h3 class="text-2xl font-semibold text-red-400 mb-4">Slang, Pop Culture & Informal Usage</h3>
+                    <div class="bg-gray-900 p-5 sm:p-6 rounded-xl shadow-inner border border-gray-700">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-red-400 mb-3 sm:mb-4">Slang, Pop Culture & Informal Usage</h3>
                         <ul>
                             <li>
                                 <strong>Crakk (Slang for "Excellent" / "Cool"):</strong> (Informal/Youth Slang) In some informal contexts, particularly among younger generations or specific subcultures, "crakk" might be used to describe something as excellent, impressive, or "cool." This usage is less widespread and highly contextual.
@@ -169,12 +212,12 @@
             </section>
 
             <!-- IV. The Digital Footprint -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">"crakk"'s Online Presence: Hashtags, Handles & Domains</h2>
-                <p class="text-gray-300 mb-6">Beyond its definitions, 'crakk' leaves a distinct trail across the digital landscape:</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 card-content">
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">"crakk"'s Online Presence: Hashtags, Handles & Domains</h2>
+                <p class="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">Beyond its definitions, 'crakk' leaves a distinct trail across the digital landscape:</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 card-content">
                     <div>
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">Popular Hashtags</h3>
+                        <h3 class="text-lg sm:text-xl font-semibold text-blue-300 mb-2 sm:mb-3">Popular Hashtags</h3>
                         <ul>
                             <li><strong>#Crakk:</strong> Often used for gaming, personal branding, or niche content where the unique spelling stands out.</li>
                             <li><strong>#Crack:</strong> General usage for a wide range of topics from humor to serious issues.</li>
@@ -182,14 +225,14 @@
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">Social Media Handles/Usernames</h3>
+                        <h3 class="text-lg sm:text-xl font-semibold text-blue-300 mb-2 sm:mb-3">Social Media Handles/Usernames</h3>
                         <ul>
                             <li><strong>@CrakkOfficial:</strong> Likely a gamer, artist, or content creator seeking a unique and memorable handle.</li>
                             <li>Numerous personal accounts and creative projects might incorporate "Crakk" for distinctiveness.</li>
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-blue-300 mb-3">Domain Name Availability / Usage</h3>
+                        <h3 class="text-lg sm:text-xl font-semibold text-blue-300 mb-2 sm:mb-3">Domain Name Availability / Usage</h3>
                         <ul>
                             <li><strong>crakk.com:</strong> Status: Varies, often taken by individuals or small businesses aiming for a unique brand.</li>
                             <li><strong>crakk.org, crakk.net:</strong> Status: More likely to be available or used by non-profits/communities with a specific niche related to the phonetic spelling.</li>
@@ -199,12 +242,12 @@
             </section>
 
             <!-- V. Creative Takes & Beyond -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">From Data to Discovery: Creative Perspectives of "crakk"</h2>
-                <p class="text-gray-300 mb-6">Beyond its literal and digital interpretations, 'crakk' sparks imagination:</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 card-content">
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">From Data to Discovery: Creative Perspectives of "crakk"</h2>
+                <p class="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">Beyond its literal and digital interpretations, 'crakk' sparks imagination:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 card-content">
                     <div>
-                        <h3 class="text-xl font-semibold text-pink-300 mb-3">Potential Brand Names / Product Ideas</h3>
+                        <h3 class="text-lg sm:text-xl font-semibold text-pink-300 mb-2 sm:mb-3">Potential Brand Names / Product Ideas</h3>
                         <ul>
                             <li><strong>Crakk Studios:</strong> For a game development company or a creative design agency, implying breaking new ground.</li>
                             <li><strong>Crakk Energy:</strong> A bold name for an energy drink or supplement, suggesting a powerful boost.</li>
@@ -212,7 +255,7 @@
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-pink-300 mb-3">Fictional Interpretations / Story Prompts</h3>
+                        <h3 class="text-lg sm:text-xl font-semibold text-pink-300 mb-2 sm:mb-3">Fictional Interpretations / Story Prompts</h3>
                         <ul>
                             <li>A futuristic currency unit called "Crakk" used in underground markets.</li>
                             <li>A mythical creature known as the "Crakk-beast," whose roar shatters stone.</li>
@@ -223,19 +266,19 @@
             </section>
 
             <!-- VI. Community Insights & Polls -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">What Does "crakk" Mean to YOU?</h2>
-                <p class="text-gray-300 mb-6">Join the conversation and share your perspective on 'crakk'!</p>
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">What Does "crakk" Mean to YOU?</h2>
+                <p class="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">Join the conversation and share your perspective on 'crakk'!</p>
 
                 <!-- Poll Section -->
                 <div class="mb-8">
-                    <h3 class="text-2xl font-semibold text-teal-400 mb-4">Featured Poll: When you see 'crakk', which interpretation first comes to mind?</h3>
-                    <div id="poll-options" class="space-y-4 mb-6">
+                    <h3 class="text-xl sm:text-2xl font-semibold text-teal-400 mb-3 sm:mb-4">Featured Poll: When you see 'crakk', which interpretation first comes to mind?</h3>
+                    <div id="poll-options" class="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                         <!-- Poll options will be rendered here by JS -->
                     </div>
                     <button id="voteButton"
-                            class="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75">
-                        Vote
+                            class="w-full sm:w-auto px-5 sm:px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75">
+                        Cast Your Vote
                     </button>
                     <div id="poll-results" class="mt-6 space-y-3 hidden">
                         <h4 class="text-xl font-semibold text-teal-300 mb-3">Current Results:</h4>
@@ -245,10 +288,10 @@
 
                 <!-- User Comments / Discussion Section (Placeholder) -->
                 <div>
-                    <h3 class="text-2xl font-semibold text-teal-400 mb-4">User Comments & Discussion</h3>
-                    <p class="text-gray-300 mb-4">Do you have another meaning for 'crakk'? Share your thoughts, personal experiences, or even a funny typo story below!</p>
-                    <textarea class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-100 placeholder-gray-400 h-24 mb-4 resize-y" placeholder="Type your comment here..."></textarea>
-                    <button class="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75">
+                    <h3 class="text-xl sm:text-2xl font-semibold text-teal-400 mb-3 sm:mb-4">User Comments & Discussion</h3>
+                    <p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">Do you have another meaning for 'crakk'? Share your thoughts, personal experiences, or even a funny typo story below!</p>
+                    <textarea class="w-full p-3 sm:p-3.5 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-100 placeholder-gray-400 h-24 mb-3 sm:mb-4 resize-y text-sm sm:text-base" placeholder="Type your comment here..."></textarea>
+                    <button class="w-full sm:w-auto px-5 sm:px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75">
                         Submit Comment
                     </button>
                     <p class="text-gray-500 text-sm mt-3">*(Comment functionality is a placeholder in this demo.)*</p>
@@ -256,23 +299,23 @@
             </section>
 
             <!-- VII. Data & Methodology -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">Behind the Scenes: How We Decode Words</h2>
-                <p class="text-gray-300 mb-4">We strive to provide comprehensive and accurate insights. Our process involves:</p>
-                <ul class="list-disc list-inside text-gray-300 space-y-2 card-content">
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">Behind the Scenes: How We Decode Words</h2>
+                <p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">We strive to provide comprehensive and accurate insights. Our process involves:</p>
+                <ul class="list-disc list-inside text-gray-300 space-y-2 card-content text-sm sm:text-base">
                     <li>Automated scanning of linguistic databases, online dictionaries, and web content.</li>
                     <li>Analysis of social media trends and common online usage patterns.</li>
                     <li>Manual curation and verification by linguistic experts for nuanced interpretations.</li>
                     <li>Integration of community feedback to continuously refine our data.</li>
                 </ul>
-                <p class="text-gray-400 mt-4 italic">Disclaimer: While we strive for accuracy, language is dynamic. Interpretations can evolve, and specific contexts may yield unique meanings. This article serves as a comprehensive guide, not an exhaustive definitive list.</p>
+                <p class="text-gray-400 mt-3 sm:mt-4 italic text-xs sm:text-sm">Disclaimer: While we strive for accuracy, language is dynamic. Interpretations can evolve, and specific contexts may yield unique meanings. This article serves as a comprehensive guide, not an exhaustive definitive list.</p>
             </section>
 
             <!-- VIII. Contribute & Expand This Knowledge Base -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-3xl font-bold text-purple-400 mb-6">Be Part of the Lexicon: Contribute to Our Database</h2>
-                <p class="text-gray-300 mb-4">Our knowledge base grows with your help. If you have unique insights or found a meaning we missed:</p>
-                <ul class="list-disc list-inside text-gray-300 space-y-2 card-content">
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-4 sm:mb-6">Be Part of the Lexicon: Contribute to Our Database</h2>
+                <p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">Our knowledge base grows with your help. If you have unique insights or found a meaning we missed:</p>
+                <ul class="list-disc list-inside text-gray-300 space-y-2 card-content text-sm sm:text-base">
                     <li>Found a new meaning for 'crakk'?</li>
                     <li>Want to suggest a word for our next deep dive?</li>
                     <li>Help us refine and expand this valuable resource.</li>
@@ -281,20 +324,20 @@
                         class="px-6 py-3 mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
                     Suggest a Meaning / New Word
                 </button>
-                <p class="text-gray-500 text-sm mt-3">*(Contribution form is a placeholder in this demo.)*</p>
+                <p class="text-gray-500 text-xs sm:text-sm mt-3">*(Contribution form is a placeholder in this demo.)*</p>
             </section>
 
             <!-- IX. Conclusion -->
-            <section class="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-center">
-                <h2 class="text-3xl font-bold text-purple-400 mb-4">The Power of Language's Ambiguity</h2>
-                <p class="text-gray-300 mb-4">From simple typos to complex acronyms and cultural phenomena, words like 'crakk' remind us that language is a living, breathing entity, constantly evolving and surprising us.</p>
-                <p class="text-gray-300 italic">Keep exploring, keep questioning, and let's continue to unravel these linguistic mysteries together.</p>
+            <section class="p-5 sm:p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-400 mb-3 sm:mb-4">The Power of Language's Ambiguity</h2>
+                <p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">From simple typos to complex acronyms and cultural phenomena, words like 'crakk' remind us that language is a living, breathing entity, constantly evolving and surprising us.</p>
+                <p class="text-gray-300 italic text-sm sm:text-base">Keep exploring, keep questioning, and let's continue to unravel these linguistic mysteries together.</p>
             </section>
 
             <!-- Download TSV Button -->
-            <div class="text-center mt-10">
+            <div class="text-center mt-8 sm:mt-10">
                 <button id="downloadTsvButton"
-                        class="px-8 py-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg shadow-xl transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 flex items-center justify-center mx-auto">
+                        class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm sm:text-base font-semibold rounded-lg shadow-xl transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 flex items-center justify-center mx-auto">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Download All "crakk" Data (TSV)
                 </button>
@@ -624,13 +667,62 @@
         const downloadTsvButton = document.getElementById('downloadTsvButton');
         const messageBox = document.getElementById('message-box');
 
-        // Function to show a temporary message
+        // Function to show a centered overlay message
         function showMessage(message, type = 'success') {
-            messageBox.textContent = message;
-            messageBox.className = `fixed top-20 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-lg z-1000 transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} show`;
-            setTimeout(() => {
+            if (!messageBox) return;
+
+            const titles = {
+                success: 'Success',
+                error: 'Something went wrong',
+                info: 'Notice'
+            };
+
+            const variant =
+                type === 'error' ? 'message-error'
+                : type === 'info' ? 'message-info'
+                : 'message-success';
+
+            const title = titles[type] || 'Notification';
+
+            messageBox.innerHTML = `
+                <div class="message-box-panel ${variant}">
+                    <div class="message-box-header">
+                        <div class="message-box-title">${title}</div>
+                        <button type="button" class="message-box-close" aria-label="Close notification">&times;</button>
+                    </div>
+                    <p class="message-box-body">${message}</p>
+                </div>
+            `;
+
+            messageBox.classList.remove('hidden');
+            messageBox.classList.add('show');
+
+            const closeButton = messageBox.querySelector('.message-box-close');
+
+            const hide = () => {
                 messageBox.classList.remove('show');
-            }, 3000);
+                messageBox.classList.add('hidden');
+            };
+
+            if (closeButton) {
+                closeButton.onclick = hide;
+            }
+
+            // Close when clicking the dimmed background
+            messageBox.onclick = (event) => {
+                if (event.target === messageBox) {
+                    hide();
+                }
+            };
+
+            // Auto-dismiss for success / info
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    if (messageBox.classList.contains('show')) {
+                        hide();
+                    }
+                }, 3200);
+            }
         }
 
         // Function to render poll options based on the current word
@@ -848,19 +940,24 @@
         }
 
         // --- Event Listeners ---
-        searchButton.addEventListener('click', () => {
-            const word = wordInput.value.trim();
-            if (word) {
-                populateArticle(word);
-            } else {
-                showMessage('Please enter a word to search.', 'error');
-                articleContent.classList.add('hidden');
-                noResultsSection.classList.add('hidden'); // Hide both if input is empty
-            }
-        });
+        if (searchButton && wordInput) {
+            searchButton.addEventListener('click', () => {
+                const word = wordInput.value.trim();
+                if (word) {
+                    populateArticle(word);
+                } else {
+                    showMessage('Please enter a word to search.', 'error');
+                    articleContent.classList.add('hidden');
+                    noResultsSection.classList.add('hidden'); // Hide both if input is empty
+                }
+            });
+        }
 
         // Initial load for "crakk"
         window.onload = () => {
+            if (wordInput) {
+                wordInput.value = 'crakk';
+            }
             populateArticle('crakk'); // Now loads 'crakk' by default
             // renderPollOptions() is called within populateArticle, so no need to call it here
         };
